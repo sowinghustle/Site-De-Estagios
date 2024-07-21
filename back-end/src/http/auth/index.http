@@ -1,0 +1,3 @@
+GET http://localhost:8000/api/v1/auth HTTP/1.1
+content-type: application/json
+authorization: Bearer 1721591213822
