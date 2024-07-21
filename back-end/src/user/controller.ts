@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { randomUUID } from "crypto";
 import {
     deleteUserFromUsersCollection,
     updateUsersCollection,
@@ -6,7 +7,7 @@ import {
     UserCollection,
     users,
 } from "./model";
-import { create } from "domain";
+import * as authService from "../auth/service";
 
 type CreateUserDto = {
     username: string;
@@ -23,13 +24,15 @@ export function index(req: Request, res: Response) {
     return res.send(users);
 }
 
-export function createUser(req: Request, res: Response) {
+export async function createUser(req: Request, res: Response) {
     const user: CreateUserDto = req.body;
-
-    const token = Date.now().toString();
+    const token = randomUUID();
     const id = Date.now().toString();
     const createdUser: User = { ...user, token, id };
-    users.push(createdUser);
+
+    await updateUsersCollection([...users, createdUser]);
+
+    authService.saveUserToken(res, token);
 
     return res.send({ success: true, user: createdUser });
 }

@@ -5,10 +5,12 @@ import passport from "passport";
 import config from "./config/project-config";
 import configureRoutes from "./routes";
 import { configurePassport } from "./auth/passport";
+import cookieParser from "cookie-parser";
+import projectConfig from "./config/project-config";
 
 const app = express();
 const sessionOptions: session.SessionOptions = {
-    secret: Date.now().toString(),
+    secret: "...",
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -24,6 +26,9 @@ if (config.environment == "production") {
 app.use(session(sessionOptions));
 app.use(passport.authenticate("session"));
 app.use(express.json());
+app.use(
+    projectConfig.environment == "production" ? cookieParser("...") : cookieParser()
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
