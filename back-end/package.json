@@ -35,7 +35,7 @@
         "passport-http-bearer": "^1.0.1"
     },
     "lint-staged": {
-        "src/**/*.{js,ts}": [
+        "*.{js,ts}": [
             "prettier --write",
             "git add -A"
         ]
