@@ -4,8 +4,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "ts-node-dev src/main.ts",
-        "lint": "prettier --check .",
-        "format": "prettier --write .",
+        "format": "prettier --write src/*.ts",
         "prepare": "cd .. && husky back-end/.husky"
     },
     "keywords": [],
