@@ -1,6 +1,6 @@
-import passport from "passport";
-import configurePassport from "./http-bearer-auth";
-import { Request, Response, NextFunction, Handler } from "express";
+import passport from 'passport';
+import configurePassport from './http-bearer-auth';
+import { Request, Response, NextFunction, Handler } from 'express';
 
 export function authenticate() {
     return function (req: Request, res: Response, next: NextFunction) {
@@ -9,7 +9,9 @@ export function authenticate() {
         if (!req.headers.authorization)
             req.headers.authorization = `Bearer ${cookieToken}`;
 
-        const midd = passport.authenticate("bearer", { session: false }) as Handler;
+        const midd = passport.authenticate('bearer', {
+            session: false,
+        }) as Handler;
         midd(req, res, next);
     };
 }

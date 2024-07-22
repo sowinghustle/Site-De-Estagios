@@ -1,5 +1,5 @@
-import { CookieOptions, Response } from "express";
-import projectConfig from "../config/project-config";
+import { CookieOptions, Response } from 'express';
+import projectConfig from '../config/project-config';
 
 export function saveUserToken(res: Response, token: string) {
     const options: CookieOptions = {
@@ -8,10 +8,10 @@ export function saveUserToken(res: Response, token: string) {
         signed: false,
     };
 
-    if (projectConfig.environment == "production") {
+    if (projectConfig.environment == 'production') {
         options.signed = true;
         options.secure = true;
     }
 
-    res.cookie("token", token, options);
+    res.cookie('token', token, options);
 }

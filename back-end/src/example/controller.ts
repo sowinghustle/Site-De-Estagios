@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
 type Item = {
     title: string;
@@ -27,7 +27,7 @@ export function createItem(req: Request, res: Response) {
     if (items.find((x) => x.number == item.number)) {
         return res.send({
             success: false,
-            msg: "Item already created.",
+            msg: 'Item already created.',
         });
     }
 
@@ -49,7 +49,7 @@ export function getItem(req: Request, res: Response) {
 
     return res.send({
         success: false,
-        msg: "Item not found",
+        msg: 'Item not found',
     });
 }
 
@@ -60,7 +60,7 @@ export function updateItem(req: Request, res: Response) {
     if (index == -1) {
         return res.send({
             success: false,
-            msg: "Item not found",
+            msg: 'Item not found',
         });
     }
 
@@ -83,7 +83,7 @@ export function deleteItem(req: Request, res: Response) {
     if (!items.find((x) => x.number == id)) {
         return res.send({
             success: false,
-            msg: "Item not found",
+            msg: 'Item not found',
         });
     }
 

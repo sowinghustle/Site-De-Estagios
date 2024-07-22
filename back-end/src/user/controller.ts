@@ -1,13 +1,13 @@
-import { Request, Response } from "express";
-import { randomUUID } from "crypto";
+import { Request, Response } from 'express';
+import { randomUUID } from 'crypto';
 import {
     deleteUserFromUsersCollection,
     updateUsersCollection,
     User,
     UserCollection,
     users,
-} from "./model";
-import * as authService from "../auth/service";
+} from './model';
+import * as authService from '../auth/service';
 
 type CreateUserDto = {
     username: string;
