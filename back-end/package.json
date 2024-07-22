@@ -6,7 +6,7 @@
         "dev": "ts-node-dev src/main.ts",
         "lint": "prettier --check .",
         "format": "prettier --write .",
-        "prepare": "husky"
+        "prepare": "cd .. && husky back-end/.husky"
     },
     "keywords": [],
     "author": "",
@@ -35,7 +35,7 @@
         "passport-http-bearer": "^1.0.1"
     },
     "lint-staged": {
-        "*": [
+        "src/**/*.{js,ts}": [
             "prettier --write",
             "git add -A"
         ]
