@@ -3,7 +3,10 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "dev": "ts-node-dev src/main.ts"
+        "dev": "ts-node-dev src/main.ts",
+        "lint": "prettier --check .",
+        "format": "prettier --write .",
+        "prepare": "husky"
     },
     "keywords": [],
     "author": "",
@@ -18,6 +21,7 @@
         "@types/passport": "^1.0.16",
         "@types/passport-http-bearer": "^1.0.41",
         "husky": "^9.1.1",
+        "lint-staged": "^15.2.7",
         "prettier": "^3.3.3",
         "ts-node-dev": "^2.0.0",
         "typescript-eslint": "^7.16.1"
@@ -30,15 +34,10 @@
         "passport": "^0.7.0",
         "passport-http-bearer": "^1.0.1"
     },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
     "lint-staged": {
-        "*.js": [
-            "prettier — write",
-            "git add"
+        "*": [
+            "prettier --write",
+            "git add -A ."
         ]
     }
 }
