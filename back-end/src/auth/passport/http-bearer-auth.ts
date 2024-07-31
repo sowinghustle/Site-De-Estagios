@@ -6,13 +6,17 @@ export default function () {
     passport.use(
         'bearer',
         new BearerStrategy(async function (token, done) {
-            const db = await DatabaseResolver.getDatabase();
+            try {
+                const db = await DatabaseResolver.getDatabase();
 
-            for (let user of await db.getUsers())
-                if (user.token.match(token))
-                    return done(null, user, { scope: 'all' });
+                for (let user of await db.getUsers())
+                    if (user.token.match(token))
+                        return done(null, user, { scope: 'all' });
 
-            return done(null, false);
+                return done(null, false);
+            } catch (err) {
+                return done(err, false);
+            }
         })
     );
 }
