@@ -1,12 +1,6 @@
 import { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
-import {
-    deleteUserFromUsersCollection,
-    updateUsersCollection,
-    User,
-    UserCollection,
-    users,
-} from './model';
+import { DatabaseResolver } from '../database';
 import * as authService from '../auth/service';
 
 type CreateUserDto = {
@@ -20,75 +14,123 @@ type UpdateUserDto = {
     email: string;
 };
 
-export function index(req: Request, res: Response) {
-    return res.send(users);
-}
+export class UserController {
+    async index(req: Request, res: Response) {
+        const db = await DatabaseResolver.getDatabase();
+        const users = await db.getUsers();
 
-export async function createUser(req: Request, res: Response) {
-    const user: CreateUserDto = req.body;
-    const token = randomUUID();
-    const id = Date.now().toString();
-    const createdUser: User = { ...user, token, id };
-
-    await updateUsersCollection([...users, createdUser]);
-
-    authService.saveUserToken(res, token);
-
-    return res.send({ success: true, user: createdUser });
-}
-
-export function getUser(req: Request, res: Response) {
-    const id = req.params.id;
-
-    for (let user of users) {
-        if (user.id.match(id)) {
+        if (db.getError()) {
             return res.send({
-                success: true,
-                user,
+                success: false,
+                error: db.getError()!.message,
             });
         }
+
+        return res.send({
+            success: true,
+            users,
+        });
     }
+    async createUser(req: Request, res: Response) {
+        const data: CreateUserDto = req.body;
+        const db = await DatabaseResolver.getDatabase();
+        const user = await db.saveNewUser({
+            ...data,
+            id: 0,
+            token: randomUUID(),
+        });
 
-    return res.send({
-        success: true,
-        user: null,
-    });
-}
+        if (user === null) {
+            if (db.getError())
+                return res.send({
+                    success: false,
+                    error: db.getError()!.message,
+                });
 
-export async function updatedUser(req: Request, res: Response) {
-    const id = req.params.id;
-    const updateUser: UpdateUserDto = req.body;
-    const newUsers: UserCollection = [];
-
-    let userFound: null | User = null;
-
-    for (let user of users) {
-        if (user.id.match(id)) {
-            const newUser: User = {
-                ...user,
-                ...updateUser,
-            };
-            newUsers.push(newUser);
-            userFound = newUser;
-        } else {
-            newUsers.push(user);
+            throw new Error(
+                'Não foi possível salvar ou obter as informações do usuário.'
+            );
         }
+
+        authService.saveUserToken(res, user.token);
+
+        return res.send({
+            success: true,
+            user,
+        });
     }
+    async getUser(req: Request, res: Response) {
+        const id = Number(req.params.id);
 
-    await updateUsersCollection(newUsers);
+        if (Number.isNaN(id)) {
+            return res.send({
+                success: false,
+                error: 'O ID do usuário precisa ser um número válido.',
+            });
+        }
 
-    return res.send({
-        success: userFound != null,
-        user: userFound,
-    });
-}
+        const db = await DatabaseResolver.getDatabase();
+        const user = await db.getUserById(id);
 
-export async function deleteUser(req: Request, res: Response) {
-    const id = req.params.id;
+        if (user === null) {
+            if (db.getError()) {
+                return res.send({
+                    success: false,
+                    error: db.getError()!.message,
+                });
+            }
 
-    await deleteUserFromUsersCollection(id);
+            return res.send({
+                success: false,
+                error: `Um usuário com ID ${id} não foi encontrado.`,
+            });
+        }
 
-    return res.send({
-        success: true,
-    });
+        return res.send({
+            success: true,
+            user,
+        });
+    }
+    async updatedUser(req: Request, res: Response) {
+        const id = Number(req.params.id);
+
+        if (Number.isNaN(id)) {
+            return res.send({
+                success: false,
+                error: 'O ID do usuário precisa ser um número válido.',
+            });
+        }
+
+        throw new Error('Not implemented');
+    }
+    async deleteUser(req: Request, res: Response) {
+        const id = Number(req.params.id);
+
+        if (Number.isNaN(id)) {
+            return res.send({
+                success: false,
+                error: 'O ID do usuário precisa ser um número válido.',
+            });
+        }
+
+        const db = await DatabaseResolver.getDatabase();
+        const userWasDeleted = await db.deleteUser(id);
+
+        if (!userWasDeleted) {
+            if (db.getError())
+                return res.send({
+                    success: false,
+                    error: db.getError()!.message,
+                });
+
+            return res.send({
+                success: false,
+                error: `Não foi possível excluir o usuário com ID ${id}`,
+            });
+        }
+
+        return res.send({
+            success: true,
+        });
+    }
 }

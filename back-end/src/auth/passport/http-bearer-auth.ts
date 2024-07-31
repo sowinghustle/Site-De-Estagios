@@ -1,14 +1,17 @@
 import passport from 'passport';
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
-import { users } from '../../user/model';
+import { DatabaseResolver } from '../../database';
 
 export default function () {
     passport.use(
         'bearer',
-        new BearerStrategy(function (token, done) {
-            for (let user of users)
+        new BearerStrategy(async function (token, done) {
+            const db = await DatabaseResolver.getDatabase();
+
+            for (let user of await db.getUsers())
                 if (user.token.match(token))
                     return done(null, user, { scope: 'all' });
+
             return done(null, false);
         })
     );

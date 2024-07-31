@@ -1,5 +1,5 @@
 import { CookieOptions, Response } from 'express';
-import projectConfig from '../config/project-config';
+import projectConfig from '../config/project';
 
 export function saveUserToken(res: Response, token: string) {
     const options: CookieOptions = {
