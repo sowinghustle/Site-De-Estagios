@@ -1,6 +1,5 @@
 require('express-async-errors');
 
-import exampleRoutes from './example/routes';
 import authRoutes from './auth/routes';
 import userRoutes from './user/routes';
 import { Router } from 'express';

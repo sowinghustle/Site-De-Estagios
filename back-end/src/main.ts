@@ -51,24 +51,22 @@ app.use(
         res: express.Response,
         next: express.NextFunction
     ) => {
-        if (err) {
-            const error = err as Error;
+        if (!err) return next();
 
-            if (config.environment != 'production') {
-                return res.status(500).send({
-                    success: false,
-                    error: error.message,
-                    stack: error.stack,
-                });
-            }
+        const error = err as Error;
 
+        if (config.environment !== 'production') {
             return res.status(500).send({
                 success: false,
-                error: 'Não foi possível completar a requisição porque ocorreu um erro inesperado!',
+                error: error.message,
+                stack: error.stack,
             });
         }
 
-        return next();
+        return res.status(500).send({
+            success: false,
+            error: 'Não foi possível completar a requisição porque ocorreu um erro inesperado!',
+        });
     }
 );
 app.use((req, res) =>
