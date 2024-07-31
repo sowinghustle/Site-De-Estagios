@@ -10,7 +10,6 @@ export default function () {
 
     routes.get('/', (req, res) => res.send('Bem vindo'));
     routes.use('/auth', authRoutes);
-    routes.use('/example', exampleRoutes);
     routes.use('/user', userRoutes);
 
     return routes;
