@@ -57,6 +57,7 @@ export class InMemorySequelizeDatabase implements Database {
             }
 
             await user.destroy();
+
             return true;
         } catch (err) {
             this.error = err as Error;
@@ -66,7 +67,8 @@ export class InMemorySequelizeDatabase implements Database {
 
     async getUsers(): Promise<UserCollection> {
         try {
-            return await SequelizeUser.findAll();
+            const users = await SequelizeUser.findAll();
+            return users.map((u) => u.toJSON());
         } catch (err) {
             this.error = err as Error;
             return [];
@@ -79,9 +81,32 @@ export class InMemorySequelizeDatabase implements Database {
                 username: user.username,
                 email: user.email,
                 password: user.password,
+                token: user.token,
             });
 
-            return model;
+            return model.toJSON();
+        } catch (err) {
+            this.error = err as Error;
+            return null;
+        }
+    }
+
+    async updateUserById(user: User): Promise<User | null> {
+        try {
+            const model = await SequelizeUser.findByPk(user.id);
+
+            if (!model) {
+                throw new Error('Usuário não encontrado!');
+            }
+
+            await model.update({
+                ...user,
+                id: model.id,
+            });
+
+            await model.reload();
+
+            return model.toJSON();
         } catch (err) {
             this.error = err as Error;
             return null;
@@ -90,7 +115,8 @@ export class InMemorySequelizeDatabase implements Database {
 
     async getUserById(id: number): Promise<User | null> {
         try {
-            return await SequelizeUser.findByPk(id);
+            const model = await SequelizeUser.findByPk(id);
+            return model ? model.toJSON() : null;
         } catch (err) {
             this.error = err as Error;
             return null;

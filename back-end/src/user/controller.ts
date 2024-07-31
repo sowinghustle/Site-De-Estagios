@@ -40,7 +40,7 @@ export class UserController {
             token: randomUUID(),
         });
 
-        if (user === null) {
+        if (!user) {
             if (db.getError())
                 return res.send({
                     success: false,
@@ -48,7 +48,7 @@ export class UserController {
                 });
 
             throw new Error(
-                'Não foi possível salvar ou obter as informações do usuário.'
+                'Ocorreu um erro inesperado ao tentar salvar os dados.'
             );
         }
 
@@ -91,7 +91,7 @@ export class UserController {
             user,
         });
     }
-    async updatedUser(req: Request, res: Response) {
+    async updateUser(req: Request, res: Response) {
         const id = Number(req.params.id);
 
         if (Number.isNaN(id)) {
