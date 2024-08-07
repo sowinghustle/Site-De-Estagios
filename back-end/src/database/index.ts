@@ -5,7 +5,7 @@ import { InMemorySequelizeDatabase } from './sequelize/in-memory-database';
 export interface Database {
     getError(): Error | null;
     saveNewUser(user: User): Promise<User | null>;
-    updateUserById(user: User): Promise<User | null>;
+    updateUser(user: User): Promise<User | null>;
     getUserById(id: number): Promise<User | null>;
     deleteUser(id: number): Promise<boolean>;
     getUsers(): Promise<UserCollection>;

@@ -91,7 +91,7 @@ export class InMemorySequelizeDatabase implements Database {
         }
     }
 
-    async updateUserById(user: User): Promise<User | null> {
+    async updateUser(user: User): Promise<User | null> {
         try {
             const model = await SequelizeUser.findByPk(user.id);
 

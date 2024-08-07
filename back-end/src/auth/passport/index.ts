@@ -6,12 +6,14 @@ export function authenticate() {
     return function (req: Request, res: Response, next: NextFunction) {
         const cookieToken = req.cookies.token;
 
-        if (!req.headers.authorization)
+        if (!req.headers.authorization && cookieToken) {
             req.headers.authorization = `Bearer ${cookieToken}`;
+        }
 
         const midd = passport.authenticate('bearer', {
             session: false,
         }) as Handler;
+
         midd(req, res, next);
     };
 }

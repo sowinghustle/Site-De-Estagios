@@ -4,9 +4,9 @@ import session from 'express-session';
 import passport from 'passport';
 import config from './config/project';
 import configureRoutes from './routes';
-import { configurePassport } from './auth/passport';
 import cookieParser from 'cookie-parser';
 import projectConfig from './config/project';
+import { configurePassport } from './auth/passport';
 import { DatabaseResolver } from './database';
 
 const app = express();
