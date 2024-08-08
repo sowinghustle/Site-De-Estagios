@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { DatabaseResolver } from '../database';
-import { CreateUserDto } from './model';
+import { CreateUserDto, UpdateUserDto } from './dto';
 
 export class UserService {
     async createUser(data: CreateUserDto) {
@@ -15,6 +15,22 @@ export class UserService {
             user,
             error: db.getError(),
         };
+    }
+    async updateUser(data: UpdateUserDto) {
+        const db = await DatabaseResolver.getDatabase();
+        const findResult = await this.findById(data.id);
+
+        if (!findResult.user)
+            return {
+                error: findResult.error,
+            };
+
+        const user = await db.updateUser({
+            ...findResult.user,
+            ...data,
+        });
+
+        return { user };
     }
     async findById(id: number) {
         const db = await DatabaseResolver.getDatabase();

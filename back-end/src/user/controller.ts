@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { DatabaseResolver } from '../database';
-import { CreateUserDto } from './model';
 import authService from '../auth/service';
 import userService from './service';
+import { UpdateUserDto } from './dto';
 
-export class UserController {
+export default class UserController {
     async index(req: Request, res: Response) {
         const db = await DatabaseResolver.getDatabase();
         const users = await db.getUsers();
@@ -38,6 +38,38 @@ export class UserController {
         }
 
         authService.saveUserToken(user, res.cookie.bind(res, 'token'));
+
+        return res.send({
+            success: true,
+            user,
+        });
+    }
+    async update(req: Request, res: Response) {
+        const id = Number(req.params.id);
+
+        if (Number.isNaN(id)) {
+            return res.send({
+                success: false,
+                error: 'O ID do usuário precisa ser um número válido.',
+            });
+        }
+
+        const data: UpdateUserDto = { id, ...req.body };
+        const { error, user } = await userService.updateUser(data);
+
+        if (error) {
+            return res.send({
+                success: false,
+                error: error.message,
+            });
+        }
+
+        if (!user) {
+            return res.send({
+                success: false,
+                error: `Não foi possível atualizar o usuário.`,
+            });
+        }
 
         return res.send({
             success: true,
