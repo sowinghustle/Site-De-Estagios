@@ -77,6 +77,6 @@ app.use((req, res) =>
     })
 );
 app.listen(config.port, async () => {
-    await DatabaseResolver.testDatabaseConnection();
+    await DatabaseResolver.initDatabase();
     console.log('Server running at port ' + config.port);
 });

@@ -2,6 +2,8 @@ import { Database } from '..';
 import { User, UserCollection } from '../../user/model';
 import { DataTypes, Sequelize } from 'sequelize';
 import { SequelizeUser } from './user';
+import { SequelizeAdmin } from './admin';
+import { Admin, AdminCollection } from '../../admin/model';
 
 export class InMemorySequelizeDatabase implements Database {
     private static sequelize: Sequelize;
@@ -15,6 +17,30 @@ export class InMemorySequelizeDatabase implements Database {
             dialect: 'sqlite',
             storage: ':memory:',
         });
+
+        SequelizeAdmin.init(
+            {
+                id: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    autoIncrement: true,
+                    primaryKey: true,
+                },
+                email: DataTypes.STRING,
+                password: DataTypes.STRING,
+                tokens: {
+                    type: DataTypes.TEXT,
+                    allowNull: true,
+                    defaultValue: null,
+                },
+            },
+            {
+                sequelize,
+                modelName: 'Admin',
+                tableName: 'admins',
+                underscored: true,
+            }
+        );
 
         SequelizeUser.init(
             {
@@ -45,7 +71,7 @@ export class InMemorySequelizeDatabase implements Database {
     }
 
     static sync() {
-        this.sequelize.sync({ force: true });
+        this.sequelize.sync();
     }
 
     async deleteUser(id: number): Promise<boolean> {
@@ -120,6 +146,43 @@ export class InMemorySequelizeDatabase implements Database {
         } catch (err) {
             this.error = err as Error;
             return null;
+        }
+    }
+
+    async getUserByToken(token: string): Promise<User | null> {
+        try {
+            const model = await SequelizeUser.findOne({
+                where: { token },
+            });
+            return model ? model.toJSON() : null;
+        } catch (err) {
+            this.error = err as Error;
+            return null;
+        }
+    }
+
+    async saveNewAdmin(admin: Admin): Promise<Admin | null> {
+        try {
+            const model = await SequelizeAdmin.create({
+                email: admin.email,
+                password: admin.password,
+                tokens: admin.tokens.join(','),
+            });
+
+            return model.toJSON();
+        } catch (err) {
+            this.error = err as Error;
+            return null;
+        }
+    }
+
+    async getAdmins(): Promise<AdminCollection> {
+        try {
+            const admins = await SequelizeAdmin.findAll();
+            return admins.map((u) => u.toJSON());
+        } catch (err) {
+            this.error = err as Error;
+            return [];
         }
     }
 
