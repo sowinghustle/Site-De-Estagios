@@ -5,7 +5,6 @@ Estrutura do diretório `front-end` :
 ├── app/                          # Código-fonte principal do aplicativo
 |   └── _layout.tsx               # Layout e a estrutura de navegação
 |   └── index.tsx                 # Pagina principal da aplicação
-├── app-example/                  # Exemplo ou protótipo do aplicativo (pode ser uma versão de teste ou uma referência)
 ├── assets/                       # Recursos estáticos (imagens, fontes, etc.)
 ├── components/                   # Componentes reutilizáveis do React
 ├── constants/                    # Constantes e variáveis globais
