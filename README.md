@@ -1,4 +1,17 @@
-# Sistema de estágios
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/da6e85d6-eef1-4f54-9cdf-532a91d7bbf4" alt="Capa do Repositorio">
+</div>
+
+<br>
+
+![Status](http://img.shields.io/static/v1?label=STATUS&message=EM-DESENVOLVIMENTO&color=yellow&style=for-the-badge)
+
+### Descrição do projeto: 
+
+O **EstagioHUB** é uma plataforma destinada a centralizar e facilitar o acesso dos alunos a vagas de estágio, permitindo que eles se candidatem diretamente através do sistema. Além disso, a ferramenta permite a gestão completa dos estágios, desde o envio de relatórios de progresso até o gerenciamento de documentos, como termos de estágio, com assinaturas digitais. O sistema também oferece funcionalidades para concedentes e instituições de ensino, que podem acessar e assinar documentos, além de acompanhar o andamento dos estágios. Com uma interface prática e organizada, a plataforma visa otimizar e modernizar o processo de estágio, proporcionando maior eficiência e acessibilidade tanto para alunos quanto para professores e empresas
+
+<hr>
 
 ## Guia a ser seguida para os commits
 
