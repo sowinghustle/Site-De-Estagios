@@ -2,12 +2,12 @@ import passport from 'passport';
 import configurePassport from './http-bearer-auth';
 import { Request, Response, NextFunction, Handler } from 'express';
 
-export function authenticate() {
+export function ensureIsAuthenticated() {
     return function (req: Request, res: Response, next: NextFunction) {
-        const cookieToken = req.cookies.token;
+        req.token = req.cookies.token;
 
-        if (!req.headers.authorization && cookieToken) {
-            req.headers.authorization = `Bearer ${cookieToken}`;
+        if (!req.headers.authorization && req.token) {
+            req.headers.authorization = `Bearer ${req.token}`;
         }
 
         const midd = passport.authenticate('bearer', {

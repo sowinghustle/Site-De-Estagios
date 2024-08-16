@@ -8,6 +8,9 @@
         "skipLibCheck": true,
         "outDir": "dist",
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "typeRoots": [
+            "./types"
+        ]
     }
 }

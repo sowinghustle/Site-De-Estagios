@@ -1,7 +1,0 @@
-PUT http://localhost:8000/api/v1/user/1 HTTP/1.1
-content-type: application/json
-
-{
-    "username": "d1",
-    "email": "d1@email.com"
-}

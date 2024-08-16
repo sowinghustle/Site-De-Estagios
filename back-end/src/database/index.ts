@@ -1,25 +1,26 @@
-import { Admin, AdminCollection } from '../admin/model';
-import instituitionConfig from '../config/instituition';
 import config from '../config/project';
-import { User, UserCollection } from '../user/model';
-import { InMemorySequelizeDatabase } from './sequelize/in-memory-database';
+import instituition from '../config/instituition';
+import { Admin, AdminCollection } from '../admin/model';
+import { SequelizeDatabase } from './sequelize/database';
+import { User } from '../user/model';
+import { UserToken } from '../token/model';
 
 export interface Database {
-    getError(): Error | null;
-    saveNewUser(user: User): Promise<User | null>;
-    updateUser(user: User): Promise<User | null>;
-    getUserById(id: number): Promise<User | null>;
-    getUserByToken(token: string): Promise<User | null>;
-    deleteUser(id: number): Promise<boolean>;
-    getUsers(): Promise<UserCollection>;
-    saveNewAdmin(admin: Admin): Promise<Admin | null>;
+    getError(): Error | undefined;
+    saveNewAdmin(admin: Admin): Promise<Admin | undefined>;
     getAdmins(): Promise<AdminCollection>;
+    getUserByToken(token: string): Promise<User | undefined>;
+    saveNewUserToken(
+        token: string,
+        userid: number
+    ): Promise<UserToken | undefined>;
+    invalidateUserToken(token: string): Promise<UserToken | undefined>;
 }
 
 export class DatabaseResolver {
     static async getDatabase(): Promise<Database> {
         if (config.environment === 'development') {
-            return new InMemorySequelizeDatabase();
+            return new SequelizeDatabase();
         }
 
         throw new Error('Database implementation not created.');
@@ -29,17 +30,18 @@ export class DatabaseResolver {
         const db = await DatabaseResolver.getDatabase();
 
         try {
-            if (db instanceof InMemorySequelizeDatabase) {
-                InMemorySequelizeDatabase.init();
-                InMemorySequelizeDatabase.sync();
+            if (db instanceof SequelizeDatabase) {
+                SequelizeDatabase.init();
+                await SequelizeDatabase.sync();
                 await db.authenticate();
             }
 
             await db.saveNewAdmin({
-                id: 0,
-                email: instituitionConfig.adminEmail,
-                password: instituitionConfig.adminPassword,
-                tokens: [],
+                name: 'admin',
+                user: {
+                    email: instituition.adminEmail,
+                    password: instituition.adminPassword,
+                },
             });
 
             if (db.getError()) {

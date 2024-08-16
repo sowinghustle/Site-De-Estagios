@@ -6,7 +6,7 @@ import config from './config/project';
 import configureRoutes from './routes';
 import cookieParser from 'cookie-parser';
 import projectConfig from './config/project';
-import { configurePassport } from './auth/passport';
+import { configurePassport } from './auth/passport/ensure-is-auth';
 import { DatabaseResolver } from './database';
 
 const app = express();

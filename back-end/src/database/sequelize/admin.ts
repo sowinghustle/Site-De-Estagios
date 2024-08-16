@@ -1,26 +1,41 @@
-import { Model, Optional } from 'sequelize';
+import { Optional } from 'sequelize';
 import { Admin } from '../../admin/model';
+import { SequelizeUser } from './user';
+import {
+    AutoIncrement,
+    BelongsTo,
+    Column,
+    ForeignKey,
+    HasOne,
+    Index,
+    Model,
+    PrimaryKey,
+    Table,
+} from 'sequelize-typescript';
 
-type AdminWithoutTokens = Omit<Admin, 'tokens'> & {
-    tokens: string;
+type LocalAdmin = Omit<Admin, 'user'> & {
+    userId: number;
 };
 
-export type SequelizeAdminCreation = Optional<AdminWithoutTokens, 'id'>;
-export class SequelizeAdmin extends Model<
-    AdminWithoutTokens,
-    SequelizeAdminCreation
-> {
+export type SequelizeAdminCreation = Optional<LocalAdmin, 'id'>;
+
+@Table({
+    tableName: 'admins',
+})
+export class SequelizeAdmin extends Model<LocalAdmin, SequelizeAdminCreation> {
+    @PrimaryKey
+    @AutoIncrement
+    @Column
     public declare id: number;
-    public declare email: string;
-    public declare password: string;
-    public declare tokens: string;
 
-    public toJSON() {
-        const data = this.get();
+    @Index
+    @Column
+    public declare name: string;
 
-        return {
-            ...data,
-            tokens: data.tokens.split(','),
-        };
-    }
+    @ForeignKey(() => SequelizeUser)
+    @Column
+    public declare userId: number;
+
+    @BelongsTo(() => SequelizeUser)
+    public declare user: SequelizeUser;
 }

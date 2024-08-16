@@ -1,8 +1,0 @@
-POST http://localhost:8000/api/v1/user HTTP/1.1
-content-type: application/json
-
-{
-    "username": "delt4d",
-    "email": "d@email.com",
-    "password": "1234"
-}
