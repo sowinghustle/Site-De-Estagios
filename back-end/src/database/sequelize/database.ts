@@ -7,8 +7,39 @@ import { User, UserRole } from '../../user/model';
 import { SequelizeUserToken } from './tokens';
 import { UserToken } from '../../token/model';
 import { mapSequelizeToModel } from './mapper';
+import { Op } from 'sequelize';
 
 export class SequelizeDatabase implements Database {
+    async findAdminByNameOrEmail(
+        nameOrEmail: string
+    ): Promise<Admin | undefined> {
+        try {
+            const model = await SequelizeAdmin.findOne({
+                where: {
+                    [Op.or]: [
+                        { name: nameOrEmail },
+                        { '$user.email$': nameOrEmail },
+                    ],
+                },
+                include: [
+                    {
+                        model: SequelizeUser,
+                        as: 'user',
+                    },
+                ],
+            });
+
+            if (!model) {
+                throw new Error(
+                    'Administrador não encontrado com este nome ou email'
+                );
+            }
+
+            return mapSequelizeToModel(model);
+        } catch (err) {
+            this.error = err as Error;
+        }
+    }
     async saveNewUserToken(
         token: string,
         userId: number
@@ -77,7 +108,7 @@ export class SequelizeDatabase implements Database {
             return [];
         }
     }
-    async getUserByToken(token: string): Promise<User | undefined> {
+    async findUserByToken(token: string): Promise<User | undefined> {
         try {
             const model = await SequelizeUserToken.findOne({
                 where: { token },
@@ -90,8 +121,7 @@ export class SequelizeDatabase implements Database {
             }
 
             const now = new Date();
-
-            if (model.expiredAt && now > model.expiredAt) {
+            if (now > model.expiresAt) {
                 throw new Error('Este token expirou!');
             }
 

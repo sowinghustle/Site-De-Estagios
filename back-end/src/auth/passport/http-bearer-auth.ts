@@ -8,7 +8,7 @@ export default function () {
         new BearerStrategy(async function (token, done) {
             try {
                 const db = await DatabaseResolver.getDatabase();
-                const user = await db.getUserByToken(token);
+                const user = await db.findUserByToken(token);
                 if (user) return done(null, user, { scope: 'all' });
                 return done(null, false);
             } catch (err) {

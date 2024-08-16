@@ -1,11 +1,15 @@
+import { randomUUID } from 'crypto';
+
 type Environment = 'development' | 'test' | 'production';
 
 const isRunningTsNodeDev = !!process.env.TS_NODE_DEV;
-const secret = process.env.secret || '...';
+const isTesting = process.env.NODE_ENV == 'env';
+const secret = process.env.secret || randomUUID();
 
-const environment = (
-    isRunningTsNodeDev ? 'development' : process.env.environment || 'production'
-) as Environment;
+let environment: Environment = 'production';
+
+if (isRunningTsNodeDev) environment = 'development';
+if (isTesting) environment = 'test';
 
 const port = process.env.PORT || 8000;
 

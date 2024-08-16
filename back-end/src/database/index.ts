@@ -9,12 +9,13 @@ export interface Database {
     getError(): Error | undefined;
     saveNewAdmin(admin: Admin): Promise<Admin | undefined>;
     getAdmins(): Promise<AdminCollection>;
-    getUserByToken(token: string): Promise<User | undefined>;
+    findUserByToken(token: string): Promise<User | undefined>;
+    findAdminByNameOrEmail(nameOrEmail: string): Promise<Admin | undefined>;
+    invalidateUserToken(token: string): Promise<UserToken | undefined>;
     saveNewUserToken(
         token: string,
         userid: number
     ): Promise<UserToken | undefined>;
-    invalidateUserToken(token: string): Promise<UserToken | undefined>;
 }
 
 export class DatabaseResolver {
