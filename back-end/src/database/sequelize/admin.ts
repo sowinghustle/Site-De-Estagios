@@ -6,7 +6,6 @@ import {
     BelongsTo,
     Column,
     ForeignKey,
-    HasOne,
     Index,
     Model,
     PrimaryKey,

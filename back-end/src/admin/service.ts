@@ -1,22 +1,24 @@
+import responseMessages from '../config/responseMessages';
 import { DatabaseResolver } from '../database';
+import { ServiceResult } from '../utils/service-result';
+import { Admin } from './model';
 
 export class AdminService {
-    async findAdminByNameOrEmailAndPassword(
-        nameOrEmail: string,
-        password: string
-    ) {
-        const db = await DatabaseResolver.getDatabase();
-        const admin = await db.findAdminByNameOrEmail(nameOrEmail);
+    async findAdminByNameOrEmailAndPassword(data: {
+        nameOrEmail: string;
+        password: string;
+    }): Promise<ServiceResult<{ admin: Admin }>> {
+        const conn = await DatabaseResolver.getConnection();
+        const admin = await conn.findAdminByNameOrEmail(data.nameOrEmail);
 
         if (!admin) {
-            return {
-                error: db.getError()!,
-            };
+            const error = conn.getError()!;
+            return { error };
         }
 
-        if (admin.user.password == password) {
+        if (admin.user.password !== data.password) {
             return {
-                error: new Error('A senha está incorreta!'),
+                error: new Error(responseMessages.wrongPassword),
             };
         }
 

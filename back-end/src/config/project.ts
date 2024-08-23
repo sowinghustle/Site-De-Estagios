@@ -1,20 +1,25 @@
 import { randomUUID } from 'crypto';
 
-type Environment = 'development' | 'test' | 'production';
+const config = buildConfig();
 
-const isRunningTsNodeDev = !!process.env.TS_NODE_DEV;
-const isTesting = process.env.NODE_ENV == 'env';
-const secret = process.env.secret || randomUUID();
+function buildConfig() {
+    type Environment = 'development' | 'test' | 'production';
 
-let environment: Environment = 'production';
+    var environment: Environment = 'production';
 
-if (isRunningTsNodeDev) environment = 'development';
-if (isTesting) environment = 'test';
+    const port = process.env.PORT || 8000;
+    const isRunningTsNodeDev = !!process.env.TS_NODE_DEV;
+    const isTesting = process.env.NODE_ENV == 'test';
+    const secret = process.env.secret || randomUUID();
 
-const port = process.env.PORT || 8000;
+    if (isRunningTsNodeDev) environment = 'development';
+    if (isTesting) environment = 'test';
 
-export default {
-    environment,
-    port,
-    secret,
-};
+    return {
+        environment,
+        port,
+        secret,
+    };
+}
+
+export default Object.freeze(config);

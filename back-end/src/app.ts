@@ -3,10 +3,12 @@ import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
 import config from './config/project';
-import configureRoutes from './routes';
+import buildRoutes from './routes';
 import cookieParser from 'cookie-parser';
 import projectConfig from './config/project';
 import { configurePassport } from './auth/passport/ensure-is-auth';
+import instituition from './config/instituition';
+import errorMessages from './config/responseMessages';
 
 const app = express();
 const sessionOptions: session.SessionOptions = {
@@ -42,7 +44,7 @@ app.use(
 
 configurePassport();
 
-app.use('/api/v1', configureRoutes());
+app.use('/api/v1', buildRoutes());
 app.use(
     (
         err: any,
@@ -57,14 +59,14 @@ app.use(
         if (config.environment !== 'production') {
             return res.status(500).send({
                 success: false,
-                error: error.message,
+                message: error.message,
                 stack: error.stack,
             });
         }
 
         return res.status(500).send({
             success: false,
-            error: 'Não foi possível completar a requisição porque ocorreu um erro inesperado!',
+            error: errorMessages.serverError,
         });
     }
 );

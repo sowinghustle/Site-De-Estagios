@@ -5,7 +5,6 @@ import {
     Column,
     Default,
     ForeignKey,
-    HasOne,
     Length,
     Model,
     PrimaryKey,
@@ -50,9 +49,8 @@ export class SequelizeUserToken extends Model<
     public declare expiresAt: Date;
 
     @ForeignKey(() => SequelizeUser)
-    @AllowNull(false)
     @Column
-    public userId: number = 0;
+    public declare userId: number;
 
     @BelongsTo(() => SequelizeUser)
     public declare user: SequelizeUser;

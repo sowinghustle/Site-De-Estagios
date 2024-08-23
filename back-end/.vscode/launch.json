@@ -6,7 +6,8 @@
             "request": "launch",
             "name": "Executar o app",
             "skipFiles": [
-                "<node_internals>/**"
+                "<node_internals>/**",
+                "${workspaceRoot}/node_modules/**/*.js"
             ],
             "program": "src/main",
             "preLaunchTask": "npm: dev",
