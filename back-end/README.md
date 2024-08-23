@@ -9,7 +9,7 @@
 * [ ] Configurar husky para formatar o código ao fazer um commit
 * [ ] Criar pipeline CI/CD do github para bloquear pull requests que não passarem nos testes
 * [ ] Sanatizar os inputs do usuário para evitar vulnerabilidades
-* [ ] Configurar helmet para proteger o servidor de perigos comuns como XSS Atack
+* [x] Configurar helmet para proteger o servidor de perigos comuns como XSS Atack
 * [ ] Configurar bcrypt para proteger senhas
 * [ ] Implementar rate limiting
 

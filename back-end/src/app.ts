@@ -9,6 +9,7 @@ import projectConfig from './config/project';
 import { configurePassport } from './auth/passport/ensure-is-auth';
 import instituition from './config/instituition';
 import errorMessages from './config/responseMessages';
+import helmet from 'helmet';
 
 const app = express();
 const sessionOptions: session.SessionOptions = {
@@ -24,6 +25,17 @@ if (config.environment == 'production') {
     app.set('trust proxy', 1);
     sessionOptions.cookie!.secure = false;
 }
+
+app.use(
+    helmet({
+        frameguard: { action: 'deny' }, // Clickjacking
+        hidePoweredBy: true, // X-Powered-By (Filtragem do cabeçalho)
+        hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // Forçar sempre conexões HTTPS
+        noSniff: true, // Prevenção contra scripts
+        referrerPolicy: { policy: 'no-referrer-when-downgrade' }, // Cabeçalho Referer (Desabilitado)
+        xssFilter: true, // XSS
+    })
+);
 
 app.use(session(sessionOptions));
 app.use(passport.authenticate('session'));
