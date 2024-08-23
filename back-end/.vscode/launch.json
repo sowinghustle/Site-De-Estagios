@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Executar o app",
+            "skipFiles": [
+                "<node_internals>/**",
+                "${workspaceRoot}/node_modules/**/*.js"
+            ],
+            "program": "src/main",
+            "preLaunchTask": "npm: dev",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        }
+    ]
+}

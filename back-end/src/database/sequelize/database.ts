@@ -1,4 +1,4 @@
-import { Database } from '..';
+import { DatabaseConnection } from '..';
 import { Admin, AdminCollection } from '../../admin/model';
 import { Sequelize } from 'sequelize-typescript';
 import { SequelizeUser } from './user';
@@ -7,8 +7,65 @@ import { User, UserRole } from '../../user/model';
 import { SequelizeUserToken } from './tokens';
 import { UserToken } from '../../token/model';
 import { mapSequelizeToModel } from './mapper';
+import { Op } from 'sequelize';
+import project from '../../config/project';
+import responseMessages from '../../config/responseMessages';
 
-export class SequelizeDatabase implements Database {
+export class SequelizeDatabaseConnection implements DatabaseConnection {
+    private static sequelize: Sequelize;
+    private error?: Error;
+
+    constructor() {
+        if (
+            project.environment === 'test' ||
+            !SequelizeDatabaseConnection.sequelize
+        ) {
+            this.sequelize = new Sequelize({
+                dialect: 'sqlite',
+                storage: ':memory:',
+                logging: false,
+                repositoryMode: false,
+                pool:
+                    project.environment !== 'test'
+                        ? {
+                              max: 5,
+                              min: 0,
+                              acquire: 3000,
+                              idle: 1000,
+                          }
+                        : undefined,
+            });
+        }
+    }
+
+    async findAdminByNameOrEmail(
+        nameOrEmail: string
+    ): Promise<Admin | undefined> {
+        try {
+            const model = await SequelizeAdmin.findOne({
+                where: {
+                    [Op.or]: [
+                        { name: nameOrEmail },
+                        { '$user.email$': nameOrEmail },
+                    ],
+                },
+                include: [
+                    {
+                        model: SequelizeUser,
+                        as: 'user',
+                    },
+                ],
+            });
+
+            if (!model) {
+                throw new Error(responseMessages.adminNotFoundWithNameOrEmail);
+            }
+
+            return mapSequelizeToModel(model);
+        } catch (err) {
+            this.error = err as Error;
+        }
+    }
     async saveNewUserToken(
         token: string,
         userId: number
@@ -16,7 +73,7 @@ export class SequelizeDatabase implements Database {
         try {
             const model = await SequelizeUserToken.create({
                 token,
-                userId,
+                userId: userId,
             });
 
             return mapSequelizeToModel(model);
@@ -45,19 +102,21 @@ export class SequelizeDatabase implements Database {
         const params = { transaction };
 
         try {
-            const adminUser = {
-                ...admin.user,
-                role: UserRole.Adm,
-            };
+            const user = await SequelizeUser.create(
+                {
+                    ...admin.user,
+                    role: UserRole.Adm,
+                },
+                params
+            );
 
-            const user = await SequelizeUser.create(adminUser, params);
-
-            const createAdminData = {
-                ...admin,
-                userId: user.id,
-            };
-
-            const model = await SequelizeAdmin.create(createAdminData, params);
+            const model = await SequelizeAdmin.create(
+                {
+                    ...admin,
+                    userId: user.id,
+                },
+                params
+            );
 
             return mapSequelizeToModel(model);
         } catch (err) {
@@ -77,7 +136,7 @@ export class SequelizeDatabase implements Database {
             return [];
         }
     }
-    async getUserByToken(token: string): Promise<User | undefined> {
+    async findUserByToken(token: string): Promise<User | undefined> {
         try {
             const model = await SequelizeUserToken.findOne({
                 where: { token },
@@ -90,8 +149,7 @@ export class SequelizeDatabase implements Database {
             }
 
             const now = new Date();
-
-            if (model.expiredAt && now > model.expiredAt) {
+            if (now > model.expiresAt) {
                 throw new Error('Este token expirou!');
             }
 
@@ -101,13 +159,23 @@ export class SequelizeDatabase implements Database {
         }
     }
 
-    getError(): Error | undefined {
-        return this.error;
-    }
-
-    async authenticate(): Promise<void> {
+    async init(): Promise<void> {
         try {
-            await this.sequelize.authenticate();
+            if (!this.sequelize) {
+                throw new Error(responseMessages.databaseImplNotDefined);
+            }
+
+            this.sequelize.addModels([
+                SequelizeUser,
+                SequelizeUserToken,
+                SequelizeAdmin,
+            ]);
+
+            if (project.environment !== 'production') {
+                await this.sequelize.sync({ force: true });
+            }
+
+            await this.sequelize.authenticate({});
         } catch (err) {
             const customError = err as Error;
             customError.message = `Unable to connect to the database: ${customError.message}`;
@@ -115,30 +183,19 @@ export class SequelizeDatabase implements Database {
         }
     }
 
-    private static sequelize: Sequelize;
-    private error?: Error;
-
-    private get sequelize(): Sequelize {
-        return SequelizeDatabase.sequelize;
+    getError(): Error | undefined {
+        return this.error;
     }
 
-    static init() {
-        const sequelize = new Sequelize({
-            dialect: 'sqlite',
-            storage: ':memory:',
-            repositoryMode: false,
-        });
-
-        sequelize.addModels([
-            SequelizeAdmin,
-            SequelizeUser,
-            SequelizeUserToken,
-        ]);
-
-        this.sequelize = sequelize;
+    getConnection() {
+        return this.sequelize;
     }
 
-    static async sync() {
-        await this.sequelize.sync();
+    private get sequelize() {
+        return SequelizeDatabaseConnection.sequelize;
+    }
+
+    private set sequelize(seq: Sequelize) {
+        SequelizeDatabaseConnection.sequelize = seq;
     }
 }

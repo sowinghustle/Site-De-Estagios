@@ -6,11 +6,11 @@ import {
     BelongsTo,
     Column,
     ForeignKey,
-    HasOne,
     Index,
     Model,
     PrimaryKey,
     Table,
+    Unique,
 } from 'sequelize-typescript';
 
 type LocalAdmin = Omit<Admin, 'user'> & {
@@ -29,6 +29,7 @@ export class SequelizeAdmin extends Model<LocalAdmin, SequelizeAdminCreation> {
     public declare id: number;
 
     @Index
+    @Unique
     @Column
     public declare name: string;
 

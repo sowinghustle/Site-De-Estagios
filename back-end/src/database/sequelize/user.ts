@@ -7,18 +7,16 @@ import {
     AutoIncrement,
     Length,
     Index,
-    BelongsTo,
     Validate,
     AllowNull,
     HasMany,
     HasOne,
-    ForeignKey,
-    BelongsToAssociation,
 } from 'sequelize-typescript';
 import { DataTypes, Optional } from 'sequelize';
 import { SequelizeAdmin } from './admin';
 import { User, UserRole, UserRoleValues } from '../../user/model';
 import { SequelizeUserToken } from './tokens';
+import validation from '../../config/validation';
 
 type LocalUser = User;
 
@@ -47,7 +45,7 @@ export class SequelizeUser extends Model<LocalUser, SequelizeUserCreation> {
     public declare role: UserRole;
 
     @Length({
-        min: 8,
+        min: validation.minPasswordLength,
         msg: 'A senha deve ter no mínimo 8 caracteres',
     })
     @Column

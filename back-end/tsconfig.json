@@ -1,4 +1,14 @@
 {
+    "exclude": [
+        "./coverage",
+        "./dist",
+        "__tests__",
+        "jest.config.js"
+    ],
+    "ts-node": {
+        "transpileOnly": true,
+        "files": true
+    },
     "compilerOptions": {
         "target": "es2016",
         "module": "commonjs",
@@ -10,7 +20,8 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "typeRoots": [
-            "./types"
+            "./types",
+            "./node_modules/@types",
         ]
     }
 }

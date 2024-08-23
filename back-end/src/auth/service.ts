@@ -1,22 +1,19 @@
-import { CookieOptions } from 'express';
-import projectConfig from '../config/project';
-
-type CookieSetter = (token: string, options: CookieOptions) => void;
+import { DatabaseResolver } from '../database';
+import { UserToken } from '../token/model';
+import tokenService from '../token/service';
 
 export class AuthService {
-    async saveUserToken(token: string, setCookie: CookieSetter) {
-        const options: CookieOptions = {
-            maxAge: 1000 * 60 * 15,
-            httpOnly: true,
-            signed: false,
-        };
+    async saveNewUserToken(userId: number) {
+        const conn = await DatabaseResolver.getConnection();
+        const userToken = await conn.saveNewUserToken(
+            tokenService.generateUserToken(),
+            userId
+        );
 
-        if (projectConfig.environment == 'production') {
-            options.signed = true;
-            options.secure = true;
-        }
+        const error = conn.getError();
 
-        setCookie(token, options);
+        if (error) return { error };
+        return { userToken: userToken! };
     }
 }
 
