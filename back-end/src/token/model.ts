@@ -4,7 +4,7 @@ export type UserToken = {
     id?: number;
     token: string;
     user: User;
-    expiredAt?: Date;
+    expiresAt: Date;
 };
 
 export type UserTokenCollection = UserToken[];

@@ -1,16 +1,25 @@
-type Environment = 'development' | 'test' | 'production';
+import { randomUUID } from 'crypto';
 
-const isRunningTsNodeDev = !!process.env.TS_NODE_DEV;
-const secret = process.env.secret || '...';
+const config = buildConfig();
 
-const environment = (
-    isRunningTsNodeDev ? 'development' : process.env.environment || 'production'
-) as Environment;
+function buildConfig() {
+    type Environment = 'development' | 'test' | 'production';
 
-const port = process.env.PORT || 8000;
+    var environment: Environment = 'production';
 
-export default {
-    environment,
-    port,
-    secret,
-};
+    const port = process.env.PORT || 8000;
+    const isRunningTsNodeDev = !!process.env.TS_NODE_DEV;
+    const isTesting = process.env.NODE_ENV == 'test';
+    const secret = process.env.secret || randomUUID();
+
+    if (isRunningTsNodeDev) environment = 'development';
+    if (isTesting) environment = 'test';
+
+    return {
+        environment,
+        port,
+        secret,
+    };
+}
+
+export default Object.freeze(config);

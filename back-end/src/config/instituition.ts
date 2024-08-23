@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 
-export default {
+export default Object.freeze({
+    adminName: 'admin',
     adminEmail: 'admin@email.com',
     adminPassword: randomUUID(),
-};
+});

@@ -3,10 +3,10 @@ import logoutService from './service';
 
 export default class LogoutController {
     async logout(req: Request, res: Response, next: NextFunction) {
-        const error = await logoutService.handle(req.token!);
+        const logoutError = await logoutService.handle(req.token!);
 
-        if (error) {
-            return next(error);
+        if (logoutError) {
+            return next(logoutError);
         }
 
         req.logOut((err) => {
