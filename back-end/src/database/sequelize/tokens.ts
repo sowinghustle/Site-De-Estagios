@@ -15,9 +15,13 @@ import { UserToken } from '../../token/model';
 
 type LocalUserToken = Omit<UserToken, 'user'> & {
     userId: number;
+    expiredAt?: Date;
 };
 
-type SequelizeUserTokenCreation = Omit<LocalUserToken, 'id' | 'expiresAt'>;
+type SequelizeUserTokenCreation = Omit<
+    LocalUserToken,
+    'id' | 'expiresAt' | 'expiredAt'
+>;
 
 @Table({
     tableName: 'tokens',
@@ -47,6 +51,9 @@ export class SequelizeUserToken extends Model<
     })
     @Column
     public declare expiresAt: Date;
+
+    @Column
+    public declare expiredAt?: Date;
 
     @ForeignKey(() => SequelizeUser)
     @Column

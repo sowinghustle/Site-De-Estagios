@@ -3,7 +3,6 @@ import { Admin, AdminCollection } from '../admin/model';
 import { SequelizeDatabaseConnection } from './sequelize/database';
 import { User } from '../user/model';
 import { UserToken } from '../token/model';
-import project from '../config/project';
 
 export interface DatabaseConnection {
     getError(): Error | undefined;

@@ -16,26 +16,21 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     private error?: Error;
 
     constructor() {
-        if (
-            project.environment === 'test' ||
-            !SequelizeDatabaseConnection.sequelize
-        ) {
-            this.sequelize = new Sequelize({
-                dialect: 'sqlite',
-                storage: ':memory:',
-                logging: false,
-                repositoryMode: false,
-                pool:
-                    project.environment !== 'test'
-                        ? {
-                              max: 5,
-                              min: 0,
-                              acquire: 3000,
-                              idle: 1000,
-                          }
-                        : undefined,
-            });
-        }
+        this.sequelize = new Sequelize({
+            dialect: 'sqlite',
+            storage: ':memory:',
+            logging: false,
+            repositoryMode: false,
+            pool:
+                project.environment !== 'test'
+                    ? {
+                          max: 5,
+                          min: 0,
+                          acquire: 3000,
+                          idle: 1000,
+                      }
+                    : undefined,
+        });
     }
 
     async findAdminByNameOrEmail(
@@ -92,6 +87,8 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                 throw new Error('Este token não foi encontrado!');
             }
 
+            await model.update({ expiredAt: new Date() });
+
             return mapSequelizeToModel(model);
         } catch (err) {
             this.error = err as Error;
@@ -99,7 +96,6 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     }
     async saveNewAdmin(admin: Admin): Promise<Admin | undefined> {
         const transaction = await this.sequelize.transaction();
-        const params = { transaction };
 
         try {
             const user = await SequelizeUser.create(
@@ -107,7 +103,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                     ...admin.user,
                     role: UserRole.Adm,
                 },
-                params
+                { transaction }
             );
 
             const model = await SequelizeAdmin.create(
@@ -115,10 +111,15 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                     ...admin,
                     userId: user.id,
                 },
-                params
+                { transaction }
             );
 
-            return mapSequelizeToModel(model);
+            model.user = user;
+            const entity = mapSequelizeToModel(model);
+
+            await transaction.commit();
+
+            return entity;
         } catch (err) {
             await transaction.rollback();
             this.error = err as Error;

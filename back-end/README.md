@@ -5,7 +5,7 @@
 * [x] Configurar testes login administrador
 * [ ] Adicionar lib de validação dos dados dos corpos das requisições
 * [ ] Adicionar lib para envio de emails
-* [ ] Configurar testes dos métodos do banco de dados
+* [x] Configurar testes dos métodos do banco de dados
 * [ ] Configurar husky para formatar o código ao fazer um commit
 * [ ] Criar pipeline CI/CD do github para bloquear pull requests que não passarem nos testes
 * [ ] Sanatizar os inputs do usuário para evitar vulnerabilidades
