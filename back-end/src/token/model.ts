@@ -5,6 +5,7 @@ export type UserToken = {
     token: string;
     user: User;
     expiresAt: Date;
+    expiredAt?: Date;
 };
 
 export type UserTokenCollection = UserToken[];

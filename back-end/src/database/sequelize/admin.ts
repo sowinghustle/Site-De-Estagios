@@ -2,12 +2,15 @@ import { Optional } from 'sequelize';
 import { Admin } from '../../admin/model';
 import { SequelizeUser } from './user';
 import {
+    AllowNull,
     AutoIncrement,
     BelongsTo,
     Column,
     ForeignKey,
     Index,
     Model,
+    NotEmpty,
+    NotNull,
     PrimaryKey,
     Table,
     Unique,
@@ -30,6 +33,7 @@ export class SequelizeAdmin extends Model<LocalAdmin, SequelizeAdminCreation> {
 
     @Index
     @Unique
+    @NotEmpty
     @Column
     public declare name: string;
 
