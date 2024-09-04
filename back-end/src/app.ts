@@ -5,11 +5,12 @@ import passport from 'passport';
 import config from './config/project';
 import buildRoutes from './routes';
 import cookieParser from 'cookie-parser';
-import projectConfig from './config/project';
+import project from './config/project';
 import { configurePassport } from './auth/passport/ensure-is-auth';
-import instituition from './config/instituition';
 import errorMessages from './config/responseMessages';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import slowDown from 'express-slow-down';
 
 const app = express();
 const sessionOptions: session.SessionOptions = {
@@ -24,6 +25,34 @@ const sessionOptions: session.SessionOptions = {
 if (config.environment == 'production') {
     app.set('trust proxy', 1);
     sessionOptions.cookie!.secure = false;
+}
+
+if (project.environment === 'production') {
+    app.use(
+        slowDown({
+            // a partir de 100 requisições em menos de 10 minutos, dá um delay de 1 segundo
+            // que aumenta em 1 para cada 50 requisições a mais que forem recebidas
+            windowMs: 10 * 60 * 1000,
+            delayAfter: 100,
+            delayMs: (heats) => (heats / 50) * 1000,
+        })
+    );
+
+    app.use(
+        rateLimit({
+            // permite até 1125 requisições a cada 15 minutos
+            windowMs: 15 * 60 * 1000,
+            limit: 1125,
+            legacyHeaders: true,
+            handler(req, res) {
+                res.status(429).send({
+                    success: false,
+                    message:
+                        'Muitas requisições foram enviadas em pouco tempo. Aguarde alguns minutos para continuar.',
+                });
+            },
+        })
+    );
 }
 
 app.use(
@@ -41,7 +70,7 @@ app.use(session(sessionOptions));
 app.use(passport.authenticate('session'));
 app.use(express.json());
 app.use(
-    projectConfig.environment == 'production'
+    project.environment == 'production'
         ? cookieParser(config.secret)
         : cookieParser()
 );
@@ -78,7 +107,7 @@ app.use(
 
         return res.status(500).send({
             success: false,
-            error: errorMessages.serverError,
+            message: errorMessages.serverError,
         });
     }
 );
@@ -86,7 +115,7 @@ app.use(
 app.use((req, res) =>
     res.status(404).send({
         success: false,
-        error: 'Não encontrado',
+        message: 'Não encontrado',
         stack: new Error().stack,
     })
 );
