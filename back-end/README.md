@@ -1,4 +1,4 @@
-# Sistema Site de Estágios
+# Sistema de Estágios - Backend
 
 ## Tasks atuais
 
