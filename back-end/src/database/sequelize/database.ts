@@ -9,7 +9,7 @@ import { UserToken } from '../../token/model';
 import { mapSequelizeToModel } from './mapper';
 import { Op } from 'sequelize';
 import project from '../../config/project';
-import responseMessages from '../../config/responseMessages';
+import respMessages from '../../config/responseMessages';
 
 export class SequelizeDatabaseConnection implements DatabaseConnection {
     private static sequelize: Sequelize;
@@ -53,7 +53,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             });
 
             if (!model) {
-                throw new Error(responseMessages.adminNotFoundWithNameOrEmail);
+                throw new Error(respMessages.adminNotFoundWithNameOrEmail);
             }
 
             return mapSequelizeToModel(model);
@@ -163,7 +163,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     async init(): Promise<void> {
         try {
             if (!this.sequelize) {
-                throw new Error(responseMessages.databaseImplNotDefined);
+                throw new Error(respMessages.databaseImplNotDefined);
             }
 
             this.sequelize.addModels([

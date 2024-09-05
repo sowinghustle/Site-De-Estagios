@@ -7,7 +7,7 @@ import buildRoutes from './routes';
 import cookieParser from 'cookie-parser';
 import project from './config/project';
 import { configurePassport } from './auth/passport/ensure-is-auth';
-import errorMessages from './config/responseMessages';
+import respMessages from './config/responseMessages';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import slowDown from 'express-slow-down';
@@ -47,8 +47,7 @@ if (project.environment === 'production') {
             handler(req, res) {
                 res.status(429).send({
                     success: false,
-                    message:
-                        'Muitas requisições foram enviadas em pouco tempo. Aguarde alguns minutos para continuar.',
+                    message: respMessages.tooManyRequests,
                 });
             },
         })
@@ -107,7 +106,7 @@ app.use(
 
         return res.status(500).send({
             success: false,
-            message: errorMessages.serverError,
+            message: respMessages.serverError,
         });
     }
 );
