@@ -3,7 +3,7 @@ import { LoginAdmin } from './dto';
 import adminService from './service';
 import authService from '../auth/service';
 import project from '../config/project';
-import responseMessages from '../config/responseMessages';
+import respMessages from '../config/responseMessages';
 import instituition from '../config/instituition';
 
 export default class AdminController {
@@ -68,7 +68,7 @@ export default class AdminController {
             .send({
                 success: true,
                 expiresAt: saveUserTokenResult.userToken.expiresAt,
-                message: responseMessages.successfullLogin,
+                message: respMessages.successfullLogin,
                 token: saveUserTokenResult.userToken.token,
             });
     }

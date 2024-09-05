@@ -1,4 +1,4 @@
-import responseMessages from '../config/responseMessages';
+import respMessages from '../config/responseMessages';
 import { DatabaseResolver } from '../database';
 import { ServiceResult } from '../utils/service-result';
 import { Admin } from './model';
@@ -18,7 +18,7 @@ export class AdminService {
 
         if (admin.user.password !== data.password) {
             return {
-                error: new Error(responseMessages.wrongPassword),
+                error: new Error(respMessages.wrongPassword),
             };
         }
 
