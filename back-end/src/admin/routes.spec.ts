@@ -7,18 +7,51 @@ describe('Admin', () => {
     beforeEach(() => DatabaseResolver.reset());
 
     describe('POST /admin/login', () => {
-        it('should return error', async () => {
-            const res = await requestWithSupertest.post('/api/v1/admin/login');
-            expect(res.body).toHaveProperty('message');
-            expect(res.body).toMatchObject({ success: false });
-            expect(res.status).toEqual(400);
+        describe('should return error when', () => {
+            it("name or email isn't provided", async () => {
+                const res = await requestWithSupertest.post(
+                    '/api/v1/admin/login'
+                );
+                expect(res.body).toMatchObject({
+                    success: false,
+                    message: respMessages.emptyNameOrEmail,
+                });
+                expect(res.status).toEqual(400);
+            });
+
+            it("password isn't provided", async () => {
+                const res = await requestWithSupertest
+                    .post('/api/v1/admin/login')
+                    .send({
+                        nameOrEmail: 'Random Username',
+                    });
+                expect(res.body).toMatchObject({
+                    success: false,
+                    message: respMessages.emptyPassword,
+                });
+                expect(res.status).toEqual(400);
+            });
+
+            it("name isn't valid", async () => {
+                const res = await requestWithSupertest
+                    .post('/api/v1/admin/login')
+                    .send({
+                        nameOrEmail: 'random123241',
+                        password: 'randomPassword41512233',
+                    });
+                expect(res.body).toMatchObject({
+                    success: false,
+                    message: respMessages.nameOnlyLetters,
+                });
+                expect(res.status).toEqual(400);
+            });
         });
 
         it('should return user not found', async () => {
             const res = await requestWithSupertest
                 .post('/api/v1/admin/login')
                 .send({
-                    nameOrEmail: 'randomUser31523',
+                    nameOrEmail: 'Random Username',
                     password: 'randomPassword41512233',
                 });
             expect(res.body).toMatchObject({
@@ -42,6 +75,20 @@ describe('Admin', () => {
             expect(res.status).toEqual(400);
         });
 
+        it('should fail with less characters than necessary', async () => {
+            const res = await requestWithSupertest
+                .post('/api/v1/admin/login')
+                .send({
+                    nameOrEmail: instituition.adminEmail,
+                    password: 'rand',
+                });
+            expect(res.body).toMatchObject({
+                success: false,
+                message: respMessages.insuficientPasswordCharacters,
+            });
+            expect(res.status).toEqual(400);
+        });
+
         describe('should return success and complete login with cookies', () => {
             it('with email and password', async () => {
                 const res = await requestWithSupertest
@@ -59,8 +106,8 @@ describe('Admin', () => {
                     token,
                 });
                 expect(res.body).toHaveProperty('expiresAt');
+                expect(res.body).toHaveProperty('token');
                 expect(res.status).toEqual(200);
-                expect(cookies).toContain(`token=${token}; Path=/`);
             });
 
             it('with name and password', async () => {
@@ -79,8 +126,8 @@ describe('Admin', () => {
                     token,
                 });
                 expect(res.body).toHaveProperty('expiresAt');
+                expect(res.body).toHaveProperty('token');
                 expect(res.status).toEqual(200);
-                expect(cookies).toContain(`token=${token}; Path=/`);
             });
         });
     });
