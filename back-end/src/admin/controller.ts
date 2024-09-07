@@ -9,17 +9,18 @@ import { AdminLoginSchema } from './schemas';
 export default class AdminController {
     async login(req: Request, res: Response) {
         try {
-            const validateResult = AdminLoginSchema.validate(req.body);
+            const validationResult = AdminLoginSchema.validate(req.body);
 
-            if (validateResult.error) {
+            if (validationResult.error) {
                 return res.status(400).send({
                     success: false,
-                    message: validateResult.error.message,
+                    message: validationResult.error.message,
                 });
             }
 
             const { nameOrEmail, password } =
-                validateResult.value as LoginAdminDto;
+                validationResult.value as LoginAdminDto;
+
             const { admin, error } =
                 await adminService.findAdminByNameOrEmailAndPassword({
                     nameOrEmail: nameOrEmail.trim(),
