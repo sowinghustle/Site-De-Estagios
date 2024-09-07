@@ -1,4 +1,4 @@
-export type LoginAdmin = {
+export type LoginAdminDto = {
     nameOrEmail: string;
     password: string;
 };
