@@ -1,6 +1,7 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/da6e85d6-eef1-4f54-9cdf-532a91d7bbf4" alt="Capa do Repositorio">
+  <img src="https://github.com/user-attachments/assets/4598b28f-9194-4626-861f-42c54bfb8920" alt="Capa do Repositorio">
 </div>
+
 
 ![Status](http://img.shields.io/static/v1?label=STATUS&message=EM-DESENVOLVIMENTO&color=yellow&style=for-the-badge)
 
