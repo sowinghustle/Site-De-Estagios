@@ -1,5 +1,4 @@
 import { DatabaseResolver } from '../database';
-import { UserToken } from '../token/model';
 import tokenService from '../token/service';
 
 export class AuthService {

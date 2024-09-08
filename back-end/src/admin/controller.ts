@@ -1,10 +1,10 @@
 import { CookieOptions, Request, Response } from 'express';
-import { LoginAdminDto } from './dto';
-import adminService from './service';
 import authService from '../auth/service';
 import project from '../config/project';
 import responseMessages from '../config/responseMessages';
+import { LoginAdminDto } from './dto';
 import { AdminLoginSchema } from './schemas';
+import adminService from './service';
 
 export default class AdminController {
     async login(req: Request, res: Response) {

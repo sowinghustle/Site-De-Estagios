@@ -1,8 +1,5 @@
 import { Optional } from 'sequelize';
-import { Admin } from '../../admin/model';
-import { SequelizeUser } from './user';
 import {
-    AllowNull,
     AutoIncrement,
     BelongsTo,
     Column,
@@ -10,11 +7,12 @@ import {
     Index,
     Model,
     NotEmpty,
-    NotNull,
     PrimaryKey,
     Table,
     Unique,
 } from 'sequelize-typescript';
+import { Admin } from '../../admin/model';
+import { SequelizeUser } from './user';
 
 type LocalAdmin = Omit<Admin, 'user'> & {
     userId: number;

@@ -1,8 +1,8 @@
-import instituition from '../config/instituition';
 import { Admin, AdminCollection } from '../admin/model';
-import { SequelizeDatabaseConnection } from './sequelize/database';
-import { User } from '../user/model';
+import instituition from '../config/instituition';
 import { UserToken } from '../token/model';
+import { User } from '../user/model';
+import { SequelizeDatabaseConnection } from './sequelize/database';
 
 export interface DatabaseConnection {
     getError(): Error | undefined;

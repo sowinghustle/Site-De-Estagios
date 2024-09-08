@@ -90,6 +90,13 @@ describe('Admin', () => {
         });
 
         describe('should return success and complete login with cookies', () => {
+            const testResponseCookies = (res: any) => {
+                const cookies = res.headers['set-cookie'];
+
+                for (let key of [`token=${token}`, 'HttpOnly'])
+                    expect(cookies[0]).toContain(key);
+            };
+
             it('with email and password', async () => {
                 const res = await requestWithSupertest
                     .post('/api/v1/admin/login')
@@ -98,7 +105,7 @@ describe('Admin', () => {
                         password: instituition.adminPassword,
                     });
 
-                const cookies = res.headers['set-cookie'];
+                testResponseCookies(res);
 
                 expect(res.body).toMatchObject({
                     success: true,
@@ -118,15 +125,15 @@ describe('Admin', () => {
                         password: instituition.adminPassword,
                     });
 
-                const cookies = res.headers['set-cookie'];
+                testResponseCookies(res);
 
+                expect(res.body).toHaveProperty('expiresAt');
                 expect(res.body).toMatchObject({
                     success: true,
                     message: respMessages.successfullLogin,
                     token,
                 });
-                expect(res.body).toHaveProperty('expiresAt');
-                expect(res.body).toHaveProperty('token');
+
                 expect(res.status).toEqual(200);
             });
         });

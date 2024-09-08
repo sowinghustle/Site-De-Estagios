@@ -1,22 +1,22 @@
+import { DataTypes, Optional } from 'sequelize';
 import {
-    Model,
+    AllowNull,
+    AutoIncrement,
     Column,
     DeletedAt,
-    Table,
-    PrimaryKey,
-    AutoIncrement,
-    Length,
-    Index,
-    Validate,
-    AllowNull,
     HasMany,
     HasOne,
+    Index,
+    Length,
+    Model,
+    PrimaryKey,
+    Table,
+    Validate,
 } from 'sequelize-typescript';
-import { DataTypes, Optional } from 'sequelize';
-import { SequelizeAdmin } from './admin';
-import { User, UserRole, UserRoleValues } from '../../user/model';
-import { SequelizeUserToken } from './tokens';
 import validation from '../../config/validation';
+import { User, UserRole, UserRoleValues } from '../../user/model';
+import { SequelizeAdmin } from './admin';
+import { SequelizeUserToken } from './tokens';
 
 type LocalUser = User;
 

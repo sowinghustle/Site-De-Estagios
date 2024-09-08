@@ -10,8 +10,8 @@ import {
     PrimaryKey,
     Table,
 } from 'sequelize-typescript';
-import { SequelizeUser } from './user';
 import { UserToken } from '../../token/model';
+import { SequelizeUser } from './user';
 
 type LocalUserToken = Omit<UserToken, 'user'> & {
     userId: number;
