@@ -3,8 +3,8 @@ require('express-async-errors');
 import userRoutes from './user/routes';
 import adminRoutes from './admin/routes';
 import logoutRoutes from './logout/routes';
-import { Router } from 'express';
 import respMessages from './config/responseMessages';
+import { Router } from 'express';
 
 export default function () {
     const routes = Router();
