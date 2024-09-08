@@ -1,6 +1,6 @@
+import { Handler, NextFunction, Request, Response } from 'express';
 import passport from 'passport';
 import configurePassport from './http-bearer-auth';
-import { Request, Response, NextFunction, Handler } from 'express';
 
 export function ensureIsAuthenticated() {
     return function (req: Request, res: Response, next: NextFunction) {

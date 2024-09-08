@@ -1,7 +1,6 @@
 import { DatabaseConnection, DatabaseResolver } from '.';
 import { Admin } from '../admin/model';
 import instituition from '../config/instituition';
-import { UserToken } from '../token/model';
 
 const saveAdmin = async (
     conn: DatabaseConnection,

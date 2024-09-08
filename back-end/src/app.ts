@@ -1,17 +1,16 @@
-import express from 'express';
-import cors from 'cors';
-import session from 'express-session';
-import passport from 'passport';
-import config from './config/project';
-import buildRoutes from './routes';
 import cookieParser from 'cookie-parser';
-import project from './config/project';
-import { configurePassport } from './auth/passport/ensure-is-auth';
-import respMessages from './config/responseMessages';
-import helmet from 'helmet';
+import cors from 'cors';
+import express from 'express';
 import rateLimit from 'express-rate-limit';
+import session from 'express-session';
 import slowDown from 'express-slow-down';
+import helmet from 'helmet';
+import passport from 'passport';
 import validator from 'validator';
+import { configurePassport } from './auth/passport/ensure-is-auth';
+import { default as config, default as project } from './config/project';
+import respMessages from './config/responseMessages';
+import buildRoutes from './routes';
 
 const app = express();
 const sessionOptions: session.SessionOptions = {

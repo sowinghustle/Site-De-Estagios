@@ -1,6 +1,6 @@
 import Joi from 'joi';
-import validation from '../config/validation';
 import respMessages from '../config/responseMessages';
+import validation from '../config/validation';
 
 export const AdminLoginSchema = Joi.object({
     nameOrEmail: Joi.string()
