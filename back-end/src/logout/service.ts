@@ -4,7 +4,8 @@ export class LogoutService {
     async handle(token: string): Promise<Error | undefined> {
         const conn = await DatabaseResolver.getConnection();
         await conn.invalidateUserToken(token);
-        return conn.getError();
+        const error = conn.getError();
+        return error;
     }
 }
 

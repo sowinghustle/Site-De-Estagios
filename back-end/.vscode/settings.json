@@ -1,0 +1,11 @@
+{
+    "jest.runMode": "watch",
+    "jest.enable": true,
+    "jest.rootPath": "./src",
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript][typescriptreact]": {
+        "typescript.preferences.importModuleSpecifier": "relative",
+    },
+}

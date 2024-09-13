@@ -1,5 +1,4 @@
 import { Admin, AdminCollection } from '../admin/model';
-import instituition from '../config/instituition';
 import { UserToken } from '../token/model';
 import { User } from '../user/model';
 import { SequelizeDatabaseConnection } from './sequelize/database';
@@ -30,18 +29,6 @@ export class DatabaseResolver {
 
             if (!this.initialized) {
                 await conn.init();
-                await conn.saveNewAdmin({
-                    name: instituition.adminName,
-                    user: {
-                        email: instituition.adminEmail,
-                        password: instituition.adminPassword,
-                    },
-                });
-
-                if (conn.getError()) {
-                    throw conn.getError();
-                }
-
                 this.initialized = true;
             }
 

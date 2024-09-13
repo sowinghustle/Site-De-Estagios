@@ -9,6 +9,7 @@ export default function () {
             try {
                 const conn = await DatabaseResolver.getConnection();
                 const user = await conn.findUserByToken(token);
+
                 if (user) return done(null, user, { scope: 'all' });
                 return done(null, false);
             } catch (err) {

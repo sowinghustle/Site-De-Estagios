@@ -1,23 +1,21 @@
 import { Admin } from '../../admin/model';
 import { UserToken } from '../../token/model';
 import { User } from '../../user/model';
-import { SequelizeAdmin } from './admin';
-import { SequelizeUserToken } from './tokens';
-import { SequelizeUser } from './user';
+import { AdminTable, UserTable, UserTokenTable } from './tables';
 
 export function mapSequelizeToModel<T>(entity: T): any {
-    if (entity instanceof SequelizeAdmin) {
+    if (entity instanceof AdminTable) {
         return {
             ...entity.toJSON(),
             user: mapSequelizeUserModel(entity.user),
         } as Admin;
     }
 
-    if (entity instanceof SequelizeUser) {
+    if (entity instanceof UserTable) {
         return mapSequelizeUserModel(entity)!;
     }
 
-    if (entity instanceof SequelizeUserToken) {
+    if (entity instanceof UserTokenTable) {
         return {
             ...entity.toJSON(),
             user: mapSequelizeUserModel(entity.user),
@@ -28,7 +26,7 @@ export function mapSequelizeToModel<T>(entity: T): any {
 }
 
 function mapSequelizeUserModel(
-    entity: SequelizeUser | undefined
+    entity: UserTable | undefined
 ): User | undefined {
     if (entity) {
         return entity.toJSON() as User;

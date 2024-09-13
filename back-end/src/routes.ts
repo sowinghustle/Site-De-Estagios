@@ -1,15 +1,14 @@
-require('express-async-errors');
-
 import { Router } from 'express';
+import 'express-async-errors';
 import adminRoutes from './admin/routes';
-import respMessages from './config/responseMessages';
+import config from './config';
 import logoutRoutes from './logout/routes';
 import userRoutes from './user/routes';
 
 export default function () {
     const routes = Router();
 
-    routes.get('/', (req, res) => res.send(respMessages.welcome));
+    routes.get('/', (req, res) => res.send(config.messages.welcomeMessage));
     routes.use('/user', userRoutes);
     routes.use('/admin', adminRoutes);
     routes.use('/logout', logoutRoutes);

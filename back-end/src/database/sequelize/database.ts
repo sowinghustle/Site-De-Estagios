@@ -2,14 +2,11 @@ import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { DatabaseConnection } from '..';
 import { Admin, AdminCollection } from '../../admin/model';
-import project from '../../config/project';
-import respMessages from '../../config/responseMessages';
+import config from '../../config';
 import { UserToken } from '../../token/model';
 import { User, UserRole } from '../../user/model';
-import { SequelizeAdmin } from './admin';
 import { mapSequelizeToModel } from './mapper';
-import { SequelizeUserToken } from './tokens';
-import { SequelizeUser } from './user';
+import { AdminTable, UserTable, UserTokenTable } from './tables';
 
 export class SequelizeDatabaseConnection implements DatabaseConnection {
     private static sequelize: Sequelize;
@@ -22,7 +19,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             logging: false,
             repositoryMode: false,
             pool:
-                project.environment !== 'test'
+                config.project.environment !== 'test'
                     ? {
                           max: 5,
                           min: 0,
@@ -37,7 +34,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         nameOrEmail: string
     ): Promise<Admin | undefined> {
         try {
-            const model = await SequelizeAdmin.findOne({
+            const model = await AdminTable.findOne({
                 where: {
                     [Op.or]: [
                         { name: nameOrEmail },
@@ -46,14 +43,14 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                 },
                 include: [
                     {
-                        model: SequelizeUser,
+                        model: UserTable,
                         as: 'user',
                     },
                 ],
             });
 
             if (!model) {
-                throw new Error(respMessages.adminNotFoundWithNameOrEmail);
+                throw new Error(config.messages.adminNotFoundWithNameOrEmail);
             }
 
             return mapSequelizeToModel(model);
@@ -66,9 +63,9 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         userId: number
     ): Promise<UserToken | undefined> {
         try {
-            const model = await SequelizeUserToken.create({
+            const model = await UserTokenTable.create({
                 token,
-                userId: userId,
+                userId,
             });
 
             return mapSequelizeToModel(model);
@@ -78,9 +75,14 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     }
     async invalidateUserToken(token: string): Promise<UserToken | undefined> {
         try {
-            const model = await SequelizeUserToken.findOne({
+            const model = await UserTokenTable.findOne({
                 where: { token },
-                include: [SequelizeUser],
+                include: [
+                    {
+                        model: UserTable,
+                        as: 'user',
+                    },
+                ],
             });
 
             if (!model) {
@@ -98,7 +100,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         const transaction = await this.sequelize.transaction();
 
         try {
-            const user = await SequelizeUser.create(
+            const user = await UserTable.create(
                 {
                     ...admin.user,
                     role: UserRole.Adm,
@@ -106,7 +108,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                 { transaction }
             );
 
-            const model = await SequelizeAdmin.create(
+            const model = await AdminTable.create(
                 {
                     ...admin,
                     userId: user.id,
@@ -127,8 +129,8 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     }
     async getAdmins(): Promise<AdminCollection> {
         try {
-            const admins = await SequelizeAdmin.findAll({
-                include: [SequelizeUser],
+            const admins = await AdminTable.findAll({
+                include: [UserTable],
             });
 
             return admins.map(mapSequelizeToModel);
@@ -139,10 +141,10 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     }
     async findUserByToken(token: string): Promise<User | undefined> {
         try {
-            const model = await SequelizeUserToken.findOne({
+            const model = await UserTokenTable.findOne({
                 where: { token },
                 attributes: [],
-                include: [SequelizeUser],
+                include: [UserTable],
             });
 
             if (!model) {
@@ -150,6 +152,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             }
 
             const now = new Date();
+
             if (now > model.expiresAt) {
                 throw new Error('Este token expirou!');
             }
@@ -162,21 +165,24 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
 
     async init(): Promise<void> {
         try {
-            if (!this.sequelize) {
-                throw new Error(respMessages.databaseImplNotDefined);
-            }
+            if (!this.sequelize)
+                throw new Error(config.messages.databaseImplNotDefined);
 
-            this.sequelize.addModels([
-                SequelizeUser,
-                SequelizeUserToken,
-                SequelizeAdmin,
-            ]);
+            this.sequelize.addModels([UserTable, UserTokenTable, AdminTable]);
 
-            if (project.environment !== 'production') {
-                await this.sequelize.sync({ force: true });
-            }
+            // user and user-tokens association
+            UserTable.hasMany(UserTokenTable, { as: 'tokens' });
+            UserTokenTable.belongsTo(UserTable, { as: 'user' });
 
-            await this.sequelize.authenticate({});
+            // user and admin association
+            UserTable.hasOne(AdminTable, { as: 'admin' });
+            AdminTable.belongsTo(UserTable, { as: 'user' });
+
+            // sync
+            await this.sequelize.sync({
+                force: config.project.environment !== 'production',
+            });
+            await this.sequelize.authenticate();
         } catch (err) {
             const customError = err as Error;
             customError.message = `Unable to connect to the database: ${customError.message}`;

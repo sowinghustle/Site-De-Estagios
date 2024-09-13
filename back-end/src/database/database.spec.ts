@@ -1,158 +1,130 @@
-import { DatabaseConnection, DatabaseResolver } from '.';
-import { Admin } from '../admin/model';
-import instituition from '../config/instituition';
+import { DatabaseResolver } from '.';
+import {
+    alternativeAdmin,
+    defaultAdmin,
+    expectPromiseNotToReject,
+    saveAdmin,
+    saveAndTestAdmin,
+} from '../config/testing';
+import { UserRole } from '../user/model';
 
-const saveAdmin = async (
-    conn: DatabaseConnection,
-    props?: { name?: string; email?: string; password?: string }
-): Promise<Admin | undefined | Error> => {
-    const admin: Admin = {
-        name: props?.name ?? 'randomAdminName23215',
-        user: {
-            email: props?.email ?? 'randomAdminEmail@email.com',
-            password: props?.password ?? 'randomPassword*4812',
-        },
-    };
-
-    return await conn.saveNewAdmin(admin).catch((err) => err);
-};
-
-describe('Database', () => {
+describe('Admin Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
 
-    describe('admin', () => {
-        it('should save a new admin sucesfully', async () => {
-            const conn = await DatabaseResolver.getConnection();
-            const result = await saveAdmin(conn);
+    it('should save a new admin', async () => {
+        const expectAdminValue = defaultAdmin;
+        const conn = await DatabaseResolver.getConnection();
+        const { value, error } = await saveAdmin(conn, defaultAdmin);
+        expect(value).toMatchObject(expectAdminValue);
+        expect(error).toBeUndefined();
+    });
 
-            expect(result).toMatchObject<Admin>({
-                name: 'randomAdminName23215',
+    describe('should not save a new admin', () => {
+        it('admin name already in use', async () => {
+            const conn = await DatabaseResolver.getConnection();
+            await saveAndTestAdmin(conn, defaultAdmin);
+
+            const { value, error } = await saveAdmin(conn, {
+                ...defaultAdmin,
                 user: {
-                    email: 'randomAdminEmail@email.com',
-                    password: 'randomPassword*4812',
+                    ...defaultAdmin.user,
+                    email: alternativeAdmin.user.email,
                 },
             });
-            expect(conn.getError()).toBeUndefined();
+            expect(value).toBeUndefined();
+            expect(error).not.toBeUndefined();
         });
 
-        it('should not save admin with duplicated name', async () => {
+        it('specified email already in use', async () => {
             const conn = await DatabaseResolver.getConnection();
+            await saveAndTestAdmin(conn, defaultAdmin);
 
-            expect(await saveAdmin(conn)).not.toBeInstanceOf(Error);
-            expect(
-                await saveAdmin(conn, { email: instituition.adminEmail })
-            ).toBeUndefined();
-            expect(conn.getError()).toBeInstanceOf(Error);
-        });
-
-        it('should not save admin with duplicated email', async () => {
-            const conn = await DatabaseResolver.getConnection();
-
-            expect(await saveAdmin(conn)).not.toBeInstanceOf(Error);
-            expect(
-                await saveAdmin(conn, { name: instituition.adminName })
-            ).toBeUndefined();
-            expect(conn.getError()).toBeInstanceOf(Error);
-        });
-
-        it('should not save admin with empty name', async () => {
-            const conn = await DatabaseResolver.getConnection();
-
-            expect(await saveAdmin(conn, { name: '' })).toBeUndefined();
-            expect(conn.getError()).toBeInstanceOf(Error);
-        });
-
-        it('should not save admin with empty email', async () => {
-            const conn = await DatabaseResolver.getConnection();
-
-            expect(await saveAdmin(conn, { email: '' })).toBeUndefined();
-            expect(conn.getError()).toBeInstanceOf(Error);
-        });
-
-        it('should get admin by name', async () => {
-            const conn = await DatabaseResolver.getConnection();
-            await saveAdmin(conn);
-
-            expect(
-                await conn
-                    .findAdminByNameOrEmail('randomAdminName23215')
-                    .catch((err) => err)
-            ).toMatchObject<Admin>({
-                name: 'randomAdminName23215',
-                user: {
-                    email: 'randomAdminEmail@email.com',
-                    password: 'randomPassword*4812',
-                },
+            const { value, error } = await saveAdmin(conn, {
+                ...defaultAdmin,
+                name: alternativeAdmin.name,
             });
-        });
 
-        it('should get admin by email', async () => {
+            expect(value).toBeUndefined();
+            expect(error).not.toBeUndefined();
+        });
+    });
+
+    describe('should find admin', () => {
+        it('by name field', async () => {
+            const expectedResultValue = defaultAdmin;
             const conn = await DatabaseResolver.getConnection();
-            await saveAdmin(conn);
-
-            expect(
-                await conn
-                    .findAdminByNameOrEmail('randomAdminEmail@email.com')
-                    .catch((err) => err)
-            ).toMatchObject<Admin>({
-                name: 'randomAdminName23215',
-                user: {
-                    email: 'randomAdminEmail@email.com',
-                    password: 'randomPassword*4812',
-                },
-            });
+            await saveAndTestAdmin(conn, defaultAdmin);
+            const promise = conn.findAdminByNameOrEmail(defaultAdmin.name);
+            await expectPromiseNotToReject(promise);
+            await expect(promise).resolves.toMatchObject(expectedResultValue);
         });
 
-        it('should not get admin with wrong name or email', async () => {
+        it('by email field', async () => {
+            const expectedResultValue = defaultAdmin;
             const conn = await DatabaseResolver.getConnection();
-            await saveAdmin(conn);
-
-            expect(
-                await conn
-                    .findAdminByNameOrEmail('differentRandomAdminName23215')
-                    .catch((err) => err)
-            ).toBeUndefined();
+            await saveAndTestAdmin(conn, defaultAdmin);
+            const promise = conn.findAdminByNameOrEmail(
+                defaultAdmin.user.email
+            );
+            await expectPromiseNotToReject(promise);
+            await expect(promise).resolves.toMatchObject(expectedResultValue);
         });
+    });
 
-        it('should save a new user token sucessfully', async () => {
+    describe('should not find admin', () => {
+        it('when provided name is wrong', async () => {
             const conn = await DatabaseResolver.getConnection();
-            const admin = await saveAdmin(conn);
-
-            expect(admin).not.toBeUndefined();
-            expect(admin).not.toBeInstanceOf(Error);
-
-            if (admin != undefined && !(admin instanceof Error)) {
-                const result = await conn
-                    .saveNewUserToken('randomToken153412', admin.user.id!)
-                    .catch((err) => err);
-
-                expect(result).toMatchObject({ token: 'randomToken153412' });
-                expect(result?.expiredAt).toBeUndefined();
-            }
-
-            expect(conn.getError()).not.toBe(Error);
+            await saveAndTestAdmin(conn, defaultAdmin);
+            const promise = conn.findAdminByNameOrEmail(alternativeAdmin.name);
+            await expect(promise).resolves.toBeUndefined();
+            await expectPromiseNotToReject(promise);
         });
 
-        it('should invalidate a user token sucessfully', async () => {
+        it('when provided email is wrong', async () => {
             const conn = await DatabaseResolver.getConnection();
-            const admin = await saveAdmin(conn);
-
-            expect(admin).not.toBeUndefined();
-            expect(admin).not.toBeInstanceOf(Error);
-
-            if (admin != undefined && !(admin instanceof Error)) {
-                await conn
-                    .saveNewUserToken('randomToken153412', admin.user.id!)
-                    .catch((err) => err);
-
-                const result =
-                    await conn.invalidateUserToken('randomToken153412');
-
-                expect(result).toMatchObject({ token: 'randomToken153412' });
-                expect(result?.expiredAt).toBeInstanceOf(Date);
-            }
-
-            expect(conn.getError()).not.toBe(Error);
+            await saveAndTestAdmin(conn, defaultAdmin);
+            const promise = conn.findAdminByNameOrEmail(
+                alternativeAdmin.user.email
+            );
+            await expect(promise).resolves.toBeUndefined();
+            await expectPromiseNotToReject(promise);
         });
+    });
+});
+
+describe('User-Token Database Tests', () => {
+    beforeEach(() => DatabaseResolver.reset());
+
+    it('should save a new user-token sucessfully', async () => {
+        const tokenValue = 'randomToken153412';
+        const expectedResult = { token: tokenValue };
+        const conn = await DatabaseResolver.getConnection();
+        const admin = await saveAndTestAdmin(conn, defaultAdmin);
+        const promise = expectPromiseNotToReject(
+            conn.saveNewUserToken(tokenValue, admin.id!)
+        );
+        const d = await promise;
+        await expect(promise).resolves.toMatchObject(expectedResult);
+    });
+
+    it('should invalidate a user-token sucessfully', async () => {
+        const tokenValue = 'randomToken153412';
+        const expectedResult = {
+            token: tokenValue,
+            user: {
+                email: defaultAdmin.user.email,
+                password: defaultAdmin.user.password,
+                role: UserRole.Adm,
+            },
+        };
+        const conn = await DatabaseResolver.getConnection();
+        const admin = await saveAndTestAdmin(conn, defaultAdmin);
+        await expectPromiseNotToReject(
+            conn.saveNewUserToken(tokenValue, admin.id!)
+        );
+        const promise = expectPromiseNotToReject(
+            conn.invalidateUserToken(tokenValue)
+        );
+        await expect(promise).resolves.toMatchObject(expectedResult);
     });
 });

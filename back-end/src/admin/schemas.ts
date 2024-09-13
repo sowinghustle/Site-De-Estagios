@@ -1,36 +1,36 @@
 import Joi from 'joi';
-import respMessages from '../config/responseMessages';
-import validation from '../config/validation';
+import config from '../config';
 
-export const AdminLoginSchema = Joi.object({
+export const AdminLoginSchema = Joi.object<{
+    nameOrEmail: string;
+    password: string;
+}>({
     nameOrEmail: Joi.string()
         .lowercase()
-        .trim()
         .required()
         .when(Joi.string().email(), {
             then: Joi.string()
-                .max(validation.maxEmailLength)
+                .max(config.validations.maxEmailLength)
                 .messages({
-                    'string.email': 'O email deve ser um email válido.',
-                    'string.max': `O email deve ter no máximo ${validation.maxEmailLength} caracteres.`,
+                    'string.email': config.messages.invalidEmail,
+                    'string.max': `O email deve ter no máximo ${config.validations.maxEmailLength} caracteres.`,
                 }),
             otherwise: Joi.string()
                 .pattern(/^[a-zA-Z ]+$/)
                 .messages({
-                    'string.pattern.base': respMessages.nameOnlyLetters,
+                    'string.pattern.base': config.messages.nameOnlyLetters,
                 }),
         })
         .messages({
-            'any.required': respMessages.emptyNameOrEmail,
+            'any.required': config.messages.emptyNameOrEmail,
             'alternatives.match':
                 'Por favor, forneça um nome ou um email válido.',
         }),
     password: Joi.string()
-        .min(validation.minPasswordLength)
-        .trim()
+        .min(config.validations.minPasswordLength)
         .required()
         .messages({
-            'string.min': respMessages.insuficientPasswordCharacters,
-            'any.required': respMessages.emptyPassword,
+            'string.min': config.messages.insuficientPasswordCharacters,
+            'any.required': config.messages.emptyPassword,
         }),
 });

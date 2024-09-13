@@ -10,9 +10,9 @@ export function ensureIsAuthenticated() {
             req.headers.authorization = `Bearer ${req.token}`;
         }
 
-        const midd = passport.authenticate('bearer', {
+        const midd: Handler = passport.authenticate('bearer', {
             session: false,
-        }) as Handler;
+        });
 
         midd(req, res, next);
     };

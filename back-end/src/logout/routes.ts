@@ -5,6 +5,6 @@ import LogoutController from './controller';
 const routes = Router();
 const controller = new LogoutController();
 
-routes.get('', ensureIsAuthenticated, controller.logout);
+routes.delete('', ensureIsAuthenticated, controller.logout);
 
 export default routes;
