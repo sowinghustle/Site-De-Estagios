@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "front-end",
-    "slug": "front-end",
+    "name": "estagiohub",
+    "slug": "estagiohub",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -27,13 +27,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
-      [
-       "expo-font",
-        {
-          "fonts": ["./assets/fonts/InterVariable.ttf"]
-        }
-      ]
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true
