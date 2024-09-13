@@ -7,11 +7,6 @@ module.exports = {
     testEnvironment: 'node',
     transform: {
         ...createDefaultPreset().transform,
-        '^.+\\.tsx?$': [
-            'ts-jest',
-            {
-                isolatedModules: true,
-            },
-        ],
+        '^.+\\.tsx?$': ['@swc/jest'],
     },
 };

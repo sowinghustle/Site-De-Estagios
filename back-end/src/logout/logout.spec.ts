@@ -1,11 +1,11 @@
 import { DatabaseResolver } from '../database';
 
 describe('POST /admin/logout', () => {
+    beforeAll(() => jest.setTimeout(120_000));
     beforeEach(() => DatabaseResolver.reset());
 
-    it('does nothing', () => {
-        expect(1).toBe(1);
-    });
+    it('does nothing', () => expect(1).toBe(1));
+
     // it('should return error if an invalid token is provided', async () => {
     //     const res = await requestWithSupertest
     //         .delete('/api/v1/logout')
