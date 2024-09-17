@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { CookieOptions } from 'express';
 
 type Environment = 'development' | 'test' | 'production';
 
@@ -6,6 +7,7 @@ const config = Object.freeze({
     messages: {
         // good
         successfullLogin: 'Login realizado com sucesso!',
+        successfullRegister: 'Cadastro realizado com sucesso!',
         welcomeMessage: 'Bem vindo.',
         // bad
         databaseImplNotDefined:
@@ -20,6 +22,7 @@ const config = Object.freeze({
         // validation
         adminNotFoundWithNameOrEmail:
             'Administrador não encontrado com este nome ou email.',
+        supervisorNotFoundWithEmail: 'Orientador não encontrado com este email',
         emptyNameOrEmail: 'O campo nome ou email é obrigatório.',
         emptyPassword: 'O campo senha é obrigatório.',
         insuficientPasswordCharacters:
@@ -36,7 +39,7 @@ const config = Object.freeze({
     instituition: {
         adminName: 'admin',
         adminEmail: 'admin@email.com',
-        adminPassword: randomUUID(),
+        adminPassword: 'adminPassword15123',
     },
     project: (() => {
         const config = {
@@ -53,7 +56,19 @@ const config = Object.freeze({
             config.environment = 'test';
         }
 
-        return config;
+        const cookieOptions: CookieOptions = {
+            maxAge: 1000 * 60 * 30,
+            httpOnly: true,
+            signed: false,
+        };
+
+        if (config.environment == 'production') {
+            cookieOptions.signed = true;
+            cookieOptions.secure = true;
+            cookieOptions.sameSite = 'strict';
+        }
+
+        return { ...config, cookieOptions };
     })(),
 });
 

@@ -107,8 +107,9 @@ app.use(
 
         const error = err as Error;
 
-        if (config.project.environment !== 'production') {
+        if (config.project.environment === 'development') {
             return res.status(500).send({
+                ...error,
                 success: false,
                 message: error.message,
                 stack: error.stack,
@@ -122,12 +123,16 @@ app.use(
     }
 );
 
-app.use((req, res) =>
-    res.status(404).send({
+app.use((req, res) => {
+    const error: any = {
         success: false,
         message: config.messages.routeNotFound,
-        stack: new Error().stack,
-    })
-);
+    };
+
+    if (config.project.environment === 'development')
+        error.stack = new Error().stack;
+
+    res.status(404).send(error);
+});
 
 export default app;

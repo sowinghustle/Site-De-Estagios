@@ -4,6 +4,7 @@ import {
     defaultAdmin,
     requestWithSupertest,
     saveAndTestAdmin,
+    testAuthResponseCookies,
     token,
 } from '../config/testing';
 import { DatabaseResolver } from '../database';
@@ -11,16 +12,7 @@ import { DatabaseResolver } from '../database';
 describe('POST /admin/login', () => {
     beforeEach(() => DatabaseResolver.reset());
 
-    describe('should authenticate user successfully', () => {
-        const testResponseCookies = (res: any) => {
-            let cookies = res.headers['set-cookie'];
-
-            expect(Array.isArray(cookies)).toBe(true);
-
-            for (let key of [`token=${token}`, 'HttpOnly'])
-                expect(cookies[0]).toContain(key);
-        };
-
+    describe('should authenticate admin successfully', () => {
         it('with correct name and password', async () => {
             const expectedResultValue = {
                 success: true,
@@ -36,7 +28,7 @@ describe('POST /admin/login', () => {
                     password: defaultAdmin.user.password,
                 });
             expect(res.body).toMatchObject(expectedResultValue);
-            testResponseCookies(res);
+            testAuthResponseCookies(res);
             expect(res.status).toEqual(200);
         });
 
@@ -55,7 +47,7 @@ describe('POST /admin/login', () => {
                     password: defaultAdmin.user.password,
                 });
             expect(res.body).toMatchObject(expectedResultValue);
-            testResponseCookies(res);
+            testAuthResponseCookies(res);
             expect(res.status).toEqual(200);
         });
     });
@@ -85,7 +77,7 @@ describe('POST /admin/login', () => {
             expect(res.status).toEqual(400);
         });
 
-        it('when user is not found', async () => {
+        it('when admin is not found', async () => {
             const expectedResultValue = {
                 success: false,
                 message: config.messages.adminNotFoundWithNameOrEmail,

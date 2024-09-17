@@ -1,4 +1,4 @@
-import { CookieOptions, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
 import { handleValidationResult } from '../config/utils';
@@ -41,21 +41,13 @@ export default class AdminController {
             });
         }
 
-        const options: CookieOptions = {
-            maxAge: 1000 * 60 * 30,
-            httpOnly: true,
-            signed: false,
-        };
-
-        if (config.project.environment == 'production') {
-            options.signed = true;
-            options.secure = true;
-            options.sameSite = 'strict';
-        }
-
         return res
             .status(200)
-            .cookie('token', saveUserTokenResult.userToken.token, options)
+            .cookie(
+                'token',
+                saveUserTokenResult.userToken.token,
+                config.project.cookieOptions
+            )
             .send({
                 success: true,
                 expiresAt: saveUserTokenResult.userToken.expiresAt,
