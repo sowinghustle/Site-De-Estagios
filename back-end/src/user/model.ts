@@ -1,7 +1,11 @@
 export enum UserRole {
+    Unknown = 'unknown',
     Adm = 'admin',
     Student = 'student',
+    Supervisor = 'supervisor',
 }
+
+export const UserRoleValues = Object.values(UserRole);
 
 export type User = {
     id?: number;
@@ -10,9 +14,8 @@ export type User = {
     role: UserRole;
 };
 
-export type UserCollection = User[];
-
 export type AdmUser = Omit<User, 'role'>;
 export type StudentUser = Omit<User, 'role'>;
+export type SupervisorUser = Omit<User, 'role'>;
 
-export const UserRoleValues = Object.values(UserRole);
+export type UserCollection = User[];

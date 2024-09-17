@@ -2,11 +2,13 @@ import { DatabaseResolver } from '.';
 import {
     alternativeAdmin,
     defaultAdmin,
+    defaultSupervisor,
     expectPromiseNotToReject,
     saveAdmin,
     saveAndTestAdmin,
+    saveSupervisor,
+    token,
 } from '../config/testing';
-import { UserRole } from '../user/model';
 
 describe('Admin Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
@@ -16,6 +18,14 @@ describe('Admin Database Tests', () => {
         const conn = await DatabaseResolver.getConnection();
         const { value, error } = await saveAdmin(conn, defaultAdmin);
         expect(value).toMatchObject(expectAdminValue);
+        expect(error).toBeUndefined();
+    });
+
+    it('should save a new supervisor', async () => {
+        const expectedSupervisorValue = defaultSupervisor;
+        const conn = await DatabaseResolver.getConnection();
+        const { value, error } = await saveSupervisor(conn, defaultSupervisor);
+        expect(value).toMatchObject(expectedSupervisorValue);
         expect(error).toBeUndefined();
     });
 
@@ -96,34 +106,28 @@ describe('User-Token Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
 
     it('should save a new user-token sucessfully', async () => {
-        const tokenValue = 'randomToken153412';
-        const expectedResult = { token: tokenValue };
+        const expectedResult = { token };
         const conn = await DatabaseResolver.getConnection();
         const admin = await saveAndTestAdmin(conn, defaultAdmin);
         const promise = expectPromiseNotToReject(
-            conn.saveNewUserToken(tokenValue, admin.id!)
+            conn.saveNewUserToken(token, admin.id!)
         );
-        const d = await promise;
         await expect(promise).resolves.toMatchObject(expectedResult);
     });
 
     it('should invalidate a user-token sucessfully', async () => {
-        const tokenValue = 'randomToken153412';
         const expectedResult = {
-            token: tokenValue,
+            token,
             user: {
                 email: defaultAdmin.user.email,
                 password: defaultAdmin.user.password,
-                role: UserRole.Adm,
             },
         };
         const conn = await DatabaseResolver.getConnection();
         const admin = await saveAndTestAdmin(conn, defaultAdmin);
-        await expectPromiseNotToReject(
-            conn.saveNewUserToken(tokenValue, admin.id!)
-        );
+        await expectPromiseNotToReject(conn.saveNewUserToken(token, admin.id!));
         const promise = expectPromiseNotToReject(
-            conn.invalidateUserToken(tokenValue)
+            conn.invalidateUserToken(token)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });

@@ -15,11 +15,13 @@ import {
 } from 'sequelize-typescript';
 import { Admin } from '../../admin/model';
 import config from '../../config';
+import { Supervisor } from '../../supervisor/model';
 import { UserToken } from '../../token/model';
 import { User, UserRole, UserRoleValues } from '../../user/model';
 
 type SequelizeUser = User;
 type SequelizeAdmin = Omit<Admin, 'user'> & { userId: number };
+type SequelizeSupervisor = Omit<Supervisor, 'user'> & { userId: number };
 type SequelizeUserToken = Omit<UserToken, 'user'> & {
     userId: number;
     expiredAt?: Date;
@@ -27,6 +29,7 @@ type SequelizeUserToken = Omit<UserToken, 'user'> & {
 
 type AdminCreate = Optional<SequelizeAdmin, 'id'>;
 type UserCreate = Optional<SequelizeUser, 'id'>;
+type SupervisorCreate = Optional<SequelizeSupervisor, 'id'>;
 type UserTokenCreate = Omit<
     SequelizeUserToken,
     'id' | 'expiresAt' | 'expiredAt'
@@ -70,6 +73,7 @@ export class UserTokenTable extends Model<SequelizeUserToken, UserTokenCreate> {
 export class UserTable extends Model<SequelizeUser, UserCreate> {
     public declare tokens: UserTokenTable[];
     public declare admin: AdminTable;
+    public declare supervisor: SupervisorTable;
 
     @PrimaryKey
     @AutoIncrement
@@ -111,6 +115,24 @@ export class AdminTable extends Model<SequelizeAdmin, AdminCreate> {
 
     @Index
     @Unique
+    @NotEmpty
+    @Column
+    public declare name: string;
+}
+
+@Table({ tableName: 'supervisors' })
+export class SupervisorTable extends Model<
+    SequelizeSupervisor,
+    SupervisorCreate
+> {
+    public declare user: UserTable;
+
+    @PrimaryKey
+    @AutoIncrement
+    @Column
+    public declare id: number;
+
+    @Index
     @NotEmpty
     @Column
     public declare name: string;

@@ -1,34 +1,47 @@
 import { Admin } from '../../admin/model';
+import { Supervisor } from '../../supervisor/model';
 import { UserToken } from '../../token/model';
-import { User } from '../../user/model';
-import { AdminTable, UserTable, UserTokenTable } from './tables';
+import { User, UserRole } from '../../user/model';
+import {
+    AdminTable,
+    SupervisorTable,
+    UserTable,
+    UserTokenTable,
+} from './tables';
 
-export function mapSequelizeToModel<T>(entity: T): any {
-    if (entity instanceof AdminTable) {
-        return {
-            ...entity.toJSON(),
-            user: mapSequelizeUserModel(entity.user),
-        } as Admin;
-    }
-
-    if (entity instanceof UserTable) {
-        return mapSequelizeUserModel(entity)!;
-    }
-
-    if (entity instanceof UserTokenTable) {
-        return {
-            ...entity.toJSON(),
-            user: mapSequelizeUserModel(entity.user),
-        } as UserToken;
-    }
-
-    throw new Error('Esta entidade não pertence aos do banco');
+export function mapSequelizeAdminToModel(entity: AdminTable) {
+    return {
+        ...entity.toJSON(),
+        user: !entity.user
+            ? undefined
+            : mapSequelizeUserToModel(entity.user, UserRole.Adm),
+    } as Admin;
 }
 
-function mapSequelizeUserModel(
-    entity: UserTable | undefined
-): User | undefined {
-    if (entity) {
-        return entity.toJSON() as User;
-    }
+export function mapSequelizeSupervisorToModel(entity: SupervisorTable) {
+    return {
+        ...entity.toJSON(),
+        user: !entity.user
+            ? undefined
+            : mapSequelizeUserToModel(entity.user, UserRole.Supervisor),
+    } as Supervisor;
+}
+
+export function mapSequelizeUserTokenToModel(
+    entity: UserTokenTable,
+    userRole: UserRole = UserRole.Unknown
+) {
+    return {
+        ...entity.toJSON(),
+        user: !entity.user
+            ? undefined
+            : mapSequelizeUserToModel(entity.user, userRole),
+    } as UserToken;
+}
+
+export function mapSequelizeUserToModel(
+    entity: UserTable,
+    role: UserRole = UserRole.Unknown
+) {
+    return { ...entity.toJSON(), role } as User;
 }

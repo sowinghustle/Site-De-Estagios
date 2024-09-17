@@ -1,4 +1,5 @@
 import { Admin, AdminCollection } from '../admin/model';
+import { Supervisor } from '../supervisor/model';
 import { UserToken } from '../token/model';
 import { User } from '../user/model';
 import { SequelizeDatabaseConnection } from './sequelize/database';
@@ -6,9 +7,11 @@ import { SequelizeDatabaseConnection } from './sequelize/database';
 export interface DatabaseConnection {
     getError(): Error | undefined;
     saveNewAdmin(admin: Admin): Promise<Admin | undefined>;
+    saveNewSupervisor(supervisor: Supervisor): Promise<Supervisor | undefined>;
     getAdmins(): Promise<AdminCollection>;
     findUserByToken(token: string): Promise<User | undefined>;
     findAdminByNameOrEmail(nameOrEmail: string): Promise<Admin | undefined>;
+    findSupervisorByEmail(email: string): Promise<Supervisor | undefined>;
     invalidateUserToken(token: string): Promise<UserToken | undefined>;
     saveNewUserToken(
         token: string,
