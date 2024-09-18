@@ -83,6 +83,10 @@ export class UserTable extends Model<SequelizeUser, UserCreate> {
     @Index
     @Unique
     @AllowNull(false)
+    @Length({
+        max: config.validations.maxEmailLength,
+        msg: config.messages.invalidEmail,
+    })
     @Validate({
         isEmail: {
             msg: config.messages.invalidEmail,
@@ -91,6 +95,7 @@ export class UserTable extends Model<SequelizeUser, UserCreate> {
     @Column
     public declare email: string;
 
+    @Index
     @Column(DataTypes.ENUM(...UserRoleValues))
     public declare role: UserRole;
 
@@ -115,6 +120,7 @@ export class AdminTable extends Model<SequelizeAdmin, AdminCreate> {
 
     @Index
     @Unique
+    @AllowNull(false)
     @NotEmpty
     @Column
     public declare name: string;
@@ -134,6 +140,7 @@ export class SupervisorTable extends Model<
 
     @Index
     @NotEmpty
+    @AllowNull(false)
     @Column
     public declare name: string;
 }

@@ -33,7 +33,6 @@ const config = Object.freeze({
     },
     validations: {
         minPasswordLength: 8,
-        minNameLength: 3,
         maxEmailLength: 254,
     },
     instituition: {
