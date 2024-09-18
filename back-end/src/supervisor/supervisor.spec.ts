@@ -1,5 +1,6 @@
 import config from '../config';
 import {
+    alternativeSupervisor,
     defaultSupervisor,
     requestWithSupertest,
     saveAndTestSupervisor,
@@ -45,5 +46,22 @@ describe('POST /supervisor/register', () => {
         expect(res.body).toMatchObject(expectedResultValue);
         testAuthResponseCookies(res);
         expect(res.status).toEqual(200);
+    });
+
+    it('should not register a supervisor when repeat-password doesnt match password', async () => {
+        const expectedResultValue = {
+            success: false,
+            message: config.messages.wrongRepeatPassword,
+        };
+        const res = await requestWithSupertest
+            .post('/api/v1/supervisor/register')
+            .send({
+                name: defaultSupervisor.name,
+                email: defaultSupervisor.user.email,
+                password: defaultSupervisor.user.password,
+                repeatPassword: alternativeSupervisor.user.password,
+            });
+        expect(res.body).toMatchObject(expectedResultValue);
+        expect(res.status).toEqual(400);
     });
 });

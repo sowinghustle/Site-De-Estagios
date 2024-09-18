@@ -30,6 +30,7 @@ const config = Object.freeze({
             'A senha deve ter pelo menos 8 caracteres.',
         invalidEmail: 'Este não é um email válido',
         nameOnlyLetters: 'O campo nome só pode ter letras.',
+        wrongRepeatPassword: 'A confirmação de senha está incorreta',
         wrongPassword: 'A senha está incorreta!',
     },
     validations: {

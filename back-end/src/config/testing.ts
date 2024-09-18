@@ -52,7 +52,15 @@ export const defaultSupervisor: Supervisor = Object.freeze({
     name: 'Supervisor Name',
     user: {
         email: 'supervisor_name123@email.com',
-        password: 'supervisorPassword15123',
+        password: 'supervisor_Password 15123*',
+    },
+});
+
+export const alternativeSupervisor: Supervisor = Object.freeze({
+    name: 'Different Supervisor Name',
+    user: {
+        email: 'anotherSupervisor_name123@email.com',
+        password: 'anotherSupervisorPassword32151',
     },
 });
 

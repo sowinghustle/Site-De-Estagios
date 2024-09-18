@@ -6,8 +6,8 @@
         "dev": "ts-node-dev src/main.ts",
         "format": "prettier --write src/*.ts && eslint ./ --fix",
         "prepare": "cd .. && husky back-end/.husky",
-        "test": "jest --ci --coverage",
-        "test:debug": "jest --debug --runInBand",
+        "test": "jest --runInBand",
+        "test:ci": "jest --ci --coverage",
         "test:watch": "jest --watch --runInBand"
     },
     "keywords": [],

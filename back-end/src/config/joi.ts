@@ -1,35 +1,39 @@
 import Joi from 'joi';
 import config from '.';
 
-export const NameSchema = Joi.string()
+const NameSchemaNoMessages = Joi.string()
     .pattern(/^[a-zA-Z ]+$/)
-    .required()
-    .messages({
-        'string.pattern.base': config.messages.nameOnlyLetters,
-    });
+    .required();
 
-export const EmailSchema = Joi.string()
+const EmailSchemaNoMessages = Joi.string()
     .email()
     .max(config.validations.maxEmailLength)
-    .required()
-    .messages({
-        'any.required': config.messages.emptyEmail,
-        'string.empty': config.messages.emptyEmail,
-        'string.email': config.messages.invalidEmail,
-        'string.max': `O email deve ter no máximo ${config.validations.maxEmailLength} caracteres.`,
-    });
+    .required();
+
+export const NameSchema = NameSchemaNoMessages.messages({
+    'string.pattern.base': config.messages.nameOnlyLetters,
+});
+
+export const EmailSchema = EmailSchemaNoMessages.messages({
+    'any.required': config.messages.emptyEmail,
+    'string.empty': config.messages.emptyEmail,
+    'string.email': config.messages.invalidEmail,
+    'string.max': `O email deve ter no máximo ${config.validations.maxEmailLength} caracteres.`,
+});
 
 export const NameOrEmailSchema = Joi.string()
     .lowercase()
-    .when(Joi.string().email(), {
-        then: EmailSchema,
-        otherwise: NameSchema,
-    })
     .required()
+    .when(Joi.string().email(), {
+        then: EmailSchemaNoMessages,
+        otherwise: NameSchemaNoMessages,
+    })
     .messages({
         'any.required': config.messages.emptyNameOrEmail,
-        'string.empty': config.messages.emptyNameOrEmail,
         'alternatives.match': 'Por favor, forneça um nome ou um email válido.',
+        'string.max': `O email deve ter no máximo ${config.validations.maxEmailLength} caracteres.`,
+        'string.empty': config.messages.emptyNameOrEmail,
+        'string.email': config.messages.invalidEmail,
     });
 
 export const PasswordSchema = Joi.string()
@@ -46,5 +50,5 @@ export const RepeatPasswordSchema = Joi.any()
     .label('Confirmar senha')
     .required()
     .options({
-        messages: { 'any.only': 'A confirmação de senha está incorreta' },
+        messages: { 'any.only': config.messages.wrongRepeatPassword },
     });
