@@ -1,43 +1,30 @@
-import config from '../config';
-import { ResultOrErrorObject } from '../config/utils';
+import { buildToResult, Result } from '../config/utils';
 import { DatabaseResolver } from '../database';
 import { Supervisor } from './model';
 
 export class SupervisorService {
-    async findSupervisorEmailAndPassword(data: {
-        email: string;
-        password: string;
-    }): Promise<ResultOrErrorObject<{ supervisor: Supervisor }>> {
+    async findSupervisorByEmail(
+        email: string
+    ): Promise<Result<Supervisor | undefined>> {
+        const toResult = buildToResult<Supervisor | undefined>();
         const conn = await DatabaseResolver.getConnection();
-        const supervisor = await conn.findSupervisorByEmail(data.email);
+        const supervisor = await conn.findSupervisorByEmail(email);
 
-        if (!supervisor) {
-            return {
-                error: conn.getError()!,
-            };
-        }
-
-        if (supervisor.user.password !== data.password) {
-            return {
-                error: new Error(config.messages.wrongPassword),
-            };
-        }
-
-        return { supervisor };
+        return toResult(supervisor);
     }
     async saveNewSupervisor(
         supervisor: Supervisor
-    ): Promise<ResultOrErrorObject<{ supervisor: Supervisor }>> {
+    ): Promise<Result<Supervisor>> {
+        const toResult = buildToResult<Supervisor>();
         const conn = await DatabaseResolver.getConnection();
         const createdSupervisor = await conn.saveNewSupervisor(supervisor);
+        const error = conn.getError();
 
-        if (!createdSupervisor) {
-            return {
-                error: conn.getError()!,
-            };
+        if (error) {
+            return toResult(error);
         }
 
-        return { supervisor: createdSupervisor };
+        return toResult(createdSupervisor!);
     }
 }
 

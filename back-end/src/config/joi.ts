@@ -32,3 +32,10 @@ export const PasswordSchema = Joi.string()
         'string.min': config.messages.insuficientPasswordCharacters,
         'any.required': config.messages.emptyPassword,
     });
+
+export const RepeatPasswordSchema = Joi.any()
+    .equal(Joi.ref('password'))
+    .label('Confirmar senha')
+    .options({
+        messages: { 'any.only': 'A confirmação de senha está incorreta' },
+    });

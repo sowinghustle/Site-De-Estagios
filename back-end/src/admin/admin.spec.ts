@@ -89,7 +89,7 @@ describe('POST /admin/login', () => {
                     password: defaultAdmin.user.password,
                 });
             expect(res.body).toMatchObject(expectedResultValue);
-            expect(res.status).toEqual(400);
+            expect(res.status).toEqual(404);
         });
 
         it('when provided password is wrong', async () => {

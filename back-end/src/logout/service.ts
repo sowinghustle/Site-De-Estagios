@@ -1,11 +1,15 @@
+import { buildToResult, Result } from '../config/utils';
 import { DatabaseResolver } from '../database';
+import { UserToken } from '../token/model';
 
 export class LogoutService {
-    async handle(token: string): Promise<Error | undefined> {
+    async handle(token: string): Promise<Result<UserToken>> {
+        const toResult = buildToResult<UserToken>();
         const conn = await DatabaseResolver.getConnection();
-        await conn.invalidateUserToken(token);
+        const userToken = await conn.invalidateUserToken(token);
         const error = conn.getError();
-        return error;
+        if (error) return toResult(error);
+        return toResult(userToken!);
     }
 }
 

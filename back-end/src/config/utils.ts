@@ -2,18 +2,50 @@ import { Response } from 'express';
 import { ValidationError, ValidationResult } from 'joi';
 import config from '.';
 
-type ErrorHandler = (validationError: ValidationError) => string;
+type ValueOrError<T> =
+    | { value: T; isError: false }
+    | { value: Error; isError: true };
 
-const defaultErrorHandler: ErrorHandler = (
-    validationError: ValidationError
-) => {
-    return validationError.message;
+export type Result<T> = ValueOrError<T> & {
+    orElseThrow: (cb?: (err: Error) => Error | string) => T;
 };
 
-export function handleValidationResult<T>(
+function success<T>(value: T): Result<T> {
+    return {
+        value,
+        isError: false,
+        orElseThrow: (_) => value,
+    };
+}
+
+function error<T>(error: Error): Result<T> {
+    return {
+        value: error,
+        isError: true,
+        orElseThrow(cb) {
+            if (cb) {
+                const ex = cb(error);
+                throw ex instanceof Error ? ex : new Error(ex);
+            }
+            throw error;
+        },
+    };
+}
+
+export function buildToResult<T>() {
+    return function (value: T | Error): Result<T> {
+        if (value instanceof Error) {
+            return error<T>(value);
+        }
+
+        return success<T>(value);
+    };
+}
+
+export function getValidationResult<T>(
     response: Response,
     validationResult: ValidationResult<T>,
-    handleError = defaultErrorHandler
+    handleError = (validationError: ValidationError) => validationError.message
 ): T | undefined {
     if (!validationResult.error) {
         return validationResult.value;
@@ -33,9 +65,3 @@ export function handleValidationResult<T>(
         });
     } else response.send({ success: false, message: errorMessage });
 }
-
-export type ResultOrErrorObject<T extends Object> =
-    | (T & { error?: never })
-    | ({ [key in keyof T]?: never } & { error: Error });
-
-export type ResultOrError<T> = ResultOrErrorObject<{ value: T }>;

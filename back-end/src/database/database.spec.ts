@@ -16,46 +16,41 @@ describe('Admin Database Tests', () => {
     it('should save a new admin', async () => {
         const expectAdminValue = defaultAdmin;
         const conn = await DatabaseResolver.getConnection();
-        const { value, error } = await saveAdmin(conn, defaultAdmin);
-        expect(value).toMatchObject(expectAdminValue);
-        expect(error).toBeUndefined();
+        const result = await saveAdmin(conn, defaultAdmin);
+        expect(result.isError).toBe(false);
+        expect(result.value).toMatchObject(expectAdminValue);
     });
 
     it('should save a new supervisor', async () => {
         const expectedSupervisorValue = defaultSupervisor;
         const conn = await DatabaseResolver.getConnection();
-        const { value, error } = await saveSupervisor(conn, defaultSupervisor);
-        expect(value).toMatchObject(expectedSupervisorValue);
-        expect(error).toBeUndefined();
+        const result = await saveSupervisor(conn, defaultSupervisor);
+        expect(result.isError).toBe(false);
+        expect(result.value).toMatchObject(expectedSupervisorValue);
     });
 
     describe('should not save a new admin', () => {
         it('admin name already in use', async () => {
             const conn = await DatabaseResolver.getConnection();
             await saveAndTestAdmin(conn, defaultAdmin);
-
-            const { value, error } = await saveAdmin(conn, {
+            const result = await saveAdmin(conn, {
                 ...defaultAdmin,
                 user: {
                     ...defaultAdmin.user,
                     email: alternativeAdmin.user.email,
                 },
             });
-            expect(value).toBeUndefined();
-            expect(error).not.toBeUndefined();
+            expect(result.value).toBeInstanceOf(Error);
         });
 
         it('specified email already in use', async () => {
             const conn = await DatabaseResolver.getConnection();
             await saveAndTestAdmin(conn, defaultAdmin);
-
-            const { value, error } = await saveAdmin(conn, {
+            const result = await saveAdmin(conn, {
                 ...defaultAdmin,
                 name: alternativeAdmin.name,
             });
-
-            expect(value).toBeUndefined();
-            expect(error).not.toBeUndefined();
+            expect(result.value).toBeInstanceOf(Error);
         });
     });
 

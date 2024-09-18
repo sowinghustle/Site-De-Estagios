@@ -107,9 +107,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                 ],
             });
 
-            if (!model) {
-                throw new Error(config.messages.adminNotFoundWithNameOrEmail);
-            }
+            if (!model) return;
 
             return mapSequelizeAdminToModel(model);
         } catch (err) {
@@ -158,9 +156,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                 ],
             });
 
-            if (!model) {
-                throw new Error(config.messages.supervisorNotFoundWithEmail);
-            }
+            if (!model) return;
 
             return mapSequelizeSupervisorToModel(model);
         } catch (err) {

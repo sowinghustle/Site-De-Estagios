@@ -6,7 +6,7 @@ import {
     RepeatPasswordSchema,
 } from '../config/joi';
 
-export const SupervisorLoginSchema = Joi.object<{
+export const StudentLoginSchema = Joi.object<{
     email: string;
     password: string;
 }>({
@@ -14,7 +14,7 @@ export const SupervisorLoginSchema = Joi.object<{
     password: PasswordSchema.required(),
 });
 
-export const SupervisorRegisterSchema = Joi.object<{
+export const StudentRegisterSchema = Joi.object<{
     name: string;
     email: string;
     password: string;

@@ -22,7 +22,7 @@ describe('POST /supervisor/register', () => {
                 name: defaultSupervisor.name,
                 email: defaultSupervisor.user.email,
                 password: defaultSupervisor.user.password,
-                passwordConfirmation: defaultSupervisor.user.password,
+                repeatPassword: defaultSupervisor.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
         expect(res.status).toEqual(201);

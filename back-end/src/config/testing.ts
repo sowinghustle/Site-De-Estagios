@@ -5,7 +5,7 @@ import { Admin } from '../admin/model';
 import app from '../app';
 import { DatabaseConnection } from '../database';
 import { Supervisor } from '../supervisor/model';
-import { ResultOrError } from './utils';
+import { buildToResult, Result } from './utils';
 
 export const requestWithSupertest = supertest(app);
 export const token = randomUUID();
@@ -58,54 +58,64 @@ export const defaultSupervisor: Supervisor = Object.freeze({
 
 export const saveAdmin = async (
     conn: DatabaseConnection,
-    admin: Admin
-): Promise<ResultOrError<Admin | undefined>> => {
-    return await conn
-        .saveNewAdmin(admin)
-        .then((value) => {
-            if (conn.getError()) {
-                return { error: conn.getError() };
-            }
-            return { value };
-        })
-        .catch((error: Error) => ({ error }));
+    data: Admin
+): Promise<Result<Admin>> => {
+    const toResult = buildToResult<Admin>();
+
+    try {
+        const admin = await conn.saveNewAdmin(data);
+        const error = conn.getError();
+
+        if (error) {
+            return toResult(error);
+        }
+
+        return toResult(admin!);
+    } catch (err: any) {
+        return toResult(err as Error);
+    }
 };
 
 export const saveAndTestAdmin = async (
     conn: DatabaseConnection,
-    admin: Admin
+    data: Admin
 ) => {
-    const expectedAdminValue = admin;
-    const { error, value } = await saveAdmin(conn, admin);
-    expect(value).toMatchObject(expectedAdminValue);
-    expect(error).toBeUndefined();
-    return value!;
+    const expectedAdminValue = data;
+    const result = await saveAdmin(conn, data);
+    expect(result.isError).toBe(false);
+    expect(result.value).toMatchObject(expectedAdminValue);
+    return result.value as Admin;
 };
 
 export const saveSupervisor = async (
     conn: DatabaseConnection,
-    supervisor: Supervisor
-): Promise<ResultOrError<Admin | undefined>> => {
-    return await conn
-        .saveNewSupervisor(supervisor)
-        .then((value) => {
-            if (conn.getError()) {
-                return { error: conn.getError() };
-            }
-            return { value };
-        })
-        .catch((error: Error) => ({ error }));
+    data: Supervisor
+): Promise<Result<Admin | undefined>> => {
+    const toResult = buildToResult<Supervisor>();
+
+    try {
+        const admin = await conn.saveNewSupervisor(data);
+        const error = conn.getError();
+
+        if (error) {
+            return toResult(error);
+        }
+
+        return toResult(admin!);
+    } catch (err: any) {
+        return toResult(err as Error);
+    }
 };
 
 export const saveAndTestSupervisor = async (
     conn: DatabaseConnection,
-    supervisor: Supervisor
+    data: Supervisor
 ) => {
-    const expectedSupervisorValue = supervisor;
-    const { error, value } = await saveSupervisor(conn, supervisor);
-    expect(value).toMatchObject(expectedSupervisorValue);
-    expect(error).toBeUndefined();
-    return value!;
+    const expectedSupervisorValue = data;
+    const result = await saveSupervisor(conn, data);
+    expect(result.isError).toBe(false);
+    expect(result.value).toMatchObject(expectedSupervisorValue);
+    return result.value as Supervisor;
 };
 
 export const adminAuthenticate = async (

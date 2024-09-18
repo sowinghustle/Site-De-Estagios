@@ -1,12 +1,12 @@
 # @name login
-# @prompt nameOrEmail
+# @prompt email
 # @prompt password
 POST {{baseUrl}}/supervisor/login
 Content-Type: application/json
 Access-Control-Allow-Credentials: true
 
 {
-    "nameOrEmail": "{{nameOrEmail}}",
+    "email": "{{email}}",
     "password": "{{password}}"
 }
 
@@ -23,5 +23,5 @@ Access-Control-Allow-Credentials: true
     "name": "{{name}}",
     "email": "{{email}}",
     "password": "{{password}}",
-    "passwordConfirmation": "{{password}}"
+    "repeatPassword": "{{password}}"
 }
