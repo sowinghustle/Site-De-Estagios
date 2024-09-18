@@ -74,7 +74,12 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     async getAdmins(): Promise<AdminCollection> {
         try {
             const admins = await AdminTable.findAll({
-                include: [UserTable],
+                include: [
+                    {
+                        model: UserTable,
+                        as: 'user',
+                    },
+                ],
             });
 
             return admins.map(mapSequelizeAdminToModel);
@@ -189,9 +194,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                 ],
             });
 
-            if (!model) {
-                throw new Error('Este token não foi encontrado!');
-            }
+            if (!model) return;
 
             await model.update({ expiredAt: new Date() });
 
@@ -200,24 +203,25 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             this.error = err as Error;
         }
     }
-    async findUserByToken(token: string): Promise<User | undefined> {
+    async findUserByValidUserToken(token: string): Promise<User | undefined> {
         try {
             const model = await UserTokenTable.findOne({
                 where: { token },
                 attributes: [],
-                include: [UserTable],
+                include: [
+                    {
+                        model: UserTable,
+                        as: 'user',
+                    },
+                ],
             });
 
-            if (!model) {
-                throw new Error('Token não encontrado.');
-            }
-
+            // token não encontrado
+            if (!model) return;
             const now = new Date();
 
-            if (now > model.expiresAt) {
-                throw new Error('Este token expirou!');
-            }
-
+            // token expirado
+            if (now > model.expiresAt) return;
             return mapSequelizeUserToModel(model.user);
         } catch (err) {
             this.error = err as Error;

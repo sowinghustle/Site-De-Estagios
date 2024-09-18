@@ -5,13 +5,19 @@ export default class LogoutController {
     async logout(req: Request, res: Response, next: NextFunction) {
         const logoutError = await logoutService.handle(req.token!);
 
-        if (logoutError) {
-            return next(logoutError);
-        }
+        if (logoutError) return next(logoutError);
 
-        req.logOut((err) => {
-            if (err) return next(err);
+        try {
+            await new Promise((resolve, reject) => {
+                req.logOut((err) => {
+                    if (!err) resolve(null);
+                    reject(err);
+                });
+            });
+
             return res.status(204).end();
-        });
+        } catch (err) {
+            return next(err);
+        }
     }
 }

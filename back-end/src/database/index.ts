@@ -9,7 +9,7 @@ export interface DatabaseConnection {
     saveNewAdmin(admin: Admin): Promise<Admin | undefined>;
     saveNewSupervisor(supervisor: Supervisor): Promise<Supervisor | undefined>;
     getAdmins(): Promise<AdminCollection>;
-    findUserByToken(token: string): Promise<User | undefined>;
+    findUserByValidUserToken(token: string): Promise<User | undefined>;
     findAdminByNameOrEmail(nameOrEmail: string): Promise<Admin | undefined>;
     findSupervisorByEmail(email: string): Promise<Supervisor | undefined>;
     invalidateUserToken(token: string): Promise<UserToken | undefined>;

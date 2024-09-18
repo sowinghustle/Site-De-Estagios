@@ -14,7 +14,7 @@ export function ensureIsAuthenticated() {
             session: false,
         });
 
-        midd(req, res, next);
+        return midd(req, res, next);
     };
 }
 

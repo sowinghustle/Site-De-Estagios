@@ -38,7 +38,7 @@ const config = Object.freeze({
     instituition: {
         adminName: 'admin',
         adminEmail: 'admin@email.com',
-        adminPassword: 'adminPassword15123',
+        adminPassword: 'adminPassword123*',
     },
     project: (() => {
         const config = {
