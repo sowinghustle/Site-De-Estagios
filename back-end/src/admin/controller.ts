@@ -36,7 +36,7 @@ export default class AdminController {
             await authService.saveNewUserToken(admin.user.id!)
         ).orElseThrow((error) => {
             return config.project.environment === 'production'
-                ? 'Os dados foram preenchidos corretamente, mas não foi possível completar a autenticação'
+                ? 'Não foi possível realizar o login, tente novamente mais tarde.'
                 : error.message;
         });
 

@@ -36,7 +36,7 @@ export default class SupervisorController {
             await authService.saveNewUserToken(supervisor.user.id!)
         ).orElseThrow((err) =>
             config.project.environment === 'production'
-                ? 'Os dados foram preenchidos corretamente, mas não foi possível completar a autenticação'
+                ? 'Não foi possível realizar o login, tente novamente mais tarde.'
                 : err.message
         );
 

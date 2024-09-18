@@ -3,17 +3,20 @@ import { Sequelize } from 'sequelize-typescript';
 import { DatabaseConnection } from '..';
 import { Admin, AdminCollection } from '../../admin/model';
 import config from '../../config';
+import { Student } from '../../student/model';
 import { Supervisor } from '../../supervisor/model';
 import { UserToken } from '../../token/model';
 import { User } from '../../user/model';
 import {
     mapSequelizeAdminToModel,
+    mapSequelizeStudentToModel,
     mapSequelizeSupervisorToModel,
     mapSequelizeUserTokenToModel,
     mapSequelizeUserToModel,
 } from './mapper';
 import {
     AdminTable,
+    StudentTable,
     SupervisorTable,
     UserTable,
     UserTokenTable,
@@ -49,20 +52,14 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
 
     async saveNewAdmin(admin: Admin): Promise<Admin | undefined> {
         try {
-            const model = await AdminTable.create(
-                {
-                    ...admin,
-                    userId: 0,
-                },
-                {
-                    include: [
-                        {
-                            model: UserTable,
-                            as: 'user',
-                        },
-                    ],
-                }
-            );
+            const model = await AdminTable.create(admin, {
+                include: [
+                    {
+                        model: UserTable,
+                        as: 'user',
+                    },
+                ],
+            });
 
             const entity = mapSequelizeAdminToModel(model);
 
@@ -118,20 +115,14 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         supervisor: Supervisor
     ): Promise<Supervisor | undefined> {
         try {
-            const model = await SupervisorTable.create(
-                {
-                    ...supervisor,
-                    userId: 0,
-                },
-                {
-                    include: [
-                        {
-                            model: UserTable,
-                            as: 'user',
-                        },
-                    ],
-                }
-            );
+            const model = await SupervisorTable.create(supervisor, {
+                include: [
+                    {
+                        model: UserTable,
+                        as: 'user',
+                    },
+                ],
+            });
 
             const entity = mapSequelizeSupervisorToModel(model);
 
@@ -159,6 +150,45 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             if (!model) return;
 
             return mapSequelizeSupervisorToModel(model);
+        } catch (err) {
+            this.error = err as Error;
+        }
+    }
+    async saveNewStudent(student: Student): Promise<Student | undefined> {
+        try {
+            const model = await StudentTable.create(student, {
+                include: [
+                    {
+                        model: UserTable,
+                        as: 'user',
+                    },
+                ],
+            });
+
+            const entity = mapSequelizeStudentToModel(model);
+
+            return entity;
+        } catch (err) {
+            this.error = err as Error;
+        }
+    }
+    async findStudentByEmail(email: string): Promise<Student | undefined> {
+        try {
+            const model = await StudentTable.findOne({
+                where: {
+                    [Op.or]: [{ '$user.email$': email }],
+                },
+                include: [
+                    {
+                        model: UserTable,
+                        as: 'user',
+                    },
+                ],
+            });
+
+            if (!model) return;
+
+            return mapSequelizeStudentToModel(model);
         } catch (err) {
             this.error = err as Error;
         }

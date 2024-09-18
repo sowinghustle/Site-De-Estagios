@@ -15,6 +15,7 @@ import {
 } from 'sequelize-typescript';
 import { Admin } from '../../admin/model';
 import config from '../../config';
+import { Student } from '../../student/model';
 import { Supervisor } from '../../supervisor/model';
 import { UserToken } from '../../token/model';
 import { User, UserRole, UserRoleValues } from '../../user/model';
@@ -22,14 +23,16 @@ import { User, UserRole, UserRoleValues } from '../../user/model';
 type SequelizeUser = User;
 type SequelizeAdmin = Omit<Admin, 'user'> & { userId: number };
 type SequelizeSupervisor = Omit<Supervisor, 'user'> & { userId: number };
+type SequelizeStudent = Omit<Student, 'user'> & { userId: number };
 type SequelizeUserToken = Omit<UserToken, 'user'> & {
     userId: number;
     expiredAt?: Date;
 };
 
-type AdminCreate = Optional<SequelizeAdmin, 'id'>;
 type UserCreate = Optional<SequelizeUser, 'id'>;
-type SupervisorCreate = Optional<SequelizeSupervisor, 'id'>;
+type AdminCreate = Omit<Optional<SequelizeAdmin, 'id'>, 'userId'>;
+type SupervisorCreate = Omit<Optional<SequelizeSupervisor, 'id'>, 'userId'>;
+type StudentCreate = Omit<Optional<SequelizeStudent, 'id'>, 'userId'>;
 type UserTokenCreate = Omit<
     SequelizeUserToken,
     'id' | 'expiresAt' | 'expiredAt'
@@ -143,4 +146,19 @@ export class SupervisorTable extends Model<
     @AllowNull(false)
     @Column
     public declare name: string;
+}
+
+export class StudentTable extends Model<SequelizeStudent, StudentCreate> {
+    public declare user: UserTable;
+
+    @PrimaryKey
+    @AutoIncrement
+    @Column
+    public declare id: number;
+
+    @Index
+    @NotEmpty
+    @AllowNull(false)
+    @Column
+    public declare fullName: string;
 }
