@@ -5,6 +5,6 @@ export const AdminLoginSchema = Joi.object<{
     nameOrEmail: string;
     password: string;
 }>({
-    nameOrEmail: NameOrEmailSchema.required(),
-    password: PasswordSchema.required(),
+    nameOrEmail: NameOrEmailSchema,
+    password: PasswordSchema,
 });

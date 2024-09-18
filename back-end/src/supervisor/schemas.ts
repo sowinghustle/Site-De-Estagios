@@ -10,8 +10,8 @@ export const SupervisorLoginSchema = Joi.object<{
     email: string;
     password: string;
 }>({
-    email: EmailSchema.required(),
-    password: PasswordSchema.required(),
+    email: EmailSchema,
+    password: PasswordSchema,
 });
 
 export const SupervisorRegisterSchema = Joi.object<{
@@ -20,8 +20,8 @@ export const SupervisorRegisterSchema = Joi.object<{
     password: string;
     repeatPassword: string;
 }>({
-    name: NameSchema.required(),
-    email: EmailSchema.required(),
-    password: PasswordSchema.required(),
-    repeatPassword: RepeatPasswordSchema.required(),
+    name: NameSchema,
+    email: EmailSchema,
+    password: PasswordSchema,
+    repeatPassword: RepeatPasswordSchema,
 });

@@ -23,6 +23,7 @@ const config = Object.freeze({
         adminNotFoundWithNameOrEmail:
             'Administrador não encontrado com este nome ou email.',
         supervisorNotFoundWithEmail: 'Orientador não encontrado com este email',
+        emptyEmail: 'O campo email é obrigatório.',
         emptyNameOrEmail: 'O campo nome ou email é obrigatório.',
         emptyPassword: 'O campo senha é obrigatório.',
         insuficientPasswordCharacters:
