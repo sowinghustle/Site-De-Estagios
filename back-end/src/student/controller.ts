@@ -61,7 +61,7 @@ export default class StudentController {
 
         (
             await studentService.saveNewStudent({
-                fullName: data.name,
+                fullName: data.fullName,
                 user: {
                     email: data.email,
                     password: data.password,

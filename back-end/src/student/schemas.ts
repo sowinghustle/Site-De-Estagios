@@ -15,12 +15,12 @@ export const StudentLoginSchema = Joi.object<{
 });
 
 export const StudentRegisterSchema = Joi.object<{
-    name: string;
+    fullName: string;
     email: string;
     password: string;
     repeatPassword: string;
 }>({
-    name: NameSchema,
+    fullName: NameSchema,
     email: EmailSchema,
     password: PasswordSchema,
     repeatPassword: RepeatPasswordSchema,

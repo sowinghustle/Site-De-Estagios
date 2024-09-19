@@ -1,30 +1,30 @@
 import config from '../config';
 import {
-    alternativeSupervisor,
-    defaultSupervisor,
+    alternativeStudent,
+    defaultStudent,
     requestWithSupertest,
-    saveAndTestSupervisor,
+    saveAndTestStudent,
     testAuthResponseCookies,
     token,
 } from '../config/testing';
 import { DatabaseResolver } from '../database';
 
-describe('POST /supervisor/login', () => {
+describe('POST /student/login', () => {
     beforeEach(() => DatabaseResolver.reset());
 
-    it('should authenticate supervisor sucessfully', async () => {
+    it('should authenticate student sucessfully', async () => {
         const expectedResultValue = {
             success: true,
             message: config.messages.successfullLogin,
             token,
         };
         const conn = await DatabaseResolver.getConnection();
-        await saveAndTestSupervisor(conn, defaultSupervisor);
+        await saveAndTestStudent(conn, defaultStudent);
         const res = await requestWithSupertest
-            .post('/api/v1/supervisor/login')
+            .post('/api/v1/student/login')
             .send({
-                email: defaultSupervisor.user.email,
-                password: defaultSupervisor.user.password,
+                email: defaultStudent.user.email,
+                password: defaultStudent.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
         testAuthResponseCookies(res);
@@ -32,38 +32,38 @@ describe('POST /supervisor/login', () => {
     });
 });
 
-describe('POST /supervisor/register', () => {
+describe('POST /student/register', () => {
     beforeEach(() => DatabaseResolver.reset());
 
-    it('should create supervisor sucessfully', async () => {
+    it('should create student sucessfully', async () => {
         const expectedResultValue = {
             success: true,
             message: config.messages.successfullRegister,
         };
         const res = await requestWithSupertest
-            .post('/api/v1/supervisor/register')
+            .post('/api/v1/student/register')
             .send({
-                name: defaultSupervisor.name,
-                email: defaultSupervisor.user.email,
-                password: defaultSupervisor.user.password,
-                repeatPassword: defaultSupervisor.user.password,
+                fullName: defaultStudent.fullName,
+                email: defaultStudent.user.email,
+                password: defaultStudent.user.password,
+                repeatPassword: defaultStudent.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
         expect(res.status).toEqual(201);
     });
 
-    it('should not register a supervisor when repeat-password doesnt match password', async () => {
+    it('should not register a student when repeat-password doesnt match password', async () => {
         const expectedResultValue = {
             success: false,
             message: config.messages.wrongRepeatPassword,
         };
         const res = await requestWithSupertest
-            .post('/api/v1/supervisor/register')
+            .post('/api/v1/student/register')
             .send({
-                name: defaultSupervisor.name,
-                email: defaultSupervisor.user.email,
-                password: defaultSupervisor.user.password,
-                repeatPassword: alternativeSupervisor.user.password,
+                fullName: defaultStudent.fullName,
+                email: defaultStudent.user.email,
+                password: defaultStudent.user.password,
+                repeatPassword: alternativeStudent.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
         expect(res.status).toEqual(400);
