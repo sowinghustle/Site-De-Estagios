@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
 import { getValidationResult } from '../config/utils';
+import userService from '../user/service';
 import { StudentLoginSchema, StudentRegisterSchema } from './schemas';
 import studentService from './service';
 
@@ -25,7 +26,12 @@ export default class StudentController {
             });
         }
 
-        if (student.user.password !== data.password) {
+        if (
+            !(await userService.compareUserPasswords(
+                student.user,
+                data.password
+            ))
+        ) {
             return res.status(400).send({
                 success: false,
                 message: config.messages.wrongPassword,

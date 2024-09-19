@@ -4,8 +4,10 @@ import config from '.';
 import { Admin } from '../admin/model';
 import app from '../app';
 import { DatabaseConnection } from '../database';
+import hashService from '../hash/service';
 import { Student } from '../student/model';
 import { Supervisor } from '../supervisor/model';
+import { User } from '../user/model';
 import { buildToResult, Result } from './utils';
 
 export const requestWithSupertest = supertest(app);
@@ -16,6 +18,23 @@ jest.mock('../token/service', () => {
         generateUserToken: () => token,
     };
 });
+
+export const getUserWithEncryptedPassword = async (
+    user: User
+): Promise<User> => {
+    return {
+        ...user,
+        password: await hashService.encryptPassword(user.password),
+    };
+};
+
+export const getUserWithoutPassword = async (
+    user: User
+): Promise<Omit<User, 'password'>> => {
+    const newUser = { ...user } as any;
+    delete newUser.password;
+    return newUser;
+};
 
 export const expectPromiseNotToReject = async <T>(promise: Promise<T>) => {
     await expect(promise.then(() => true).catch(() => false)).resolves.toBe(
@@ -150,7 +169,10 @@ export const saveStudent = async (
     const toResult = buildToResult<Student>();
 
     try {
-        const student = await conn.saveNewStudent(data);
+        const student = await conn.saveNewStudent({
+            ...data,
+            user: await getUserWithEncryptedPassword(data.user),
+        });
         const error = conn.getError();
 
         if (error) {
@@ -167,7 +189,10 @@ export const saveAndTestStudent = async (
     conn: DatabaseConnection,
     data: Student
 ) => {
-    const expectedStudentValue = data;
+    const expectedStudentValue = {
+        ...data,
+        user: await getUserWithoutPassword(data.user),
+    };
     const result = await saveStudent(conn, data);
     expect(result.isError).toBe(false);
     expect(result.value).toMatchObject(expectedStudentValue);

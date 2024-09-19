@@ -1,5 +1,6 @@
 import { buildToResult, Result } from '../config/utils';
 import { DatabaseResolver } from '../database';
+import hashService from '../hash/service';
 import { Student } from './model';
 
 export class StudentService {
@@ -15,7 +16,16 @@ export class StudentService {
     async saveNewStudent(student: Student) {
         const toResult = buildToResult<Student>();
         const conn = await DatabaseResolver.getConnection();
-        const createdStudent = await conn.saveNewStudent(student);
+        const encryptedPassword = await hashService.encryptPassword(
+            student.user.password
+        );
+        const createdStudent = await conn.saveNewStudent({
+            ...student,
+            user: {
+                ...student.user,
+                password: encryptedPassword,
+            },
+        });
         const error = conn.getError();
 
         if (error) {

@@ -1,9 +1,9 @@
-import { SupervisorUser } from '../user/model';
+import { User } from '../user/model';
 
 export type Supervisor = {
     id?: number;
     name: string;
-    user: SupervisorUser;
+    user: User;
 };
 
 export type SupervisorCollection = Supervisor[];

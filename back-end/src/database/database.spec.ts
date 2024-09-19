@@ -7,6 +7,7 @@ import {
     defaultStudent,
     defaultSupervisor,
     expectPromiseNotToReject,
+    getUserWithoutPassword,
     saveAdmin,
     saveAndTestAdmin,
     saveAndTestStudent,
@@ -141,7 +142,10 @@ describe('Student Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
 
     it('should save a new student', async () => {
-        const expectedStudentValue = defaultStudent;
+        const expectedStudentValue = {
+            ...defaultStudent,
+            user: await getUserWithoutPassword(defaultStudent.user),
+        };
         const conn = await DatabaseResolver.getConnection();
         const result = await saveStudent(conn, defaultStudent);
         expect(result.value).toMatchObject(expectedStudentValue);
@@ -158,7 +162,10 @@ describe('Student Database Tests', () => {
     });
 
     it('should find student by email field', async () => {
-        const expectedResultValue = defaultStudent;
+        const expectedResultValue = {
+            ...defaultStudent,
+            user: await getUserWithoutPassword(defaultStudent.user),
+        };
         const conn = await DatabaseResolver.getConnection();
         await saveAndTestStudent(conn, defaultStudent);
         const promise = conn.findStudentByEmail(defaultStudent.user.email);

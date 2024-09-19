@@ -1,9 +1,9 @@
-import { AdmUser } from '../user/model';
+import { User } from '../user/model';
 
 export type Admin = {
     id?: number;
     name: string;
-    user: AdmUser;
+    user: User;
 };
 
 export type AdminCollection = Admin[];
