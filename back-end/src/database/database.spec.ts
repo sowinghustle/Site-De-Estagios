@@ -107,7 +107,7 @@ describe('Supervisor Database Tests', () => {
         await saveAndTestSupervisor(conn, defaultSupervisor);
         const result = await saveSupervisor(conn, {
             ...defaultSupervisor,
-            name: alternativeAdmin.name,
+            name: alternativeSupervisor.name,
         });
         expect(result.value).toBeInstanceOf(Error);
     });
