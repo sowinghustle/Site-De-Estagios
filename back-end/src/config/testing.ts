@@ -4,6 +4,7 @@ import config from '.';
 import { Admin } from '../admin/model';
 import app from '../app';
 import { DatabaseConnection } from '../database';
+import { Student } from '../student/model';
 import { Supervisor } from '../supervisor/model';
 import { buildToResult, Result } from './utils';
 
@@ -64,6 +65,22 @@ export const alternativeSupervisor: Supervisor = Object.freeze({
     },
 });
 
+export const defaultStudent: Student = Object.freeze({
+    fullName: 'Student Name',
+    user: {
+        email: 'student_name79@email.com',
+        password: 'student-123pass__word',
+    },
+});
+
+export const alternativeStudent: Student = Object.freeze({
+    fullName: 'Different Student Name',
+    user: {
+        email: 'anotherStudent_name123@email.com',
+        password: 'anotherStudent123Password*',
+    },
+});
+
 export const saveAdmin = async (
     conn: DatabaseConnection,
     data: Admin
@@ -102,14 +119,14 @@ export const saveSupervisor = async (
     const toResult = buildToResult<Supervisor>();
 
     try {
-        const admin = await conn.saveNewSupervisor(data);
+        const supervisor = await conn.saveNewSupervisor(data);
         const error = conn.getError();
 
         if (error) {
             return toResult(error);
         }
 
-        return toResult(admin!);
+        return toResult(supervisor!);
     } catch (err: any) {
         return toResult(err as Error);
     }
@@ -124,6 +141,37 @@ export const saveAndTestSupervisor = async (
     expect(result.isError).toBe(false);
     expect(result.value).toMatchObject(expectedSupervisorValue);
     return result.value as Supervisor;
+};
+
+export const saveStudent = async (
+    conn: DatabaseConnection,
+    data: Student
+): Promise<Result<Student | undefined>> => {
+    const toResult = buildToResult<Student>();
+
+    try {
+        const student = await conn.saveNewStudent(data);
+        const error = conn.getError();
+
+        if (error) {
+            return toResult(error);
+        }
+
+        return toResult(student!);
+    } catch (err: any) {
+        return toResult(err as Error);
+    }
+};
+
+export const saveAndTestStudent = async (
+    conn: DatabaseConnection,
+    data: Student
+) => {
+    const expectedStudentValue = data;
+    const result = await saveStudent(conn, data);
+    expect(result.isError).toBe(false);
+    expect(result.value).toMatchObject(expectedStudentValue);
+    return result.value as Student;
 };
 
 export const adminAuthenticate = async (

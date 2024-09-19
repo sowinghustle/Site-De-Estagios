@@ -30,6 +30,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         UserTokenTable,
         AdminTable,
         SupervisorTable,
+        StudentTable,
     ];
 
     constructor() {
@@ -272,6 +273,10 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             // user and supervisor association
             UserTable.hasOne(SupervisorTable, { as: 'supervisor' });
             SupervisorTable.belongsTo(UserTable, { as: 'user' });
+
+            // user and student association
+            UserTable.hasOne(SupervisorTable, { as: 'student' });
+            StudentTable.belongsTo(UserTable, { as: 'user' });
 
             // sync
             await this.sequelize.sync({

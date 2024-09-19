@@ -148,6 +148,7 @@ export class SupervisorTable extends Model<
     public declare name: string;
 }
 
+@Table({ tableName: 'students' })
 export class StudentTable extends Model<SequelizeStudent, StudentCreate> {
     public declare user: UserTable;
 

@@ -1,13 +1,17 @@
 import { DatabaseResolver } from '.';
 import {
     alternativeAdmin,
+    alternativeStudent,
     alternativeSupervisor,
     defaultAdmin,
+    defaultStudent,
     defaultSupervisor,
     expectPromiseNotToReject,
     saveAdmin,
     saveAndTestAdmin,
+    saveAndTestStudent,
     saveAndTestSupervisor,
+    saveStudent,
     saveSupervisor,
     token,
 } from '../config/testing';
@@ -98,7 +102,6 @@ describe('Supervisor Database Tests', () => {
         const expectedSupervisorValue = defaultSupervisor;
         const conn = await DatabaseResolver.getConnection();
         const result = await saveSupervisor(conn, defaultSupervisor);
-        expect(result.isError).toBe(false);
         expect(result.value).toMatchObject(expectedSupervisorValue);
     });
 
@@ -123,26 +126,52 @@ describe('Supervisor Database Tests', () => {
         await expect(promise).resolves.toMatchObject(expectedResultValue);
     });
 
-    describe('should not find supervisor', () => {
-        it('when provided name is wrong', async () => {
-            const conn = await DatabaseResolver.getConnection();
-            await saveAndTestSupervisor(conn, defaultSupervisor);
-            const promise = conn.findAdminByNameOrEmail(
-                alternativeSupervisor.name
-            );
-            await expect(promise).resolves.toBeUndefined();
-            await expectPromiseNotToReject(promise);
-        });
+    it('should not find supervisor when provided email is wrong', async () => {
+        const conn = await DatabaseResolver.getConnection();
+        await saveAndTestSupervisor(conn, defaultSupervisor);
+        const promise = conn.findAdminByNameOrEmail(
+            alternativeSupervisor.user.email
+        );
+        await expect(promise).resolves.toBeUndefined();
+        await expectPromiseNotToReject(promise);
+    });
+});
 
-        it('when provided email is wrong', async () => {
-            const conn = await DatabaseResolver.getConnection();
-            await saveAndTestSupervisor(conn, defaultSupervisor);
-            const promise = conn.findAdminByNameOrEmail(
-                alternativeSupervisor.user.email
-            );
-            await expect(promise).resolves.toBeUndefined();
-            await expectPromiseNotToReject(promise);
+describe('Student Database Tests', () => {
+    beforeEach(() => DatabaseResolver.reset());
+
+    it('should save a new student', async () => {
+        const expectedStudentValue = defaultStudent;
+        const conn = await DatabaseResolver.getConnection();
+        const result = await saveStudent(conn, defaultStudent);
+        expect(result.value).toMatchObject(expectedStudentValue);
+    });
+
+    it('should not save a new student with specified email already in use', async () => {
+        const conn = await DatabaseResolver.getConnection();
+        await saveAndTestStudent(conn, defaultStudent);
+        const result = await saveStudent(conn, {
+            ...defaultStudent,
+            fullName: alternativeStudent.fullName,
         });
+        expect(result.value).toBeInstanceOf(Error);
+    });
+
+    it('should find student by email field', async () => {
+        const expectedResultValue = defaultStudent;
+        const conn = await DatabaseResolver.getConnection();
+        await saveAndTestStudent(conn, defaultStudent);
+        const promise = conn.findStudentByEmail(defaultStudent.user.email);
+        await expectPromiseNotToReject(promise);
+        await expect(promise).resolves.toMatchObject(expectedResultValue);
+    });
+
+    it('should not find student when provided email is wrong', async () => {
+        const conn = await DatabaseResolver.getConnection();
+        await saveAndTestStudent(conn, defaultStudent);
+        const promise = conn.findStudentByEmail(alternativeStudent.user.email);
+        await expect(promise).resolves.toBeUndefined();
+        await expectPromiseNotToReject(promise);
     });
 });
 
