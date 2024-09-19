@@ -13,12 +13,12 @@ import {
     Unique,
     Validate,
 } from 'sequelize-typescript';
-import { Admin } from '../../admin/model';
-import config from '../../config';
-import { Student } from '../../student/model';
-import { Supervisor } from '../../supervisor/model';
-import { UserToken } from '../../token/model';
-import { User, UserRole, UserRoleValues } from '../../user/model';
+import { Admin } from '../admin/model';
+import config from '../config';
+import { Student } from '../student/model';
+import { Supervisor } from '../supervisor/model';
+import { UserToken } from '../token/model';
+import { User, UserRole, UserRoleValues } from '../user/model';
 
 type SequelizeUser = User;
 type SequelizeAdmin = Omit<Admin, 'user'> & { userId: number };

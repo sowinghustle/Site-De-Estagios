@@ -1,15 +1,15 @@
-import { Admin } from '../../admin/model';
-import { Student } from '../../student/model';
-import { Supervisor } from '../../supervisor/model';
-import { UserToken } from '../../token/model';
-import { User, UserRole } from '../../user/model';
+import { Admin } from '../admin/model';
+import { Student } from '../student/model';
+import { Supervisor } from '../supervisor/model';
+import { UserToken } from '../token/model';
+import { User, UserRole } from '../user/model';
 import {
     AdminTable,
     StudentTable,
     SupervisorTable,
     UserTable,
     UserTokenTable,
-} from './tables';
+} from './sequelize-tables';
 
 export function mapSequelizeAdminToModel(entity: AdminTable) {
     return {

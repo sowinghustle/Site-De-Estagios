@@ -1,26 +1,26 @@
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { DatabaseConnection } from '..';
-import { Admin, AdminCollection } from '../../admin/model';
-import config from '../../config';
-import { Student } from '../../student/model';
-import { Supervisor } from '../../supervisor/model';
-import { UserToken } from '../../token/model';
-import { User } from '../../user/model';
+import { DatabaseConnection } from '.';
+import { Admin, AdminCollection } from '../admin/model';
+import config from '../config';
+import { Student } from '../student/model';
+import { Supervisor } from '../supervisor/model';
+import { UserToken } from '../token/model';
+import { User } from '../user/model';
 import {
     mapSequelizeAdminToModel,
     mapSequelizeStudentToModel,
     mapSequelizeSupervisorToModel,
     mapSequelizeUserTokenToModel,
     mapSequelizeUserToModel,
-} from './mapper';
+} from './sequelize-mapper';
 import {
     AdminTable,
     StudentTable,
     SupervisorTable,
     UserTable,
     UserTokenTable,
-} from './tables';
+} from './sequelize-tables';
 
 export class SequelizeDatabaseConnection implements DatabaseConnection {
     private static sequelize: Sequelize;
