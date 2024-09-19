@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { User } from './user/model'; // ajuste o caminho conforme necessário
+import { User } from '../user/model'; 
 
 class EmailService {
     private transporter;
@@ -9,8 +9,8 @@ class EmailService {
             host: 'sandbox.smtp.mailtrap.io',
             port: 2525,
             auth: {
-                user: '6c0d90943fb7b6', // substitua pelo seu usuário do Mailtrap
-                pass: '5de85912b951c6', // substitua pela sua senha do Mailtrap
+                user: '6c0d90943fb7b6', 
+                pass: '5de85912b951c6', 
             },
         });
     }
