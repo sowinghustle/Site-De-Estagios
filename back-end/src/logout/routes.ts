@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import LogoutController from './controller';
 import { ensureIsAuthenticated } from '../auth/passport/ensure-is-auth';
+import LogoutController from './controller';
 
 const routes = Router();
 const controller = new LogoutController();

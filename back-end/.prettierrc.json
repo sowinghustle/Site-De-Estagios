@@ -4,5 +4,8 @@
     "tabWidth": 4,
     "parser": "typescript",
     "endOfLine": "lf",
-    "singleAttributePerLine": true
+    "singleAttributePerLine": true,
+    "plugins": [
+        "prettier-plugin-organize-imports"
+    ]
 }

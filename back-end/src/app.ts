@@ -1,16 +1,16 @@
-import express from 'express';
-import cors from 'cors';
-import session from 'express-session';
-import passport from 'passport';
-import config from './config/project';
-import buildRoutes from './routes';
 import cookieParser from 'cookie-parser';
-import project from './config/project';
-import { configurePassport } from './auth/passport/ensure-is-auth';
-import respMessages from './config/responseMessages';
-import helmet from 'helmet';
+import cors from 'cors';
+import express from 'express';
 import rateLimit from 'express-rate-limit';
+import session from 'express-session';
 import slowDown from 'express-slow-down';
+import helmet from 'helmet';
+import passport from 'passport';
+import validator from 'validator';
+import { configurePassport } from './auth/passport/ensure-is-auth';
+import { default as config, default as project } from './config/project';
+import respMessages from './config/responseMessages';
+import buildRoutes from './routes';
 
 const app = express();
 const sessionOptions: session.SessionOptions = {
@@ -56,12 +56,12 @@ if (project.environment === 'production') {
 
 app.use(
     helmet({
-        frameguard: { action: 'deny' }, // Clickjacking
-        hidePoweredBy: true, // X-Powered-By (Filtragem do cabeçalho)
-        hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // Forçar sempre conexões HTTPS
-        noSniff: true, // Prevenção contra scripts
+        frameguard: { action: 'deny' },
+        hidePoweredBy: true,
+        hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+        noSniff: true,
         referrerPolicy: { policy: 'no-referrer-when-downgrade' }, // Cabeçalho Referer (Desabilitado)
-        xssFilter: true, // XSS
+        xssFilter: true,
     })
 );
 
@@ -83,6 +83,18 @@ app.use(
 );
 
 configurePassport();
+
+app.use((req, res, next) => {
+    if (req.body) {
+        for (let key in req.body) {
+            if (typeof req.body[key] === 'string') {
+                req.body[key] = validator.trim(req.body[key]);
+                req.body[key] = validator.escape(req.body[key]);
+            }
+        }
+    }
+    next();
+});
 
 app.use('/api/v1', buildRoutes());
 app.use(

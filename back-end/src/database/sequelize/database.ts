@@ -1,15 +1,15 @@
+import { Op } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 import { DatabaseConnection } from '..';
 import { Admin, AdminCollection } from '../../admin/model';
-import { Sequelize } from 'sequelize-typescript';
-import { SequelizeUser } from './user';
-import { SequelizeAdmin } from './admin';
-import { User, UserRole } from '../../user/model';
-import { SequelizeUserToken } from './tokens';
-import { UserToken } from '../../token/model';
-import { mapSequelizeToModel } from './mapper';
-import { Op } from 'sequelize';
 import project from '../../config/project';
 import respMessages from '../../config/responseMessages';
+import { UserToken } from '../../token/model';
+import { User, UserRole } from '../../user/model';
+import { SequelizeAdmin } from './admin';
+import { mapSequelizeToModel } from './mapper';
+import { SequelizeUserToken } from './tokens';
+import { SequelizeUser } from './user';
 
 export class SequelizeDatabaseConnection implements DatabaseConnection {
     private static sequelize: Sequelize;
