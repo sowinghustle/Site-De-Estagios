@@ -1,20 +1,45 @@
 import { Admin, AdminCollection } from '../admin/model';
-import instituition from '../config/instituition';
+import { Student } from '../student/model';
+import { Supervisor } from '../supervisor/model';
 import { UserToken } from '../token/model';
 import { User } from '../user/model';
-import { SequelizeDatabaseConnection } from './sequelize/database';
+import { SequelizeDatabaseConnection } from './sequelize';
 
 export interface DatabaseConnection {
     getError(): Error | undefined;
+
+    // cadastrar novo admin
     saveNewAdmin(admin: Admin): Promise<Admin | undefined>;
-    getAdmins(): Promise<AdminCollection>;
-    findUserByToken(token: string): Promise<User | undefined>;
-    findAdminByNameOrEmail(nameOrEmail: string): Promise<Admin | undefined>;
-    invalidateUserToken(token: string): Promise<UserToken | undefined>;
+
+    // cadastrar novo orientador
+    saveNewSupervisor(supervisor: Supervisor): Promise<Supervisor | undefined>;
+
+    // cadastrar novo aluno
+    saveNewStudent(student: Student): Promise<Student | undefined>;
+
+    // cadastrar um novo user-token
     saveNewUserToken(
         token: string,
         userid: number
     ): Promise<UserToken | undefined>;
+
+    // obter todos os admins
+    getAdmins(): Promise<AdminCollection>;
+
+    // obter um usuário por um user-token válido
+    findUserByValidUserToken(token: string): Promise<User | undefined>;
+
+    // obter um administrador pelo nome ou email
+    findAdminByNameOrEmail(nameOrEmail: string): Promise<Admin | undefined>;
+
+    // obter um orientador pelo email
+    findSupervisorByEmail(email: string): Promise<Supervisor | undefined>;
+
+    // obter um estudente pelo email
+    findStudentByEmail(email: string): Promise<Student | undefined>;
+
+    // invalidar um user-token
+    invalidateUserToken(token: string): Promise<UserToken | undefined>;
 }
 
 export class DatabaseResolver {
@@ -30,18 +55,6 @@ export class DatabaseResolver {
 
             if (!this.initialized) {
                 await conn.init();
-                await conn.saveNewAdmin({
-                    name: instituition.adminName,
-                    user: {
-                        email: instituition.adminEmail,
-                        password: instituition.adminPassword,
-                    },
-                });
-
-                if (conn.getError()) {
-                    throw conn.getError();
-                }
-
                 this.initialized = true;
             }
 

@@ -8,9 +8,9 @@ export default function () {
         new BearerStrategy(async function (token, done) {
             try {
                 const conn = await DatabaseResolver.getConnection();
-                const user = await conn.findUserByToken(token);
+                const user = await conn.findUserByValidUserToken(token);
                 if (user) return done(null, user, { scope: 'all' });
-                return done(null, false);
+                return done(conn.getError() ?? null, false);
             } catch (err) {
                 return done(err, false);
             }

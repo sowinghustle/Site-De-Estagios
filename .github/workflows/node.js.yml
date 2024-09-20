@@ -33,4 +33,4 @@ jobs:
       run: npm run build --if-present --prefix back-end
 
     - name: Run tests
-      run: npm run test --prefix back-end
+      run: npm run test:ci --prefix back-end

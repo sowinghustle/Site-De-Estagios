@@ -1,9 +1,9 @@
-import { StudentUser } from '../user/model';
+import { User } from '../user/model';
 
 export type Student = {
-    id: number;
+    id?: number;
     fullName: string;
-    user: StudentUser;
+    user: User;
 };
 
 export type StudentCollection = Student[];

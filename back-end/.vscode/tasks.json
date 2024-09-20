@@ -2,10 +2,10 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "npm: dev",
             "type": "npm",
             "script": "dev",
             "problemMatcher": [],
-            "label": "npm: dev",
             "detail": "ts-node-dev src/main.ts"
         }
     ]

@@ -1,0 +1,11 @@
+# @name login
+# @prompt nameOrEmail
+# @prompt password
+POST {{baseUrl}}/admin/login
+Content-Type: application/json
+Access-Control-Allow-Credentials: true
+
+{
+    "nameOrEmail": "{{nameOrEmail}}",
+    "password": "{{password}}"
+}
