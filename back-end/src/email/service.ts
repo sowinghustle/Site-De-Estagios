@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { User } from '../user/model'; 
+import { User } from '../user/model';
 
 class EmailService {
     private transporter;
@@ -9,8 +9,8 @@ class EmailService {
             host: 'sandbox.smtp.mailtrap.io',
             port: 2525,
             auth: {
-                user: '6c0d90943fb7b6', 
-                pass: '5de85912b951c6', 
+                user: '6c0d90943fb7b6',
+                pass: '5de85912b951c6',
             },
         });
     }
@@ -53,9 +53,15 @@ class EmailService {
 
         try {
             await this.transporter.sendMail(mailOptions);
-            console.log('Email de redefinição de senha enviado para:', user.email);
+            console.log(
+                'Email de redefinição de senha enviado para:',
+                user.email
+            );
         } catch (error) {
-            console.error('Erro ao enviar email de redefinição de senha:', error);
+            console.error(
+                'Erro ao enviar email de redefinição de senha:',
+                error
+            );
         }
     }
 }

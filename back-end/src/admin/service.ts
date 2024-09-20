@@ -1,28 +1,44 @@
-import respMessages from '../config/responseMessages';
+import { buildToResult, Result } from '../config/utils';
 import { DatabaseResolver } from '../database';
-import { ServiceResult } from '../utils/service-result';
+import hashService from '../hash/service';
 import { Admin } from './model';
 
 export class AdminService {
-    async findAdminByNameOrEmailAndPassword(data: {
-        nameOrEmail: string;
-        password: string;
-    }): Promise<ServiceResult<{ admin: Admin }>> {
+    async findAdminByNameOrEmail(
+        nameOrEmail: string
+    ): Promise<Result<Admin | undefined>> {
+        const toResult = buildToResult<Admin | undefined>();
         const conn = await DatabaseResolver.getConnection();
-        const admin = await conn.findAdminByNameOrEmail(data.nameOrEmail);
+        const admin = await conn.findAdminByNameOrEmail(nameOrEmail);
+        const error = conn.getError();
 
-        if (!admin) {
-            const error = conn.getError()!;
-            return { error };
+        if (error) {
+            return toResult(error);
         }
 
-        if (admin.user.password !== data.password) {
-            return {
-                error: new Error(respMessages.wrongPassword),
-            };
+        return toResult(admin);
+    }
+
+    async saveNewAdmin(admin: Admin) {
+        const toResult = buildToResult<Admin>();
+        const conn = await DatabaseResolver.getConnection();
+        const encryptedPassword = await hashService.encryptPassword(
+            admin.user.password
+        );
+        const createdAdmin = await conn.saveNewAdmin({
+            ...admin,
+            user: {
+                ...admin.user,
+                password: encryptedPassword,
+            },
+        });
+        const error = conn.getError();
+
+        if (error) {
+            return toResult(error);
         }
 
-        return { admin };
+        return toResult(createdAdmin!);
     }
 }
 

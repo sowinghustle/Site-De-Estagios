@@ -8,13 +8,12 @@ import helmet from 'helmet';
 import passport from 'passport';
 import validator from 'validator';
 import { configurePassport } from './auth/passport/ensure-is-auth';
-import { default as config, default as project } from './config/project';
-import respMessages from './config/responseMessages';
+import config from './config';
 import buildRoutes from './routes';
 
 const app = express();
 const sessionOptions: session.SessionOptions = {
-    secret: config.secret,
+    secret: config.project.secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -22,12 +21,10 @@ const sessionOptions: session.SessionOptions = {
     },
 };
 
-if (config.environment == 'production') {
-    app.set('trust proxy', 1);
+if (config.project.environment === 'production') {
     sessionOptions.cookie!.secure = false;
-}
 
-if (project.environment === 'production') {
+    app.set('trust proxy', 1);
     app.use(
         slowDown({
             // a partir de 100 requisições em menos de 10 minutos, dá um delay de 1 segundo
@@ -47,7 +44,7 @@ if (project.environment === 'production') {
             handler(req, res) {
                 res.status(429).send({
                     success: false,
-                    message: respMessages.tooManyRequests,
+                    message: config.messages.tooManyRequests,
                 });
             },
         })
@@ -69,15 +66,17 @@ app.use(session(sessionOptions));
 app.use(passport.authenticate('session'));
 app.use(express.json());
 app.use(
-    project.environment == 'production'
-        ? cookieParser(config.secret)
+    config.project.environment === 'production'
+        ? cookieParser(config.project.secret)
         : cookieParser()
 );
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
         origin: [
-            config.environment != 'production' ? 'http://localhost:8000' : '',
+            config.project.environment !== 'production'
+                ? 'http://localhost:8000'
+                : '',
         ],
     })
 );
@@ -108,8 +107,9 @@ app.use(
 
         const error = err as Error;
 
-        if (config.environment !== 'production') {
+        if (config.project.environment === 'development') {
             return res.status(500).send({
+                ...error,
                 success: false,
                 message: error.message,
                 stack: error.stack,
@@ -118,17 +118,21 @@ app.use(
 
         return res.status(500).send({
             success: false,
-            message: respMessages.serverError,
+            message: config.messages.serverUnhandledException,
         });
     }
 );
 
-app.use((req, res) =>
-    res.status(404).send({
+app.use((req, res) => {
+    const error: any = {
         success: false,
-        message: 'Não encontrado',
-        stack: new Error().stack,
-    })
-);
+        message: config.messages.routeNotFound,
+    };
+
+    if (config.project.environment === 'development')
+        error.stack = new Error().stack;
+
+    res.status(404).send(error);
+});
 
 export default app;
