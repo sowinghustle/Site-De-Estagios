@@ -1,12 +1,5 @@
 import config from '../config';
-import {
-    alternativeStudent,
-    defaultStudent,
-    requestWithSupertest,
-    saveAndTestStudent,
-    testAuthResponseCookies,
-    token,
-} from '../config/testing';
+import { requestWithSupertest, TestingUtils, token } from '../config/testing';
 import { DatabaseResolver } from '../database';
 
 describe('POST /student/login', () => {
@@ -18,16 +11,15 @@ describe('POST /student/login', () => {
             message: config.messages.successfullLogin,
             token,
         };
-        const conn = await DatabaseResolver.getConnection();
-        await saveAndTestStudent(conn, defaultStudent);
+        await TestingUtils.saveAndTestStudent(TestingUtils.DEFAULT_STUDENT);
         const res = await requestWithSupertest
             .post('/api/v1/student/login')
             .send({
-                email: defaultStudent.user.email,
-                password: defaultStudent.user.password,
+                email: TestingUtils.DEFAULT_STUDENT.user.email,
+                password: TestingUtils.DEFAULT_STUDENT.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
-        testAuthResponseCookies(res);
+        TestingUtils.testAuthResponseCookies(res);
         expect(res.status).toEqual(200);
     });
 });
@@ -43,10 +35,10 @@ describe('POST /student/register', () => {
         const res = await requestWithSupertest
             .post('/api/v1/student/register')
             .send({
-                fullName: defaultStudent.fullName,
-                email: defaultStudent.user.email,
-                password: defaultStudent.user.password,
-                repeatPassword: defaultStudent.user.password,
+                fullName: TestingUtils.DEFAULT_STUDENT.fullName,
+                email: TestingUtils.DEFAULT_STUDENT.user.email,
+                password: TestingUtils.DEFAULT_STUDENT.user.password,
+                repeatPassword: TestingUtils.DEFAULT_STUDENT.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
         expect(res.status).toEqual(201);
@@ -60,10 +52,10 @@ describe('POST /student/register', () => {
         const res = await requestWithSupertest
             .post('/api/v1/student/register')
             .send({
-                fullName: defaultStudent.fullName,
-                email: defaultStudent.user.email,
-                password: defaultStudent.user.password,
-                repeatPassword: alternativeStudent.user.password,
+                fullName: TestingUtils.DEFAULT_STUDENT.fullName,
+                email: TestingUtils.DEFAULT_STUDENT.user.email,
+                password: TestingUtils.DEFAULT_STUDENT.user.password,
+                repeatPassword: TestingUtils.ALTERNATIVE_STUDENT.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
         expect(res.status).toEqual(400);

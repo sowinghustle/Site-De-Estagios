@@ -1,12 +1,5 @@
 import config from '../config';
-import {
-    alternativeSupervisor,
-    defaultSupervisor,
-    requestWithSupertest,
-    saveAndTestSupervisor,
-    testAuthResponseCookies,
-    token,
-} from '../config/testing';
+import { requestWithSupertest, TestingUtils, token } from '../config/testing';
 import { DatabaseResolver } from '../database';
 
 describe('POST /supervisor/login', () => {
@@ -18,16 +11,17 @@ describe('POST /supervisor/login', () => {
             message: config.messages.successfullLogin,
             token,
         };
-        const conn = await DatabaseResolver.getConnection();
-        await saveAndTestSupervisor(conn, defaultSupervisor);
+        await TestingUtils.saveAndTestSupervisor(
+            TestingUtils.DEFAULT_SUPERVISOR
+        );
         const res = await requestWithSupertest
             .post('/api/v1/supervisor/login')
             .send({
-                email: defaultSupervisor.user.email,
-                password: defaultSupervisor.user.password,
+                email: TestingUtils.DEFAULT_SUPERVISOR.user.email,
+                password: TestingUtils.DEFAULT_SUPERVISOR.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
-        testAuthResponseCookies(res);
+        TestingUtils.testAuthResponseCookies(res);
         expect(res.status).toEqual(200);
     });
 });
@@ -43,10 +37,10 @@ describe('POST /supervisor/register', () => {
         const res = await requestWithSupertest
             .post('/api/v1/supervisor/register')
             .send({
-                name: defaultSupervisor.name,
-                email: defaultSupervisor.user.email,
-                password: defaultSupervisor.user.password,
-                repeatPassword: defaultSupervisor.user.password,
+                name: TestingUtils.DEFAULT_SUPERVISOR.name,
+                email: TestingUtils.DEFAULT_SUPERVISOR.user.email,
+                password: TestingUtils.DEFAULT_SUPERVISOR.user.password,
+                repeatPassword: TestingUtils.DEFAULT_SUPERVISOR.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
         expect(res.status).toEqual(201);
@@ -60,10 +54,11 @@ describe('POST /supervisor/register', () => {
         const res = await requestWithSupertest
             .post('/api/v1/supervisor/register')
             .send({
-                name: defaultSupervisor.name,
-                email: defaultSupervisor.user.email,
-                password: defaultSupervisor.user.password,
-                repeatPassword: alternativeSupervisor.user.password,
+                name: TestingUtils.DEFAULT_SUPERVISOR.name,
+                email: TestingUtils.DEFAULT_SUPERVISOR.user.email,
+                password: TestingUtils.DEFAULT_SUPERVISOR.user.password,
+                repeatPassword:
+                    TestingUtils.ALTERNATIVE_SUPERVISOR.user.password,
             });
         expect(res.body).toMatchObject(expectedResultValue);
         expect(res.status).toEqual(400);

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
 import { getValidationResult } from '../config/utils';
+import userService from '../user/service';
 import { AdminLoginSchema } from './schemas';
 import adminService from './service';
 
@@ -25,7 +26,9 @@ export default class AdminController {
             });
         }
 
-        if (admin && admin.user.password !== data.password) {
+        if (
+            !(await userService.compareUserPasswords(admin.user, data.password))
+        ) {
             return res.status(400).send({
                 success: false,
                 message: config.messages.wrongPassword,
