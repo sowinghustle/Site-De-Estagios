@@ -5,9 +5,6 @@ services:
       numInstances: 1
       plan: free
       branch: main
-      disk:
-        name: node_modules
-        mountPath: ./node_modules
       autoDeploy: true
       envVars:
           - key: NODE_ENV
