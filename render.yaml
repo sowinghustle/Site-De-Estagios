@@ -6,7 +6,7 @@ services:
       plan: free
       branch: main
       autoDeploy: false
-      buildCommand: npm i && npm run build
+      buildCommand: npm pkg delete scripts.prepare && npm i && npm run build
       startCommand: npm run start
       envVars:
           - key: NODE_ENV
