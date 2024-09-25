@@ -5,8 +5,8 @@ services:
       numInstances: 1
       plan: free
       branch: main
-      autoDeploy: true
-      buildCommand: npm run prepare:production && npm run build
+      autoDeploy: false
+      buildCommand: npm i && npm run build
       startCommand: npm run start
       envVars:
           - key: NODE_ENV
