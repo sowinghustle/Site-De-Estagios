@@ -1,0 +1,17 @@
+previews:
+    generation: automatic
+
+services:
+    - type: web
+      runtime: node
+      name: estagios-server
+      numInstances: 1
+      plan: free
+      branch: main
+      buildCommand: npm run build
+      startCommand: npm run start
+      autoDeploy: true
+      envVars:
+          - key: NODE_ENV
+            value: production
+      rootDir: back-end
