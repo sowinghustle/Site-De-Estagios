@@ -6,6 +6,8 @@ services:
       plan: free
       branch: main
       autoDeploy: true
+      buildCommand: npm run prepare:production && npm run build
+      startCommand: npm run start
       envVars:
           - key: NODE_ENV
             value: production
