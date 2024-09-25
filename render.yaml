@@ -1,13 +1,13 @@
 services:
     - type: web
-      runtime: node
+      runtime: docker
       name: estagiohub-server
       numInstances: 1
       plan: free
       branch: main
       autoDeploy: false
-      buildCommand: npm pkg delete scripts.prepare && npm i && npm run build
-      startCommand: npm run start
+      buildCommand: docker build -t estagios-backend -p 8000:8000 .
+      startCommand: docker run estagios-backend
       envVars:
           - key: NODE_ENV
             value: production

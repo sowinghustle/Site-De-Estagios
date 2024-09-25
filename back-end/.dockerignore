@@ -1,6 +1,5 @@
 .vscode
 .husky
-types
 node_modules/
 dist/
 *.config.js
