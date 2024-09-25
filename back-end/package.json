@@ -9,6 +9,7 @@
         "test": "jest --runInBand",
         "test:ci": "jest --ci --coverage",
         "test:watch": "jest --watch --runInBand",
+        "prepare:production": "npm pkg delete scripts.prepare && npm ci --only=production",
         "build": "tsc --project tsconfig.build.json",
         "start": "node dist/main.js"
     },
