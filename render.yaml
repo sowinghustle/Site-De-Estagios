@@ -8,10 +8,6 @@ services:
       disk:
         name: node_modules
         mountPath: ./node_modules
-      buildCommand: 
-        npm ci --production
-        npm run build
-      startCommand: npm run start
       autoDeploy: true
       envVars:
           - key: NODE_ENV

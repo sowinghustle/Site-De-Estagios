@@ -9,7 +9,7 @@
         "test": "jest --runInBand",
         "test:ci": "jest --ci --coverage",
         "test:watch": "jest --watch --runInBand",
-        "build": "tsc",
+        "build": "tsc --project tsconfig.build.json",
         "start": "node dist/main.js"
     },
     "keywords": [],
