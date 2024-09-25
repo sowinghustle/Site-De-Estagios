@@ -1,6 +1,5 @@
 {
     "extends": "./tsconfig.json",
-    "typeRoots": [],
     "exclude": [
         "./src/**/*.spec.ts",
         "./src/config/testing.ts"
