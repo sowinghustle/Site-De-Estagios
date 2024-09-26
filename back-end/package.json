@@ -49,11 +49,10 @@
         "typescript-eslint": "^7.16.1"
     },
     "dependencies": {
-        "back-end": "file:",
         "bcrypt": "^5.1.1",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
-        "express": "^4.19.2",
+        "express": "^4.21.0",
         "express-async-errors": "^3.1.1",
         "express-rate-limit": "^7.4.0",
         "express-session": "^1.18.0",
@@ -66,7 +65,8 @@
         "reflect-metadata": "^0.2.2",
         "sequelize": "^6.37.3",
         "sequelize-typescript": "^2.1.6",
-        "sqlite3": "^5.1.7"
+        "sqlite3": "^5.1.7",
+        "typescript": "^5.6.2"
     },
     "lint-staged": {
         "*.{js,ts}": [
