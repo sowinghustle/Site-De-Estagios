@@ -5,6 +5,6 @@ services:
       numInstances: 1
       plan: free
       branch: main
-      autoDeploy: false
+      autoDeploy: true
       buildCommand: docker build -p 8000:10000 .
       rootDir: back-end
