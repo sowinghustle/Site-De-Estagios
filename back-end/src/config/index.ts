@@ -1,9 +1,21 @@
 import { randomUUID } from 'crypto';
 import { CookieOptions } from 'express';
+import nodemailer from 'nodemailer';
 
 type Environment = 'development' | 'test' | 'production';
 
+const emailOptions: EmailOptions = {
+    host: process.env.EMAIL_HOST || 'sandbox.smtp.mailtrap.io',
+    port: Number(process.env.EMAIL_PORT || '2525'),
+    auth: {
+        user: process.env.EMAIL_USER || '6c0d90943fb7b6',
+        pass: process.env.EMAIL_PASS || '5de85912b951c6',
+    },
+};
+
 const config = Object.freeze({
+
+
     messages: {
         // good
         successfullLogin: 'Login realizado com sucesso!',
