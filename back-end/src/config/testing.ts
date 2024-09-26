@@ -22,7 +22,7 @@ jest.mock('../token/service', () => {
 
 export const TestingUtils = Object.freeze({
     DEFAULT_ADMIN: {
-        name: config.instituition.adminName,
+        name: config.instituition.adminName + '123',
         user: {
             email: config.instituition.adminEmail,
             password: config.instituition.adminPassword,
