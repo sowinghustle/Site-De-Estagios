@@ -6,9 +6,5 @@ services:
       plan: free
       branch: main
       autoDeploy: false
-      buildCommand: docker build -t estagios-backend -p 8000:8000 .
-      startCommand: docker run estagios-backend
-      envVars:
-          - key: NODE_ENV
-            value: production
+      buildCommand: docker build -p 8000:8000 .
       rootDir: back-end
