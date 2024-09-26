@@ -73,11 +73,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: [
-            config.project.environment !== 'production'
-                ? 'http://localhost:8000'
-                : '',
-        ],
+        origin: [config.project.frontendUrl],
     })
 );
 

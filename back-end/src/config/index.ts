@@ -50,9 +50,11 @@ const config = Object.freeze({
             environment: 'production' as Environment,
             port: Number(process.env.PORT || '8000'),
             secret: process.env.secret || randomUUID(),
+            frontendUrl: process.env.FRONTEND_URL ?? '',
         };
 
-        if (process.env.TS_NODE_DEV) {
+        if (process.env.TS_NODE_DEV || process.env.NODE_ENV === 'development') {
+            config.frontendUrl = 'http://localhost:3000';
             config.environment = 'development';
         }
 
@@ -72,7 +74,10 @@ const config = Object.freeze({
             cookieOptions.sameSite = 'strict';
         }
 
-        return { ...config, cookieOptions };
+        return {
+            ...config,
+            cookieOptions,
+        };
     })(),
 });
 
