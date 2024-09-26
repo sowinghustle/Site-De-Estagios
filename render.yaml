@@ -8,3 +8,4 @@ services:
       autoDeploy: true
       buildCommand: docker build -p 8000:10000 .
       rootDir: back-end
+      healthCheckPath: /healthcheck

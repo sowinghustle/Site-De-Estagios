@@ -8,7 +8,7 @@ const config = Object.freeze({
         // good
         successfullLogin: 'Login realizado com sucesso!',
         successfullRegister: 'Cadastro realizado com sucesso!',
-        welcomeMessage: 'Bem vindo.',
+        welcomeMessage: 'Servidor ativo. API está disponível.',
         // bad
         databaseImplNotDefined:
             'A implementação do banco de dados não foi definida.',

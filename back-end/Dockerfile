@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm i
+RUN npm prepare:production
 RUN npm run build
 
 EXPOSE 8000

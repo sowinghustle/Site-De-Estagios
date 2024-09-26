@@ -95,6 +95,7 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/', (req, res) => res.send(config.messages.welcomeMessage));
 app.get('/healthcheck', (req, res) => res.sendStatus(200));
 app.use('/api/v1', buildRoutes());
 app.use(
