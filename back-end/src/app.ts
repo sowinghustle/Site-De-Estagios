@@ -109,14 +109,14 @@ app.use(
 
         const error = err as Error;
 
-        if (config.project.environment === 'development') {
-            return res.status(500).send({
-                ...error,
-                success: false,
-                message: error.message,
-                stack: error.stack,
-            });
-        }
+        // if (config.project.environment === 'development') {
+        return res.status(500).send({
+            ...error,
+            success: false,
+            message: error.message,
+            stack: error.stack,
+        });
+        // }
 
         return res.status(500).send({
             success: false,
