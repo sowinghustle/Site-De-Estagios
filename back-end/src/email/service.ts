@@ -2,7 +2,11 @@ import nodemailer from 'nodemailer';
 import { User } from '../user/model';
 import config from '../config/index'; 
 
-
+type Result<T> = {
+    success: boolean;
+    data?: T;
+    error?: string;
+};
 
 class EmailService {
     private transporter;
@@ -12,8 +16,8 @@ class EmailService {
             host: config.project.emailOptions.host,
             port: config.project.emailOptions.port,
             auth: {
-                user: config.project.emailOptions.user,
-                pass: config.project.emailOptions.pass,
+                user: config.project.emailOptions.auth.user, // Corrigido
+                pass: config.project.emailOptions.auth.pass, // Corrigido
             },
         });
     }
@@ -26,9 +30,9 @@ class EmailService {
                 subject: 'Bem-vindo!',
                 text: 'Sua conta foi criada com sucesso!',
             });
-  
+            return { success: true };
         } catch (error) {
-  
+            return { success: false, error: 'Falha ao enviar email de boas-vindas.' };
         }
     }
     async sendResetPasswordEmail(email: string): Promise<Result<void>> {
@@ -39,9 +43,9 @@ class EmailService {
                 subject: 'Redefinição de Senha',
                 text: 'Clique aqui para redefinir sua senha.',
             });
-
+            return { success: true };
         } catch (error) {
-            
+            return { success: false, error: 'Falha ao enviar email de redefinição de senha.' };
         }
     }
 
