@@ -24,7 +24,7 @@ export default function NotFoundScreen() {
         }}
       />
       <ThemedView style={styles.container}>
-        <ThemedText type="title">Parece que não existe essa tela</ThemedText>
+        <ThemedText type="title">Parece que essa tela não existe.</ThemedText>
         <Link href="/" style={styles.link}>
           <ThemedText style={styles.linkText} type="link">
             Voltar para o EstagioHUB
