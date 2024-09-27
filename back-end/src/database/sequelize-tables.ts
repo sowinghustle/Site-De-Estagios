@@ -18,7 +18,7 @@ import config from '../config';
 import { Student } from '../student/model';
 import { Supervisor } from '../supervisor/model';
 import { UserToken } from '../token/model';
-import { User, UserRole, UserRoleValues } from '../user/model';
+import { User } from '../user/model';
 
 type SequelizeUser = User;
 type SequelizeAdmin = Omit<Admin, 'user'> & { userId: number };
@@ -99,8 +99,8 @@ export class UserTable extends Model<SequelizeUser, UserCreate> {
     public declare email: string;
 
     @Index
-    @Column(DataTypes.ENUM(...UserRoleValues))
-    public declare role: UserRole;
+    @Column(DataTypes.STRING)
+    public declare role: string;
 
     @Length({
         min: config.validations.minPasswordLength,

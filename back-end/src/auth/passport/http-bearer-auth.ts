@@ -12,7 +12,7 @@ export default function () {
                 }
                 const conn = await DatabaseResolver.getConnection();
                 const user = await conn.findUserByValidUserToken(token);
-                if (user) return done(null, user, { scope: 'all' });
+                if (user) return done(null, user.id, { scope: 'all' });
                 return done(conn.getError(), false);
             } catch (err) {
                 return done(err, false);

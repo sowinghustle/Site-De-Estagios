@@ -9,7 +9,7 @@ import { Student } from '../student/model';
 import studentService from '../student/service';
 import { Supervisor } from '../supervisor/model';
 import supervisorService from '../supervisor/service';
-import { User } from '../user/model';
+import { User, UserRole } from '../user/model';
 
 export const requestWithSupertest = supertest(app);
 export const token = randomUUID();
@@ -26,6 +26,7 @@ export const TestingUtils = Object.freeze({
         user: {
             email: config.instituition.adminEmail,
             password: config.instituition.adminPassword,
+            role: UserRole.Adm,
         },
     } as Admin,
     ALTERNATIVE_ADMIN: {
@@ -33,6 +34,7 @@ export const TestingUtils = Object.freeze({
         user: {
             email: 'differentEmail23@email.com',
             password: 'different_Password 123',
+            role: UserRole.Adm,
         },
     } as Admin,
     get DEFAULT_ADMIN_WITHOUT_PASSWORD() {
@@ -46,6 +48,7 @@ export const TestingUtils = Object.freeze({
         user: {
             email: 'supervisor_name79@email.com',
             password: 'supervisor-123pass__word',
+            role: UserRole.Supervisor,
         },
     } as Supervisor,
     ALTERNATIVE_SUPERVISOR: {
@@ -53,6 +56,7 @@ export const TestingUtils = Object.freeze({
         user: {
             email: 'anothersupervisor_name123@email.com',
             password: 'anothersupervisor123Password*',
+            role: UserRole.Supervisor,
         },
     } as Supervisor,
     get DEFAULT_SUPERVISOR_WITHOUT_PASSWORD() {
@@ -66,6 +70,7 @@ export const TestingUtils = Object.freeze({
         user: {
             email: 'student_name79@email.com',
             password: 'student-123pass__word',
+            role: UserRole.Student,
         },
     } as Student,
     ALTERNATIVE_STUDENT: {
@@ -73,6 +78,7 @@ export const TestingUtils = Object.freeze({
         user: {
             email: 'anotherStudent_name123@email.com',
             password: 'anotherStudent123Password*',
+            role: UserRole.Student,
         },
     } as Student,
     get DEFAULT_STUDENT_WITHOUT_PASSWORD() {
@@ -105,6 +111,20 @@ export const TestingUtils = Object.freeze({
     async authenticateAdmin(nameOrEmail: string, password: string) {
         return await requestWithSupertest.post('/api/v1/admin/login').send({
             nameOrEmail,
+            password,
+        });
+    },
+    async authenticateSupervisor(email: string, password: string) {
+        return await requestWithSupertest
+            .post('/api/v1/supervisor/login')
+            .send({
+                email,
+                password,
+            });
+    },
+    async authenticateStudent(email: string, password: string) {
+        return await requestWithSupertest.post('/api/v1/student/login').send({
+            email,
             password,
         });
     },
