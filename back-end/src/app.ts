@@ -73,11 +73,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: [
-            config.project.environment !== 'production'
-                ? 'http://localhost:8000'
-                : '',
-        ],
+        origin: [config.project.frontendUrl],
     })
 );
 
@@ -95,6 +91,8 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/', (req, res) => res.send(config.messages.welcomeMessage));
+app.get('/healthcheck', (req, res) => res.sendStatus(200));
 app.use('/api/v1', buildRoutes());
 app.use(
     (

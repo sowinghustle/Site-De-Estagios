@@ -8,7 +8,11 @@ export class LogoutService {
         const conn = await DatabaseResolver.getConnection();
         const userToken = await conn.invalidateUserToken(token);
         const error = conn.getError();
-        if (error) return toResult(error);
+
+        if (error) {
+            return toResult(error);
+        }
+
         return toResult(userToken!);
     }
 }

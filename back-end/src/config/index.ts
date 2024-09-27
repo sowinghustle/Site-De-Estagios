@@ -8,7 +8,7 @@ const config = Object.freeze({
         // good
         successfullLogin: 'Login realizado com sucesso!',
         successfullRegister: 'Cadastro realizado com sucesso!',
-        welcomeMessage: 'Bem vindo.',
+        welcomeMessage: 'Servidor ativo. API está disponível.',
         // bad
         databaseImplNotDefined:
             'A implementação do banco de dados não foi definida.',
@@ -31,6 +31,7 @@ const config = Object.freeze({
         insuficientPasswordCharacters:
             'A senha deve ter pelo menos 8 caracteres.',
         invalidEmail: 'Este não é um email válido',
+        invalidAdminName: 'O nome do admin deve conter apenas letras e números',
         nameOnlyLetters: 'O campo nome só pode ter letras.',
         wrongRepeatPassword: 'A confirmação de senha está incorreta',
         wrongPassword: 'A senha está incorreta!',
@@ -49,9 +50,11 @@ const config = Object.freeze({
             environment: 'production' as Environment,
             port: Number(process.env.PORT || '8000'),
             secret: process.env.secret || randomUUID(),
+            frontendUrl: process.env.FRONTEND_URL ?? '',
         };
 
-        if (process.env.TS_NODE_DEV) {
+        if (process.env.TS_NODE_DEV || process.env.NODE_ENV === 'development') {
+            config.frontendUrl = 'http://localhost:3000';
             config.environment = 'development';
         }
 
@@ -71,7 +74,10 @@ const config = Object.freeze({
             cookieOptions.sameSite = 'strict';
         }
 
-        return { ...config, cookieOptions };
+        return {
+            ...config,
+            cookieOptions,
+        };
     })(),
 });
 

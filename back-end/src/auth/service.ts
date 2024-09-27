@@ -12,7 +12,12 @@ export class AuthService {
             userId
         );
         const error = conn.getError();
-        return toResult(error ?? userToken!);
+
+        if (error) {
+            return toResult(error);
+        }
+
+        return toResult(userToken!);
     }
 }
 

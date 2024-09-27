@@ -9,6 +9,12 @@ export class SupervisorService {
         const toResult = buildToResult<Supervisor | undefined>();
         const conn = await DatabaseResolver.getConnection();
         const supervisor = await conn.findSupervisorByEmail(email);
+        const error = conn.getError();
+
+        if (error) {
+            return toResult(error);
+        }
+
         return toResult(supervisor);
     }
     async saveNewSupervisor(
