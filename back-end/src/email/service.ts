@@ -29,8 +29,8 @@ class EmailService {
                 text: 'Sua conta foi criada com sucesso!',
             });
             return toResult(); // Sucesso
-        } catch (error) {
-            throw error;
+        } catch (error: any) {
+            return toResult(error)
         }
     }
 
@@ -45,8 +45,8 @@ class EmailService {
                 text: 'Clique aqui para redefinir sua senha.',
             });
             return toResult(); // Sucesso
-        } catch (error) {
-            throw error;
+        } catch (error: any) {
+            return toResult(error)
         }
     }
 }
