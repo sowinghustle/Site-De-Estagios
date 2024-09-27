@@ -10,6 +10,8 @@ export type Result<T> = ValueOrError<T> & {
     orElseThrow: (cb?: (err: Error) => Error | string) => T;
 };
 
+
+
 function success<T>(value: T): Result<T> {
     return {
         value,
