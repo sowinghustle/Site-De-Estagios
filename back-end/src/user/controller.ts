@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { mapUserToJson as mapUserToData } from './model';
 import userService from './service';
 
 export default class UserController {
@@ -15,7 +16,7 @@ export default class UserController {
         if (user) {
             return res.send({
                 success: true,
-                user,
+                user: mapUserToData(user),
             });
         }
 
