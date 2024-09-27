@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
 import { getValidationResult } from '../config/utils';
+import emailService from '../email/service';
 import { SupervisorLoginSchema, SupervisorRegisterSchema } from './schemas';
 import supervisorService from './service';
-import emailService from '../email/service'; // Importando o serviço de email
 
 export default class SupervisorController {
     async login(req: Request, res: Response) {
@@ -77,7 +77,7 @@ export default class SupervisorController {
         // Enviar email de boas-vindas
         const emailResult = await emailService.sendNewUserEmail(data.email);
 
-        if (!emailResult.success) {
+        if (!emailResult.isError) {
             return res.status(500).send({
                 success: false,
                 message: 'Falha ao enviar email de boas-vindas.',
