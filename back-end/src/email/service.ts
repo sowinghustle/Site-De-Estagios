@@ -30,7 +30,7 @@ class EmailService {
             });
             return toResult(); // Sucesso
         } catch (error) {
-            return toResult(new Error('Falha ao enviar email de boas-vindas.'));
+            throw error;
         }
     }
 
@@ -46,7 +46,7 @@ class EmailService {
             });
             return toResult(); // Sucesso
         } catch (error) {
-            return toResult(new Error('Falha ao enviar email de redefinição de senha.'));
+            throw error;
         }
     }
 }

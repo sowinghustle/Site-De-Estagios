@@ -5,7 +5,7 @@ import { getValidationResult } from '../config/utils';
 import userService from '../user/service';
 import { StudentLoginSchema, StudentRegisterSchema } from './schemas';
 import studentService from './service';
-import emailService from '../email/service';  // Importa o serviço de email
+import emailService from '../email/service'; // Importe o serviço de email
 
 export default class StudentController {
     async login(req: Request, res: Response) {
@@ -80,14 +80,10 @@ export default class StudentController {
                 : err.message
         );
 
-        // Envia o email de boas-vindas ao estudante
-        const emailResult = await emailService.sendNewUserEmail(data.email);
-        if (!emailResult.success) {
-            return res.status(500).send({
-                success: false,
-                message: emailResult.error || 'Falha ao enviar email de boas-vindas.',
-            });
-        }
+        // Tente enviar o email para o aluno
+        emailService.sendNewUserEmail(student.user.email).catch((error) => {
+            console.error('Erro ao enviar email de boas-vindas:', error);
+        });
 
         return res.status(201).send({
             success: true,
