@@ -5,6 +5,7 @@ import { getValidationResult } from '../config/utils';
 import userService from '../user/service';
 import { StudentLoginSchema, StudentRegisterSchema } from './schemas';
 import studentService from './service';
+import emailService from '../email/service';  // Importa o serviço de email
 
 export default class StudentController {
     async login(req: Request, res: Response) {
@@ -65,7 +66,7 @@ export default class StudentController {
 
         if (!data) return res.end();
 
-        (
+        const student = (
             await studentService.saveNewStudent({
                 fullName: data.fullName,
                 user: {
@@ -78,6 +79,15 @@ export default class StudentController {
                 ? 'Os dados foram preenchidos corretamente, mas não foi possível completar o registro'
                 : err.message
         );
+
+        // Envia o email de boas-vindas ao estudante
+        const emailResult = await emailService.sendNewUserEmail(data.email);
+        if (!emailResult.success) {
+            return res.status(500).send({
+                success: false,
+                message: emailResult.error || 'Falha ao enviar email de boas-vindas.',
+            });
+        }
 
         return res.status(201).send({
             success: true,
