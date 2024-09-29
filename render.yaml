@@ -9,3 +9,9 @@ services:
       buildCommand: docker build -p 8000:10000 .
       rootDir: back-end
       healthCheckPath: /healthcheck
+    - type: redis
+      name: session-store
+      ipAllowList:
+        - source: 0.0.0.0/0
+          description: everywhere
+      plan: free
