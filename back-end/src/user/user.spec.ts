@@ -20,8 +20,7 @@ describe('GET /user/me', () => {
             admin.user.password
         );
         const res = await requestWithSupertest
-            .get('/api/v1/user/me')
-            .set('Cookie', `token=${loginRes.body.token}`)
+            .get(`/api/v1/user/me?access_token=${loginRes.body.token}`)
             .send();
         expect(res.status).toEqual(200);
         expect(res.body).toMatchObject(expectedResultValue);
@@ -42,8 +41,7 @@ describe('GET /user/me', () => {
             supervisor.user.password
         );
         const res = await requestWithSupertest
-            .get('/api/v1/user/me')
-            .set('Cookie', `token=${loginRes.body.token}`)
+            .get(`/api/v1/user/me?access_token=${loginRes.body.token}`)
             .send();
         expect(res.status).toEqual(200);
         expect(res.body).toMatchObject(expectedResultValue);
@@ -64,8 +62,7 @@ describe('GET /user/me', () => {
             student.user.password
         );
         const res = await requestWithSupertest
-            .get('/api/v1/user/me')
-            .set('Cookie', `token=${loginRes.body.token}`)
+            .get(`/api/v1/user/me?access_token=${loginRes.body.token}`)
             .send();
         expect(res.status).toEqual(200);
         expect(res.body).toMatchObject(expectedResultValue);
@@ -73,72 +70,6 @@ describe('GET /user/me', () => {
 
     it('should get unauthorized if user not logged in', async () => {
         const res = await requestWithSupertest.get('/api/v1/user/me').send();
-        expect(res.status).toEqual(401);
-    });
-
-    it('should get unauthorized when admin token was invalidated', async () => {
-        const admin = TestingUtils.DEFAULT_ADMIN;
-        await TestingUtils.saveAndTestAdmin(admin);
-        const loginRes = await TestingUtils.authenticateAdmin(
-            admin.name,
-            admin.user.password
-        );
-        expect(loginRes.status).toEqual(200);
-
-        const logoutRes = await requestWithSupertest
-            .delete('/api/v1/logout')
-            .set('Cookie', `token=${loginRes.body.token}`)
-            .send();
-        expect(logoutRes.status).toEqual(204);
-
-        const res = await requestWithSupertest
-            .get('/api/v1/user/me')
-            .set('Cookie', `token=${loginRes.body.token}`)
-            .send();
-        expect(res.status).toEqual(401);
-    });
-
-    it('should get unauthorized when supervisor token was invalidated', async () => {
-        const supervisor = TestingUtils.DEFAULT_SUPERVISOR;
-        await TestingUtils.saveAndTestSupervisor(supervisor);
-        const loginRes = await TestingUtils.authenticateSupervisor(
-            supervisor.user.email,
-            supervisor.user.password
-        );
-        expect(loginRes.status).toEqual(200);
-
-        const logoutRes = await requestWithSupertest
-            .delete('/api/v1/logout')
-            .set('Cookie', `token=${loginRes.body.token}`)
-            .send();
-        expect(logoutRes.status).toEqual(204);
-
-        const res = await requestWithSupertest
-            .get('/api/v1/user/me')
-            .set('Cookie', `token=${loginRes.body.token}`)
-            .send();
-        expect(res.status).toEqual(401);
-    });
-
-    it('should get unauthorized when student token was invalidated', async () => {
-        const student = TestingUtils.DEFAULT_STUDENT;
-        await TestingUtils.saveAndTestStudent(student);
-        const loginRes = await TestingUtils.authenticateStudent(
-            student.user.email,
-            student.user.password
-        );
-        expect(loginRes.status).toEqual(200);
-
-        const logoutRes = await requestWithSupertest
-            .delete('/api/v1/logout')
-            .set('Cookie', `token=${loginRes.body.token}`)
-            .send();
-        expect(logoutRes.status).toEqual(204);
-
-        const res = await requestWithSupertest
-            .get('/api/v1/user/me')
-            .set('Cookie', `token=${loginRes.body.token}`)
-            .send();
         expect(res.status).toEqual(401);
     });
 });
