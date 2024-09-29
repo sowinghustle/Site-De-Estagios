@@ -1,6 +1,6 @@
 import RedisStore from 'connect-redis';
 import { randomUUID } from 'crypto';
-import { CookieOptions, RequestHandler } from 'express';
+import { CookieOptions } from 'express';
 import { Store } from 'express-session';
 import Redis from 'ioredis';
 
@@ -83,10 +83,9 @@ const config = Object.freeze({
         };
     })(),
     external: {
-        redisStore(session: RequestHandler): Store {
+        redisStore(): Store {
             const redisClient = new Redis(config.project.redisUrl as string);
-            const redisStore = RedisStore(() => session);
-            return new redisStore({
+            return new RedisStore({
                 client: redisClient,
                 prefix: 'session:',
             });

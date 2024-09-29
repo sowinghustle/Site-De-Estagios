@@ -20,7 +20,7 @@ const sessionOptions: session.SessionOptions = {
     cookie: config.project.cookieOptions,
     store:
         config.project.environment === 'production'
-            ? config.external.redisStore(session())
+            ? config.external.redisStore()
             : new MemoryStore(),
 };
 

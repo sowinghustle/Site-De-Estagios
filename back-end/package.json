@@ -21,7 +21,6 @@
         "@swc/core": "^1.7.26",
         "@swc/jest": "^0.2.36",
         "@types/bcrypt": "^5.0.2",
-        "@types/connect-redis": "^0.0.23",
         "@types/cookie-parser": "^1.4.7",
         "@types/cors": "^2.8.17",
         "@types/express": "^4.17.21",
