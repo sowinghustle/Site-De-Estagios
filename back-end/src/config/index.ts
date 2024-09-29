@@ -54,7 +54,6 @@ const config = Object.freeze({
         };
 
         if (process.env.TS_NODE_DEV || process.env.NODE_ENV === 'development') {
-            config.frontendUrl = 'http://localhost:3000';
             config.environment = 'development';
         }
 
