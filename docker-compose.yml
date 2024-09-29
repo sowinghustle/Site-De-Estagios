@@ -6,7 +6,7 @@ services:
     networks:
       - net
     ports:
-      - "6379:6379"
+      - 6379:6379
   server:
     container_name: estagios-server
     build: ./back-end
@@ -20,8 +20,8 @@ services:
       FRONTEND_URL: '*'
       NODE_ENV: production
       REDIS_URL: redis://redis:6379
-  
   redis-commander:
+    container_name: redis-commander
     image: rediscommander/redis-commander:latest
     environment:
       REDIS_HOSTS: redis
