@@ -1,5 +1,8 @@
+import RedisStore from 'connect-redis';
 import { randomUUID } from 'crypto';
-import { CookieOptions } from 'express';
+import { CookieOptions, RequestHandler } from 'express';
+import { Store } from 'express-session';
+import Redis from 'ioredis';
 
 type Environment = 'development' | 'test' | 'production';
 
@@ -51,6 +54,7 @@ const config = Object.freeze({
             port: Number(process.env.PORT || '8000'),
             secret: process.env.secret || randomUUID(),
             frontendUrl: process.env.FRONTEND_URL ?? '',
+            redisUrl: process.env.REDIS_URL,
         };
 
         if (process.env.TS_NODE_DEV || process.env.NODE_ENV === 'development') {
@@ -78,6 +82,16 @@ const config = Object.freeze({
             cookieOptions,
         };
     })(),
+    external: {
+        redisStore(session: RequestHandler): Store {
+            const redisClient = new Redis(config.project.redisUrl as string);
+            const redisStore = RedisStore(() => session);
+            return new redisStore({
+                client: redisClient,
+                prefix: 'session:',
+            });
+        },
+    },
 });
 
 export default config;

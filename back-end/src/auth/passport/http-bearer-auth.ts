@@ -1,5 +1,6 @@
 import passport from 'passport';
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
+import { UnauthorizedError } from '../../config/errors';
 import { DatabaseResolver } from '../../database';
 
 export default function () {
@@ -12,8 +13,11 @@ export default function () {
                 }
                 const conn = await DatabaseResolver.getConnection();
                 const user = await conn.findUserByValidUserToken(token);
-                if (user) return done(null, user.id, { scope: 'all' });
-                return done(conn.getError(), false);
+
+                if (user) {
+                    return done(null, user, { scope: 'all' });
+                }
+                return done(conn.getError() ?? new UnauthorizedError(), false);
             } catch (err) {
                 return done(err, false);
             }

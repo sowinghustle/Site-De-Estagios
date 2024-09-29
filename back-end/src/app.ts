@@ -2,13 +2,14 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
-import session from 'express-session';
+import session, { MemoryStore } from 'express-session';
 import slowDown from 'express-slow-down';
 import helmet from 'helmet';
 import passport from 'passport';
 import validator from 'validator';
 import { configurePassport } from './auth/passport/ensure-is-auth';
 import config from './config';
+import { UnauthorizedError } from './config/errors';
 import buildRoutes from './routes';
 
 const app = express();
@@ -16,14 +17,14 @@ const sessionOptions: session.SessionOptions = {
     secret: config.project.secret,
     resave: false,
     saveUninitialized: true,
-    cookie: {
-        secure: true,
-    },
+    cookie: config.project.cookieOptions,
+    store:
+        config.project.environment === 'production'
+            ? config.external.redisStore(session())
+            : new MemoryStore(),
 };
 
 if (config.project.environment === 'production') {
-    sessionOptions.cookie!.secure = false;
-
     app.set('trust proxy', 1);
     app.use(
         slowDown({
@@ -103,10 +104,13 @@ app.use(
     ) => {
         if (!err) return next();
 
+        res.status(500);
+        if (err instanceof UnauthorizedError) res.status(401);
+
         const error = err as Error;
 
         if (config.project.environment === 'development') {
-            return res.status(500).send({
+            return res.send({
                 ...error,
                 success: false,
                 message: error.message,
@@ -114,7 +118,7 @@ app.use(
             });
         }
 
-        return res.status(500).send({
+        return res.send({
             success: false,
             message: config.messages.serverUnhandledException,
         });
