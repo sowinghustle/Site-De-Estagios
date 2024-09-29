@@ -1,25 +1,24 @@
 import { NextFunction, Request, Response } from 'express';
-import logoutService from './service';
+import authService from '../auth/service';
+import { UnauthorizedError } from '../config/errors';
 
 export default class LogoutController {
     async logout(req: Request, res: Response, next: NextFunction) {
-        if (!req.token) {
-            return res.status(400).send({
-                success: false,
-                message:
-                    'Não foi possível deslogar do sistema porque o token de acesso não foi recebido.',
-            });
+        if (req.isUnauthenticated()) {
+            throw new UnauthorizedError();
         }
 
-        const logoutResult = await logoutService.handle(req.token);
+        const logoutResult = await authService.invalidateToken(req.token!);
 
         if (logoutResult.isError) {
-            return next(logoutResult.value);
+            throw logoutResult.value;
         }
 
-        req.logOut((err) => {
-            if (!err) return res.status(204).end();
-            return next(err);
+        req.logout((err) => {
+            if (err) return next(err);
+            res.clearCookie('connect.sid');
+            res.clearCookie('token');
+            req.session.destroy(() => res.sendStatus(204));
         });
     }
 }

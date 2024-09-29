@@ -5,11 +5,9 @@ import rateLimit from 'express-rate-limit';
 import session, { MemoryStore } from 'express-session';
 import slowDown from 'express-slow-down';
 import helmet from 'helmet';
-import passport from 'passport';
 import validator from 'validator';
-import { configurePassport } from './auth/passport/ensure-is-auth';
+import configurePassport from './auth/passport';
 import config from './config';
-import { UnauthorizedError } from './config/errors';
 import buildRoutes from './routes';
 
 const app = express();
@@ -64,7 +62,6 @@ app.use(
 );
 
 app.use(session(sessionOptions));
-app.use(passport.authenticate('session'));
 app.use(express.json());
 app.use(
     config.project.environment === 'production'
@@ -97,34 +94,42 @@ app.get('/healthcheck', (req, res) => res.sendStatus(200));
 app.use('/api/v1', buildRoutes());
 app.use(
     (
-        err: any,
+        error: Error | undefined,
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
     ) => {
-        if (!err) return next();
+        if (!error) {
+            return next();
+        }
 
-        res.status(500);
-        if (err instanceof UnauthorizedError) res.status(401);
+        const statusCode =
+            {
+                'Unauthorized Error': 401,
+                'Bad Request Error': 400,
+                'Not Found Error': 404,
+            }[error.name] ?? 500;
 
-        const error = err as Error;
+        if (statusCode === 500) {
+            error.message = config.messages.serverUnhandledException;
+        }
 
         if (config.project.environment === 'development') {
-            return res.send({
+            return res.status(statusCode).send({
                 ...error,
                 success: false,
                 message: error.message,
+                statusCode,
                 stack: error.stack,
             });
         }
 
-        return res.send({
+        return res.status(statusCode).send({
             success: false,
-            message: config.messages.serverUnhandledException,
+            message: error.message,
         });
     }
 );
-
 app.use((req, res) => {
     const error: any = {
         success: false,

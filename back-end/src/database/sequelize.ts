@@ -240,7 +240,6 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         try {
             const model = await UserTokenTable.findOne({
                 where: { token },
-                attributes: [],
                 include: [
                     {
                         model: UserTable,
@@ -254,7 +253,12 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             const now = new Date();
 
             // token expirado
-            if (now > model.expiresAt) return;
+            if (model.expiredAt) return;
+            if (now > model.expiresAt) {
+                await model.update({ expiredAt: now });
+                return;
+            }
+
             return mapSequelizeUserToModel(model.user);
         } catch (err) {
             this.error = err as Error;
