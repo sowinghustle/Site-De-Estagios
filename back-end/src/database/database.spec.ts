@@ -143,6 +143,21 @@ describe('Student Database Tests', () => {
         expect(result.value).toMatchObject(expectedStudentValue);
     });
 
+    it('should get user by id', async () => {
+        const student = await TestingUtils.saveAndTestStudent(
+            TestingUtils.DEFAULT_STUDENT
+        );
+        const conn = await DatabaseResolver.getConnection();
+
+        expect(
+            await TestingUtils.expectPromiseNotToReject(
+                conn.findUserById(student.id!)
+            )
+        ).not.toBeUndefined();
+
+        expect(conn.getError()).toBeUndefined();
+    });
+
     it('should not save a new student with specified email already in use', async () => {
         await TestingUtils.saveAndTestStudent(TestingUtils.DEFAULT_STUDENT);
         const result = await TestingUtils.saveStudent({

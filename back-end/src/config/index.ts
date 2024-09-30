@@ -8,20 +8,6 @@ type Environment = 'development' | 'test' | 'production';
 
 const config = Object.freeze({
     messages: {
-        // good
-        successfullLogin: 'Login realizado com sucesso!',
-        successfullRegister: 'Cadastro realizado com sucesso!',
-        welcomeMessage: 'Servidor ativo. API está disponível.',
-        // bad
-        databaseImplNotDefined:
-            'A implementação do banco de dados não foi definida.',
-        routeNotFound: 'Este recurso não foi encontrado.',
-        serverUnhandledException:
-            'Não foi possível completar a requisição porque ocorreu um erro inesperado!',
-        tooManyRequests:
-            'Muitas requisições foram enviadas em pouco tempo. Aguarde alguns minutos para continuar.',
-        notAuth: 'Você precisa estar autenticado para acessar este recurso!',
-        invalidToken: 'Seu acesso não é válido! Tente fazer o login novamente.',
         // validation
         adminNotFoundWithNameOrEmail:
             'Administrador não encontrado com este nome ou email.',
@@ -38,6 +24,22 @@ const config = Object.freeze({
         nameOnlyLetters: 'O campo nome só pode ter letras.',
         wrongRepeatPassword: 'A confirmação de senha está incorreta',
         wrongPassword: 'A senha está incorreta!',
+
+        // good
+        successfullLogin: 'Login realizado com sucesso!',
+        successfullRegister: 'Cadastro realizado com sucesso!',
+        welcomeMessage: 'Servidor ativo. API está disponível.',
+
+        // bad
+        databaseImplNotDefined:
+            'A implementação do banco de dados não foi definida.',
+        routeNotFound: 'Este recurso não foi encontrado.',
+        serverUnhandledException:
+            'Não foi possível completar a requisição porque ocorreu um erro inesperado!',
+        tooManyRequests:
+            'Muitas requisições foram enviadas em pouco tempo. Aguarde alguns minutos para continuar.',
+        notAuth: 'Você precisa estar autenticado para acessar este recurso!',
+        invalidToken: 'Seu acesso não é válido! Tente fazer o login novamente.',
     },
     validations: {
         minPasswordLength: 8,
@@ -85,6 +87,7 @@ const config = Object.freeze({
     external: {
         redisStore(): Store {
             const redisClient = new Redis(config.project.redisUrl as string);
+
             return new RedisStore({
                 client: redisClient,
                 prefix: 'session:',
