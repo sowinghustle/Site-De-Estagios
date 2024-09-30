@@ -8,9 +8,9 @@ import supervisorService from './service';
 export default class SupervisorController {
     async login(req: Request, res: Response) {
         const data = getValidationResult(
-            res,
-            SupervisorLoginSchema.validate(req.body)
-        );
+            SupervisorLoginSchema,
+            req.body
+        ).orElseThrow();
 
         if (!data) return res.end();
 
@@ -53,11 +53,9 @@ export default class SupervisorController {
 
     async register(req: Request, res: Response) {
         const data = getValidationResult(
-            res,
-            SupervisorRegisterSchema.validate(req.body)
-        );
-
-        if (!data) return res.end();
+            SupervisorRegisterSchema,
+            req.body
+        ).orElseThrow();
 
         (
             await supervisorService.saveNewSupervisor({

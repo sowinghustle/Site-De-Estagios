@@ -1,16 +1,15 @@
-import { Response } from 'express';
-import { ValidationError, ValidationResult } from 'joi';
-import config from '.';
+import Joi from 'joi';
+import { ValidationError } from './errors';
 
-type ValueOrError<T> =
+type ValueOrError<T, E extends Error = Error> =
     | { value: T; isError: false }
-    | { value: Error; isError: true };
+    | { value: E; isError: true };
 
-export type Result<T> = ValueOrError<T> & {
-    orElseThrow: (cb?: (err: Error) => Error | string) => T;
+export type Result<T, E extends Error = Error> = ValueOrError<T, E> & {
+    orElseThrow: (cb?: (err: E) => E | string) => T;
 };
 
-function success<T>(value: T): Result<T> {
+function success<T, E extends Error = Error>(value: T): Result<T, E> {
     return {
         value,
         isError: false,
@@ -18,7 +17,7 @@ function success<T>(value: T): Result<T> {
     };
 }
 
-function error<T>(error: Error): Result<T> {
+function error<T, E extends Error = Error>(error: E): Result<T, E> {
     return {
         value: error,
         isError: true,
@@ -32,36 +31,32 @@ function error<T>(error: Error): Result<T> {
     };
 }
 
-export function buildToResult<T>() {
-    return function (value: T | Error): Result<T> {
+export function buildToResult<T, E extends Error = Error>() {
+    return function (value: T | E): Result<T, E> {
         if (value instanceof Error) {
-            return error<T>(value);
+            return error<T, E>(value as E);
         }
 
-        return success<T>(value);
+        return success<T, E>(value);
     };
 }
 
 export function getValidationResult<T>(
-    response: Response,
-    validationResult: ValidationResult<T>,
-    handleError = (validationError: ValidationError) => validationError.message
-): T | undefined {
+    validationSchema: Joi.ObjectSchema<T>,
+    value?: any
+): Result<T, ValidationError> {
+    const toResult = buildToResult<T, ValidationError>();
+    const validationResult = validationSchema.validate(value);
+
     if (!validationResult.error) {
-        return validationResult.value;
+        return toResult(validationResult.value);
     }
 
-    response.status(400);
+    const error = new ValidationError(
+        validationResult.error.message,
+        validationResult.error.details,
+        validationResult.warning
+    );
 
-    const errorMessage = handleError(validationResult.error);
-
-    if (config.project.environment !== 'production') {
-        response.send({
-            success: false,
-            message: errorMessage,
-            details: validationResult.error.details,
-            stack: validationResult.error.stack,
-            warning: validationResult.warning,
-        });
-    } else response.send({ success: false, message: errorMessage });
+    return toResult(error);
 }

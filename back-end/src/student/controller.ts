@@ -9,11 +9,9 @@ import studentService from './service';
 export default class StudentController {
     async login(req: Request, res: Response) {
         const data = getValidationResult(
-            res,
-            StudentLoginSchema.validate(req.body)
-        );
-
-        if (!data) return res.end();
+            StudentLoginSchema,
+            req.body
+        ).orElseThrow();
 
         const student = (
             await studentService.findStudentByEmail(data.email)
@@ -59,11 +57,9 @@ export default class StudentController {
 
     async register(req: Request, res: Response) {
         const data = getValidationResult(
-            res,
-            StudentRegisterSchema.validate(req.body)
-        );
-
-        if (!data) return res.end();
+            StudentRegisterSchema,
+            req.body
+        ).orElseThrow();
 
         (
             await studentService.saveNewStudent({

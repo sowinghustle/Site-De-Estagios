@@ -9,11 +9,9 @@ import adminService from './service';
 export default class AdminController {
     async login(req: Request, res: Response) {
         const data = getValidationResult(
-            res,
-            AdminLoginSchema.validate(req.body)
-        );
-
-        if (!data) return res.end();
+            AdminLoginSchema,
+            req.body
+        ).orElseThrow();
 
         const admin = (
             await adminService.findAdminByNameOrEmail(data.nameOrEmail)

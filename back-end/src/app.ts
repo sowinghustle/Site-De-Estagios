@@ -105,20 +105,16 @@ app.use(
 
         const statusCode =
             {
-                'Unauthorized Error': 401,
-                'Bad Request Error': 400,
-                'Not Found Error': 404,
+                UnauthorizedError: 401,
+                BadRequestError: 400,
+                NotFoundError: 404,
+                ValidationError: 400,
             }[error.name] ?? 500;
-
-        if (statusCode === 500) {
-            error.message = config.messages.serverUnhandledException;
-        }
 
         if (config.project.environment === 'development') {
             return res.status(statusCode).send({
-                ...error,
                 success: false,
-                message: error.message,
+                ...error,
                 statusCode,
                 stack: error.stack,
             });
@@ -126,7 +122,10 @@ app.use(
 
         return res.status(statusCode).send({
             success: false,
-            message: error.message,
+            message:
+                statusCode === 500
+                    ? config.messages.serverUnhandledException
+                    : error.message,
         });
     }
 );
