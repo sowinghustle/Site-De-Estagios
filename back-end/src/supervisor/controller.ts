@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
+import { BadRequestError, NotFoundError } from '../config/errors';
 import { getValidationResult } from '../config/utils';
 import { SupervisorLoginSchema, SupervisorRegisterSchema } from './schemas';
 import supervisorService from './service';
@@ -12,24 +13,18 @@ export default class SupervisorController {
             req.body
         ).orElseThrow();
 
-        if (!data) return res.end();
-
         const supervisor = (
             await supervisorService.findSupervisorByEmail(data.email)
         ).orElseThrow();
 
         if (!supervisor) {
-            return res.status(404).send({
-                success: false,
-                message: config.messages.supervisorNotFoundWithEmail,
-            });
+            throw new NotFoundError(
+                config.messages.supervisorNotFoundWithEmail
+            );
         }
 
         if (supervisor.user.password !== data.password) {
-            return res.status(400).send({
-                success: false,
-                message: config.messages.wrongPassword,
-            });
+            throw new BadRequestError(config.messages.wrongPassword);
         }
 
         const { token, expiresAt } = (

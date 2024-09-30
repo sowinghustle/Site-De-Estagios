@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
+import { BadRequestError, NotFoundError } from '../config/errors';
 import { getValidationResult } from '../config/utils';
 import userService from '../user/service';
 import { AdminLoginSchema } from './schemas';
@@ -18,28 +19,22 @@ export default class AdminController {
         ).orElseThrow();
 
         if (!admin) {
-            return res.status(404).send({
-                success: false,
-                message: config.messages.adminNotFoundWithNameOrEmail,
-            });
+            throw new NotFoundError(
+                config.messages.adminNotFoundWithNameOrEmail
+            );
         }
 
-        if (
-            !(await userService.compareUserPasswords(admin.user, data.password))
-        ) {
-            return res.status(400).send({
-                success: false,
-                message: config.messages.wrongPassword,
-            });
+        if (!(await userService.comparePassword(admin.user, data.password))) {
+            throw new BadRequestError(config.messages.wrongPassword);
         }
 
         const { expiresAt, token } = (
             await authService.saveNewUserToken(admin.user.id!)
-        ).orElseThrow((error) => {
-            return config.project.environment === 'production'
+        ).orElseThrow((error) =>
+            config.project.environment === 'production'
                 ? 'Não foi possível realizar o login, tente novamente mais tarde.'
-                : error.message;
-        });
+                : error.message
+        );
 
         return res
             .status(200)

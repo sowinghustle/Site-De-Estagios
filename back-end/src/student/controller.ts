@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
+import { BadRequestError, NotFoundError } from '../config/errors';
 import { getValidationResult } from '../config/utils';
 import userService from '../user/service';
 import { StudentLoginSchema, StudentRegisterSchema } from './schemas';
@@ -18,22 +19,11 @@ export default class StudentController {
         ).orElseThrow();
 
         if (!student) {
-            return res.status(404).send({
-                success: false,
-                message: config.messages.studentNotFoundWithEmail,
-            });
+            throw new NotFoundError(config.messages.studentNotFoundWithEmail);
         }
 
-        if (
-            !(await userService.compareUserPasswords(
-                student.user,
-                data.password
-            ))
-        ) {
-            return res.status(400).send({
-                success: false,
-                message: config.messages.wrongPassword,
-            });
+        if (!(await userService.comparePassword(student.user, data.password))) {
+            throw new BadRequestError(config.messages.wrongPassword);
         }
 
         const { token, expiresAt } = (
