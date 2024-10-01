@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import validator from 'validator';
 import configurePassport from './auth/passport';
 import config from './config';
+import { UnhandledError } from './config/errors';
 import buildRoutes from './routes';
 
 const app = express();
@@ -120,12 +121,16 @@ app.use(
             });
         }
 
+        if (!(error instanceof UnhandledError)) {
+            error = new UnhandledError(
+                error.message,
+                statusCode === 500 ? undefined : error.message
+            );
+        }
+
         return res.status(statusCode).send({
             success: false,
-            message:
-                statusCode === 500
-                    ? config.messages.serverUnhandledException
-                    : error.message,
+            message: (error as UnhandledError).userFriendlyMessage,
         });
     }
 );

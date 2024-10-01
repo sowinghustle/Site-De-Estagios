@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import config from '.';
 
 export class UnauthorizedError extends Error {
     readonly name = 'UnauthorizedError';
@@ -35,5 +36,20 @@ export class ValidationError extends Joi.ValidationError implements Error {
     ) {
         super(message, details, original);
         this.warning = warning;
+    }
+}
+
+export class UnhandledError extends Error {
+    public userFriendlyMessage: string;
+
+    public constructor(message: string, userFriendlyMessage?: string) {
+        super(message);
+
+        this.userFriendlyMessage =
+            userFriendlyMessage ?? config.messages.serverUnhandledException;
+
+        if (config.project.environment === 'development') {
+            this.userFriendlyMessage = message;
+        }
     }
 }

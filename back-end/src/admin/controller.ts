@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
-import { BadRequestError, NotFoundError } from '../config/errors';
+import {
+    BadRequestError,
+    NotFoundError,
+    UnhandledError,
+} from '../config/errors';
 import { getValidationResult } from '../config/utils';
 import userService from '../user/service';
 import { AdminLoginSchema } from './schemas';
@@ -30,10 +34,12 @@ export default class AdminController {
 
         const { expiresAt, token } = (
             await authService.saveNewUserToken(admin.user.id!)
-        ).orElseThrow((error) =>
-            config.project.environment === 'production'
-                ? 'Não foi possível realizar o login, tente novamente mais tarde.'
-                : error.message
+        ).orElseThrow(
+            (error) =>
+                new UnhandledError(
+                    error.message,
+                    'Não foi possível realizar o login, tente novamente mais tarde.'
+                )
         );
 
         return res

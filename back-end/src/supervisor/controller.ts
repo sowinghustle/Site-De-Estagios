@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
-import { BadRequestError, NotFoundError } from '../config/errors';
+import {
+    BadRequestError,
+    NotFoundError,
+    UnhandledError,
+} from '../config/errors';
 import { getValidationResult } from '../config/utils';
 import userService from '../user/service';
 import { SupervisorLoginSchema, SupervisorRegisterSchema } from './schemas';
@@ -32,10 +36,12 @@ export default class SupervisorController {
 
         const { token, expiresAt } = (
             await authService.saveNewUserToken(supervisor.user.id!)
-        ).orElseThrow((err) =>
-            config.project.environment === 'production'
-                ? 'Não foi possível realizar o login, tente novamente mais tarde.'
-                : err.message
+        ).orElseThrow(
+            (error) =>
+                new UnhandledError(
+                    error.message,
+                    'Não foi possível realizar o login, tente novamente mais tarde.'
+                )
         );
 
         return res
@@ -63,10 +69,12 @@ export default class SupervisorController {
                     password: data.password,
                 },
             })
-        ).orElseThrow((err) =>
-            config.project.environment === 'production'
-                ? 'Os dados foram preenchidos corretamente, mas não foi possível completar o registro'
-                : err.message
+        ).orElseThrow(
+            (error) =>
+                new UnhandledError(
+                    error.message,
+                    'Os dados foram preenchidos corretamente, mas não foi possível completar o registro.'
+                )
         );
 
         return res.status(201).send({
