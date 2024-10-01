@@ -82,8 +82,12 @@ describe('Supervisor Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
 
     it('should save a new supervisor', async () => {
-        const expectedSupervisorValue = TestingUtils.DEFAULT_SUPERVISOR;
-
+        const expectedSupervisorValue = {
+            ...TestingUtils.DEFAULT_SUPERVISOR,
+            user: await TestingUtils.getUserWithoutPassword(
+                TestingUtils.DEFAULT_SUPERVISOR.user
+            ),
+        };
         const result = await TestingUtils.saveSupervisor(
             TestingUtils.DEFAULT_SUPERVISOR
         );
@@ -102,7 +106,8 @@ describe('Supervisor Database Tests', () => {
     });
 
     it('should find supervisor by email field', async () => {
-        const expectedResultValue = TestingUtils.DEFAULT_SUPERVISOR;
+        const expectedResultValue =
+            TestingUtils.DEFAULT_SUPERVISOR_WITHOUT_PASSWORD;
         await TestingUtils.saveAndTestSupervisor(
             TestingUtils.DEFAULT_SUPERVISOR
         );

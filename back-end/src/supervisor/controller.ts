@@ -3,6 +3,7 @@ import authService from '../auth/service';
 import config from '../config';
 import { BadRequestError, NotFoundError } from '../config/errors';
 import { getValidationResult } from '../config/utils';
+import userService from '../user/service';
 import { SupervisorLoginSchema, SupervisorRegisterSchema } from './schemas';
 import supervisorService from './service';
 
@@ -23,7 +24,9 @@ export default class SupervisorController {
             );
         }
 
-        if (supervisor.user.password !== data.password) {
+        if (
+            !(await userService.comparePassword(supervisor.user, data.password))
+        ) {
             throw new BadRequestError(config.messages.wrongPassword);
         }
 
