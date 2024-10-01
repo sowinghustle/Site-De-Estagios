@@ -1,5 +1,6 @@
 import { buildToResult, Result } from '../config/utils';
 import { DatabaseResolver } from '../database';
+import hashService from '../hash/service';
 import { Supervisor } from './model';
 
 export class SupervisorService {
@@ -22,7 +23,16 @@ export class SupervisorService {
     ): Promise<Result<Supervisor>> {
         const toResult = buildToResult<Supervisor>();
         const conn = await DatabaseResolver.getConnection();
-        const createdSupervisor = await conn.saveNewSupervisor(supervisor);
+        const encryptedPassword = await hashService.encryptPassword(
+            supervisor.user.password
+        );
+        const createdSupervisor = await conn.saveNewSupervisor({
+            ...supervisor,
+            user: {
+                ...supervisor.user,
+                password: encryptedPassword,
+            },
+        });
         const error = conn.getError();
 
         if (error) {

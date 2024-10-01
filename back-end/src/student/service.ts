@@ -13,7 +13,7 @@ export class StudentService {
         return toResult(student);
     }
 
-    async saveNewStudent(student: Student) {
+    async saveNewStudent(student: Student): Promise<Result<Student>> {
         const toResult = buildToResult<Student>();
         const conn = await DatabaseResolver.getConnection();
         const encryptedPassword = await hashService.encryptPassword(

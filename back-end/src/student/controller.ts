@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
+import {
+    BadRequestError,
+    NotFoundError,
+    UnhandledError,
+} from '../config/errors';
 import { getValidationResult } from '../config/utils';
 import userService from '../user/service';
 import { StudentLoginSchema, StudentRegisterSchema } from './schemas';
@@ -9,41 +14,30 @@ import studentService from './service';
 export default class StudentController {
     async login(req: Request, res: Response) {
         const data = getValidationResult(
-            res,
-            StudentLoginSchema.validate(req.body)
-        );
-
-        if (!data) return res.end();
+            StudentLoginSchema,
+            req.body
+        ).orElseThrow();
 
         const student = (
             await studentService.findStudentByEmail(data.email)
         ).orElseThrow();
 
         if (!student) {
-            return res.status(404).send({
-                success: false,
-                message: config.messages.studentNotFoundWithEmail,
-            });
+            throw new NotFoundError(config.messages.studentNotFoundWithEmail);
         }
 
-        if (
-            !(await userService.compareUserPasswords(
-                student.user,
-                data.password
-            ))
-        ) {
-            return res.status(400).send({
-                success: false,
-                message: config.messages.wrongPassword,
-            });
+        if (!(await userService.comparePassword(student.user, data.password))) {
+            throw new BadRequestError(config.messages.wrongPassword);
         }
 
         const { token, expiresAt } = (
             await authService.saveNewUserToken(student.user.id!)
-        ).orElseThrow((err) =>
-            config.project.environment === 'production'
-                ? 'Não foi possível realizar o login, tente novamente mais tarde.'
-                : err.message
+        ).orElseThrow(
+            (error) =>
+                new UnhandledError(
+                    error.message,
+                    'Não foi possível realizar o login, tente novamente mais tarde.'
+                )
         );
 
         return res
@@ -59,11 +53,9 @@ export default class StudentController {
 
     async register(req: Request, res: Response) {
         const data = getValidationResult(
-            res,
-            StudentRegisterSchema.validate(req.body)
-        );
-
-        if (!data) return res.end();
+            StudentRegisterSchema,
+            req.body
+        ).orElseThrow();
 
         (
             await studentService.saveNewStudent({
@@ -73,10 +65,12 @@ export default class StudentController {
                     password: data.password,
                 },
             })
-        ).orElseThrow((err) =>
-            config.project.environment === 'production'
-                ? 'Os dados foram preenchidos corretamente, mas não foi possível completar o registro'
-                : err.message
+        ).orElseThrow(
+            (error) =>
+                new UnhandledError(
+                    error.message,
+                    'Os dados foram preenchidos corretamente, mas não foi possível completar o registro.'
+                )
         );
 
         return res.status(201).send({

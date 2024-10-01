@@ -1,43 +1,47 @@
 import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
+import {
+    BadRequestError,
+    NotFoundError,
+    UnhandledError,
+} from '../config/errors';
 import { getValidationResult } from '../config/utils';
+import userService from '../user/service';
 import { SupervisorLoginSchema, SupervisorRegisterSchema } from './schemas';
 import supervisorService from './service';
 
 export default class SupervisorController {
     async login(req: Request, res: Response) {
         const data = getValidationResult(
-            res,
-            SupervisorLoginSchema.validate(req.body)
-        );
-
-        if (!data) return res.end();
+            SupervisorLoginSchema,
+            req.body
+        ).orElseThrow();
 
         const supervisor = (
             await supervisorService.findSupervisorByEmail(data.email)
         ).orElseThrow();
 
         if (!supervisor) {
-            return res.status(404).send({
-                success: false,
-                message: config.messages.supervisorNotFoundWithEmail,
-            });
+            throw new NotFoundError(
+                config.messages.supervisorNotFoundWithEmail
+            );
         }
 
-        if (supervisor.user.password !== data.password) {
-            return res.status(400).send({
-                success: false,
-                message: config.messages.wrongPassword,
-            });
+        if (
+            !(await userService.comparePassword(supervisor.user, data.password))
+        ) {
+            throw new BadRequestError(config.messages.wrongPassword);
         }
 
         const { token, expiresAt } = (
             await authService.saveNewUserToken(supervisor.user.id!)
-        ).orElseThrow((err) =>
-            config.project.environment === 'production'
-                ? 'Não foi possível realizar o login, tente novamente mais tarde.'
-                : err.message
+        ).orElseThrow(
+            (error) =>
+                new UnhandledError(
+                    error.message,
+                    'Não foi possível realizar o login, tente novamente mais tarde.'
+                )
         );
 
         return res
@@ -53,11 +57,9 @@ export default class SupervisorController {
 
     async register(req: Request, res: Response) {
         const data = getValidationResult(
-            res,
-            SupervisorRegisterSchema.validate(req.body)
-        );
-
-        if (!data) return res.end();
+            SupervisorRegisterSchema,
+            req.body
+        ).orElseThrow();
 
         (
             await supervisorService.saveNewSupervisor({
@@ -67,10 +69,12 @@ export default class SupervisorController {
                     password: data.password,
                 },
             })
-        ).orElseThrow((err) =>
-            config.project.environment === 'production'
-                ? 'Os dados foram preenchidos corretamente, mas não foi possível completar o registro'
-                : err.message
+        ).orElseThrow(
+            (error) =>
+                new UnhandledError(
+                    error.message,
+                    'Os dados foram preenchidos corretamente, mas não foi possível completar o registro.'
+                )
         );
 
         return res.status(201).send({

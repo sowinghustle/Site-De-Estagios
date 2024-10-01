@@ -94,9 +94,8 @@ export const TestingUtils = Object.freeze({
         };
     },
     async getUserWithoutPassword(user: User): Promise<Omit<User, 'password'>> {
-        const newUser = { ...user } as any;
-        delete newUser.password;
-        return newUser;
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
     },
     async saveAdmin(data: Admin) {
         return await adminService.saveNewAdmin(data);

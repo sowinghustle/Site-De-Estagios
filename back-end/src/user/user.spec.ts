@@ -20,8 +20,7 @@ describe('GET /user/me', () => {
             admin.user.password
         );
         const res = await requestWithSupertest
-            .get('/api/v1/user/me')
-            .set('Cookie', `token=${loginRes.body.token}`)
+            .get(`/api/v1/user/me?access_token=${loginRes.body.token}`)
             .send();
         expect(res.status).toEqual(200);
         expect(res.body).toMatchObject(expectedResultValue);
@@ -42,8 +41,7 @@ describe('GET /user/me', () => {
             supervisor.user.password
         );
         const res = await requestWithSupertest
-            .get('/api/v1/user/me')
-            .set('Cookie', `token=${loginRes.body.token}`)
+            .get(`/api/v1/user/me?access_token=${loginRes.body.token}`)
             .send();
         expect(res.status).toEqual(200);
         expect(res.body).toMatchObject(expectedResultValue);
@@ -64,8 +62,7 @@ describe('GET /user/me', () => {
             student.user.password
         );
         const res = await requestWithSupertest
-            .get('/api/v1/user/me')
-            .set('Cookie', `token=${loginRes.body.token}`)
+            .get(`/api/v1/user/me?access_token=${loginRes.body.token}`)
             .send();
         expect(res.status).toEqual(200);
         expect(res.body).toMatchObject(expectedResultValue);
