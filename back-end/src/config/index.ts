@@ -20,6 +20,7 @@ const config = Object.freeze({
         insuficientPasswordCharacters:
             'A senha deve ter pelo menos 8 caracteres.',
         invalidEmail: 'Este não é um email válido',
+        emailAddressIsInUse: 'Este email já está em uso',
         invalidAdminName: 'O nome do admin deve conter apenas letras e números',
         nameOnlyLetters: 'O campo nome só pode ter letras.',
         wrongRepeatPassword: 'A confirmação de senha está incorreta',

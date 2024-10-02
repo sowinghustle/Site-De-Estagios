@@ -273,6 +273,16 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             this.error = err as Error;
         }
     }
+    async verifyIfEmailIsInUse(email: string): Promise<boolean | undefined> {
+        try {
+            const result = await UserTable.findAndCountAll({
+                where: { email },
+            });
+            return result.count > 0;
+        } catch (err) {
+            this.error = err as Error;
+        }
+    }
 
     async init(): Promise<void> {
         try {
