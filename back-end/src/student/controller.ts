@@ -8,6 +8,7 @@ import {
 } from '../config/errors';
 import { getValidationResult } from '../config/utils';
 import userService from '../user/service';
+import { Student } from './model';
 import { StudentLoginSchema, StudentRegisterSchema } from './schemas';
 import studentService from './service';
 
@@ -57,15 +58,15 @@ export default class StudentController {
             req.body
         ).orElseThrow();
 
-        (
-            await studentService.saveNewStudent({
-                fullName: data.fullName,
-                user: {
-                    email: data.email,
-                    password: data.password,
-                },
-            })
-        ).orElseThrow(
+        const student: Student = {
+            fullName: data.fullName,
+            user: {
+                email: data.email,
+                password: data.password,
+            },
+        };
+
+        (await studentService.saveNewStudent(student)).orElseThrow(
             (error) =>
                 new UnhandledError(
                     error.message,

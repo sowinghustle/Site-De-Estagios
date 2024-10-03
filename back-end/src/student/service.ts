@@ -14,8 +14,8 @@ export class StudentService {
         return toResult(student);
     }
 
-    async saveNewStudent(student: Student): Promise<Result<Student>> {
-        const toResult = buildToResult<Student>();
+    async ensureCanSaveStudent(student: Student): Promise<Result<void>> {
+        const toResult = buildToResult<void>();
         const verifyEmailResult = await userService.ensureEmailIsNotInUse(
             student.user.email
         );
@@ -24,6 +24,11 @@ export class StudentService {
             return toResult(verifyEmailResult.value);
         }
 
+        return toResult();
+    }
+
+    async saveNewStudent(student: Student): Promise<Result<Student>> {
+        const toResult = buildToResult<Student>();
         const conn = await DatabaseResolver.getConnection();
         const encryptedPassword = await hashService.encryptPassword(
             student.user.password
