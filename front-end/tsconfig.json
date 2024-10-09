@@ -4,12 +4,7 @@
     "strict": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./*"],
-      "@assets/*": ["./assets/*"],
-      "@images/*": ["./assets/images/*"],
-      "@fonts/*": ["./assets/fonts/*"],
-      "@components/*": ["./components/*"],
-      "@app/*": ["./app*"]
+      "@/*": ["./*"]
     },
     "jsx": "react-native",
     "skipLibCheck": true

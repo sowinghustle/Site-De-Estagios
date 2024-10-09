@@ -1,46 +1,16 @@
 import React from 'react';
-import { Button, ButtonText, ButtonIcon } from '@gluestack-ui/themed';
-import { primaryButtonStyles, secondaryButtonStyles } from './styles';
+import { Button } from 'react-native-elements';
 
-interface CustomButtonProps {
+interface MyButtonProps 
+{
   title: string;
-  buttonIcon?: string;
-  type: 'primary' | 'secondary'; 
-  [key: string]: any;
+  onPress: () => void;
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({ title, buttonIcon, type, ...props })  => 
-{
-
-  let styles;
-  switch (type) 
-  {
-    case 'primary':
-      styles = primaryButtonStyles;
-      break;
-
-    case 'secondary':
-      styles = secondaryButtonStyles;
-      break;
-
-    default:
-      styles = primaryButtonStyles;
-      break;
-  }
-
+const MyButton: React.FC<MyButtonProps> = ({ title, onPress }) => {
   return (
-    <Button
-      size="md"
-      variant="solid"
-      style={styles.button}
-      isDisabled={false}
-      isFocusVisible={false}
-      {...props}
-    >
-      <ButtonText style={styles.buttonText}>{title}</ButtonText>
-      {buttonIcon && <ButtonIcon style={styles.buttonIcon} as={buttonIcon} />}
-    </Button>
+    <Button title={title} onPress={onPress} />
   );
 };
 
-export default CustomButton;
+export default MyButton;
