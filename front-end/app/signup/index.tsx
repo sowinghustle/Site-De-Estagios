@@ -1,9 +1,14 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, SafeAreaView } from 'react-native';
+import CustomButton from '../../components/button/CustomButton';
 
-export default function signup() {
+export default function signup() 
+{
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    </View>
+    <SafeAreaView>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <CustomButton title="Cadastrar-se" type="primary" onPress={() => alert('Button pressed!')} />
+      </View>
+    </SafeAreaView>
   );
 }

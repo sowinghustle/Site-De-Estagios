@@ -1,11 +1,14 @@
 import React from 'react';
-import { View } from 'react-native';
-import Button from '../../components/button/CustomButton';
+import { View, SafeAreaView } from 'react-native';
+import CustomButton from '../../components/button/CustomButton';
 
-export default function signin() {
+export default function SignIn() 
+{
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Button title="Acessar o Sistema" onPress={() => alert('Button pressed!')} />
-    </View>
+    <SafeAreaView>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <CustomButton title="Acessar o Sistema" type="primary" onPress={() => alert('Button pressed!')} />
+      </View>
+    </SafeAreaView>
   );
 }
