@@ -1,45 +1,35 @@
 import React from 'react';
-import { Button, ButtonText, ButtonIcon } from '@gluestack-ui/themed';
+import { Button } from 'react-native-elements';
 import { primaryButtonStyles, secondaryButtonStyles } from './styles';
 
 interface CustomButtonProps {
   title: string;
-  buttonIcon?: string;
-  type: 'primary' | 'secondary'; 
-  [key: string]: any;
+  type: 'primary' | 'secondary';
+  onPress: () => void;
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({ title, buttonIcon, type, ...props })  => 
-{
+const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, type }) => {
+  
+  const buttonStylesMap = {
+    primary: primaryButtonStyles.button,
+    secondary: secondaryButtonStyles.button,
+  };
 
-  let styles;
-  switch (type) 
-  {
-    case 'primary':
-      styles = primaryButtonStyles;
-      break;
+  const buttonTextStylesMap = {
+    primary: primaryButtonStyles.buttonText,
+    secondary: secondaryButtonStyles.buttonText,
+  };
 
-    case 'secondary':
-      styles = secondaryButtonStyles;
-      break;
-
-    default:
-      styles = primaryButtonStyles;
-      break;
-  }
+  const buttonStyle = buttonStylesMap[type] || buttonStylesMap.primary;
+  const buttonTextStyle = buttonTextStylesMap[type] || buttonTextStylesMap.primary;
 
   return (
     <Button
-      size="md"
-      variant="solid"
-      style={styles.button}
-      isDisabled={false}
-      isFocusVisible={false}
-      {...props}
-    >
-      <ButtonText style={styles.buttonText}>{title}</ButtonText>
-      {buttonIcon && <ButtonIcon style={styles.buttonIcon} as={buttonIcon} />}
-    </Button>
+      title={title}
+      buttonStyle={buttonStyle}
+      titleStyle={buttonTextStyle}
+      onPress={onPress}
+    />
   );
 };
 
