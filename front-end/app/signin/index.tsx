@@ -14,25 +14,32 @@ export default function SignIn() {
   const [senhaError, setSenhaError] = useState('');
 
   const handleSignIn = () => {
+    
     setEmailError('');
     setSenhaError('');
 
     if (email && senha) {
+
       alert('Acessando o sistema');
-    } else {
-      if (!email) {
+    } 
+    else 
+    {
+      if (!email) 
+      {
         setEmailError("Digite um email");
       }
-      if (!senha) {
+      if (!senha) 
+      {
         setSenhaError("Digite uma senha");
       }
       alert('Por favor, preencha todos os campos');
     }
+    
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.innerContainer}>
+      <View style={styles.innerContainer /* Verificar esta linha depois */}>
         
         <Image 
           source={require('../../assets/images/Logo1.png')}
@@ -58,7 +65,7 @@ export default function SignIn() {
           errorMessage={senhaError}
         />
 
-        <Text style={signin.forgotPassword}>Esqueceu sua senha? <Link style={styles.link} href={'/password'}>Redefinir Senha</Link></Text>
+        <Text style={signin.linkForgotPassword}>Esqueceu sua senha? <Link style={styles.link} href={'/password'}>Redefinir Senha</Link></Text>
 
         <CustomButton 
           title="Acessar o Sistema" 
@@ -66,7 +73,7 @@ export default function SignIn() {
           onPress={handleSignIn} 
         />
         
-        <Text style={signin.forgotPassword}>Ainda não tem uma conta? <Link style={styles.link} href={'/signup'}>Criar uma Conta</Link></Text>
+        <Text style={signin.linkText}>Ainda não tem uma conta? <Link style={styles.link} href={'/signup'}>Criar uma Conta</Link></Text>
 
       </View>
     </SafeAreaView>

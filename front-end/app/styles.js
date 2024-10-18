@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: 
   {
+    backgroundColor: '#F5F5F5',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -18,16 +19,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginVertical: 10,
     textAlign: 'center',
-    fontWeight: 'bold',
   },
 });
 
 // =============================================================================
 
 const signin = StyleSheet.create({
+  innerContainer: 
+  {
+    backgroundColor: '#000',
+  },
   header: 
   {
     fontSize: 24,
+    fontWeight: 500,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -37,12 +42,23 @@ const signin = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     marginVertical: 10,
   },
-  forgotPassword: 
+  linkForgotPassword: 
   {
-    textAlign: 'center',
+    
+    textAlign: 'left',
+    fontSize: 19,
+    fontWeight: 400,
     marginVertical: 10,
   },
-  logoImage: {
+  linkText: 
+  {
+    textAlign: 'center',
+    fontSize: 19,
+    fontWeight: 400,
+    marginVertical: 10,
+  },
+  logoImage: 
+  {
     marginBottom: 10,
     alignSelf: 'center',
   },

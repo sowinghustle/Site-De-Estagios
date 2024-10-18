@@ -16,7 +16,8 @@ const styles = StyleSheet.create({
   inputStyle: 
   {
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: 400,
   },
   labelStyle: 
   {
