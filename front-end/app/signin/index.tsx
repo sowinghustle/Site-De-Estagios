@@ -38,8 +38,8 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.innerContainer /* Verificar esta linha depois */}>
+    <SafeAreaView style={signin.container}>
+      <View style={signin.innerContainer}>
         
         <Image 
           source={require('../../assets/images/Logo1.png')}

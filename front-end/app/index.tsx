@@ -1,14 +1,40 @@
+import React from 'react';
 import { View, SafeAreaView } from 'react-native';
 import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 
-import { styles } from './styles';
+import CustomButton from '../components/button/CustomButton';
+
+import { signin, styles } from './styles';
 
 export default function HomeScreen() {
+
+  const router = useRouter();
+
+  const PaginaLogin = () => {
+    router.push('/signin');
+  };
+
+  const PaginaRegister = () => {
+    router.push('/signup');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
-        <Link style={styles.link} href={'/signup'}>Registre-se</Link>
-        <Link style={styles.link} href={'/signin'}>Entrar</Link>
+        
+        <CustomButton 
+          title="Login" 
+          type="primary" 
+          onPress={PaginaLogin} 
+        />
+
+        <CustomButton 
+          title="Cadastro" 
+          type="secondary" 
+          onPress={PaginaRegister} 
+        />
+        
       </View>
     </SafeAreaView>
   );

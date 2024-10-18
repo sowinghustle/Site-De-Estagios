@@ -3,9 +3,9 @@ import { Button } from 'react-native-elements';
 import { primaryButtonStyles, secondaryButtonStyles } from './styles';
 
 interface CustomButtonProps {
-  title: string;
+  title?: string;
   type: 'primary' | 'secondary';
-  onPress: () => void;
+  onPress?: () => void;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, type }) => {
