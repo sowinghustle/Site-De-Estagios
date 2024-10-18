@@ -2,7 +2,7 @@ import React from 'react';
 import { View, SafeAreaView } from 'react-native';
 import CustomButton from '../../components/button/CustomButton';
 
-import styles from '../styles';
+import { styles } from '../styles';
 
 export default function signup() 
 {
