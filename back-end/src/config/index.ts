@@ -62,11 +62,11 @@ const config = Object.freeze({
             port: Number(process.env.PORT || '8000'),
             secret: process.env.secret || randomUUID(),
             emailOptions: { 
-                host: process.env.EMAIL_HOST || 'sandbox.smtp.mailtrap.io',
-                port: Number(process.env.EMAIL_PORT || '2525'),
+                host: process.env.EMAIL_HOST,
+                port: Number(process.env.EMAIL_PORT),
                 auth: {
-                    user: process.env.EMAIL_USER || '6c0d90943fb7b6',
-                    pass: process.env.EMAIL_PASS || '5de85912b951c6',
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
                 },
             },
         };

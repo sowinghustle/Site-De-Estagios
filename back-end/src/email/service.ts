@@ -3,7 +3,7 @@ import { User } from '../user/model';
 import config from '../config/index'; 
 import { buildToResult } from '../config/utils';
 
-class EmailService {
+class NodeMailerService {
     private transporter;
 
     constructor() {
@@ -17,7 +17,6 @@ class EmailService {
         });
     }
 
-    // Utilizando buildToResult para padronizar o retorno
     async sendNewUserEmail(email: string) {
         const toResult = buildToResult<void>();
         
@@ -52,4 +51,4 @@ class EmailService {
 }
 
 const emailService = new EmailService();
-export default emailService;
+export default NodeMailerService;
