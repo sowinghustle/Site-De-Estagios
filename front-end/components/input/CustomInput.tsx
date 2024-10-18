@@ -7,22 +7,26 @@ interface CustomInputProps
   label?: string;
   placeholder?: string;
   iconName?: string;
-  iconType?: string;
   errorMessage?: string;
   inputStyle?: object;
-  onChangeText?: (text: string) => void;
+  onChangeText: (text: string) => void;
+  secureTextEntry?: boolean;
 }
 
-const CustomInput: React.FC<CustomInputProps> = ({ label, placeholder, iconName, iconType, errorMessage, inputStyle, ...props }) => {
+const CustomInput: React.FC<CustomInputProps> = ({ label, placeholder, iconName, errorMessage, inputStyle, onChangeText, secureTextEntry, ...props }) => {
   return (
     <Input
-      label={label}
-      placeholder={placeholder}
-      rightIcon={iconName ? (<Icon type={iconType} name={iconName} />) : undefined}
-      errorStyle={{ color: 'red' }}
-      errorMessage={errorMessage}
-      inputStyle={inputStyle}
-      ...props
+    containerStyle={styles.inputContainer}
+    label={label}
+    labelStyle={styles.labelStyle}
+    placeholder={placeholder}
+    rightIcon={iconName ? <Icon type="font-awesome" name={iconName} /> : undefined}
+    errorStyle={styles.errorStyle}
+    errorMessage={errorMessage}
+    inputStyle={[styles.inputStyle, inputStyle]}
+    onChangeText={onChangeText}
+    secureTextEntry={secureTextEntry}
+    {...props}
     />
   );
 };
