@@ -6,22 +6,32 @@ import CustomInput from '../../components/input/CustomInput';
 
 import styles from '../styles';
 
-export default function SignIn() {
+export default function SignIn() 
+{
+
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [senhaError, setSenhaError] = useState('');
 
   const handleSignIn = () => {
 
-    // ++++++++++++++++++++++++++++++++++++++
-    // Adicionar a lógica de autenticação
-    // ++++++++++++++++++++++++++++++++++++++
+    setEmailError('');
+    setSenhaError('');
 
-    if (email && senha) 
-    {
+    if (email && senha) {
       alert('Acessando o sistema');
     } 
-    else 
+    else
     {
+      if (!email) 
+      {
+        setEmailError("Digite um email");
+      }
+      if (!senha) 
+      {
+        setSenhaError("Digite uma senha");
+      }
       alert('Por favor, preencha todos os campos');
     }
   };
@@ -33,17 +43,17 @@ export default function SignIn() {
         <CustomInput 
           label="Endereço de email"
           placeholder="Digite seu email"
-          errorMessage={!email ? "Digite um email" : undefined}
           onChangeText={setEmail}
+          errorMessage={emailError}
         />
 
         <CustomInput 
           label="Senha"
           placeholder="Digite sua senha"
           iconName="eye"
-          errorMessage={!senha ? "Digite uma senha" : undefined}
           onChangeText={setSenha}
           secureTextEntry={true}
+          errorMessage={senhaError}
         />
 
         <CustomButton 

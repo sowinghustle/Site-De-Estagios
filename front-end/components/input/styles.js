@@ -1,34 +1,35 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-  
   inputContainer: 
   {
     backgroundColor: '#fff',
-    borderRadius: 4,
-    elevation: 2,
+    borderRadius: 8,
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
     marginVertical: 10,
+    paddingHorizontal: 12,
   },
   inputStyle: 
   {
-    paddingLeft: 10,
-    paddingRight: 10,
+    paddingVertical: 12,
+    fontSize: 16,
   },
-  labelStyle:
- {
+  labelStyle: 
+  {
     fontWeight: 'bold',
-    marginBottom: 5,
+    fontSize: 16,
+    marginTop: 5,
+    color: '#000000',
   },
   errorStyle: 
   {
     color: '#B11116',
     marginTop: 5,
   },
-
 });
 
 export default styles;
