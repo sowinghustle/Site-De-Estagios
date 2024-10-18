@@ -1,6 +1,4 @@
 # @name logout
-# @prompt token
 DELETE {{baseUrl}}/logout
 Content-Type: application/json
 Access-Control-Allow-Credentials: true
-Authorization: Bearer {{token}}
