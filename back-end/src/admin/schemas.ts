@@ -1,10 +1,10 @@
 import Joi from 'joi';
-import { NameOrEmailSchema, PasswordSchema } from '../config/joi';
+import { AdminNameOrEmailSchema, PasswordSchema } from '../config/joi';
 
 export const AdminLoginSchema = Joi.object<{
     nameOrEmail: string;
     password: string;
 }>({
-    nameOrEmail: NameOrEmailSchema,
+    nameOrEmail: AdminNameOrEmailSchema,
     password: PasswordSchema,
 });

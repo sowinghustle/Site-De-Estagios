@@ -5,10 +5,18 @@ const NameSchemaNoMessages = Joi.string()
     .pattern(/^[a-zA-Z ]+$/)
     .required();
 
+const AdminNameSchemaNoMessages = Joi.string()
+    .pattern(/^[a-zA-Z0-9 ]+$/)
+    .required();
+
 const EmailSchemaNoMessages = Joi.string()
     .email()
     .max(config.validations.maxEmailLength)
     .required();
+
+export const AdminNameSchema = AdminNameSchemaNoMessages.messages({
+    'string.pattern.base': config.messages.invalidAdminName,
+});
 
 export const NameSchema = NameSchemaNoMessages.messages({
     'string.pattern.base': config.messages.nameOnlyLetters,
@@ -21,12 +29,12 @@ export const EmailSchema = EmailSchemaNoMessages.messages({
     'string.max': `O email deve ter no máximo ${config.validations.maxEmailLength} caracteres.`,
 });
 
-export const NameOrEmailSchema = Joi.string()
+export const AdminNameOrEmailSchema = Joi.string()
     .lowercase()
     .required()
     .when(Joi.string().email(), {
         then: EmailSchemaNoMessages,
-        otherwise: NameSchemaNoMessages,
+        otherwise: AdminNameSchema,
     })
     .messages({
         'any.required': config.messages.emptyNameOrEmail,

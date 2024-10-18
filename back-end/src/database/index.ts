@@ -26,6 +26,9 @@ export interface DatabaseConnection {
     // obter todos os admins
     getAdmins(): Promise<AdminCollection>;
 
+    // obter um usuário pelo id
+    findUserById(id: number): Promise<User | undefined>;
+
     // obter um usuário por um user-token válido
     findUserByValidUserToken(token: string): Promise<User | undefined>;
 

@@ -2,13 +2,13 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
-import session from 'express-session';
+import session, { MemoryStore } from 'express-session';
 import slowDown from 'express-slow-down';
 import helmet from 'helmet';
-import passport from 'passport';
 import validator from 'validator';
-import { configurePassport } from './auth/passport/ensure-is-auth';
+import configurePassport from './auth/passport';
 import config from './config';
+import { UnhandledError } from './config/errors';
 import buildRoutes from './routes';
 
 const app = express();
@@ -16,14 +16,15 @@ const sessionOptions: session.SessionOptions = {
     secret: config.project.secret,
     resave: false,
     saveUninitialized: true,
-    cookie: {
-        secure: true,
-    },
+    rolling: true,
+    cookie: config.project.cookieOptions,
+    store:
+        config.project.environment === 'production'
+            ? config.external.redisStore()
+            : new MemoryStore(),
 };
 
 if (config.project.environment === 'production') {
-    sessionOptions.cookie!.secure = false;
-
     app.set('trust proxy', 1);
     app.use(
         slowDown({
@@ -63,7 +64,6 @@ app.use(
 );
 
 app.use(session(sessionOptions));
-app.use(passport.authenticate('session'));
 app.use(express.json());
 app.use(
     config.project.environment === 'production'
@@ -73,11 +73,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: [
-            config.project.environment !== 'production'
-                ? 'http://localhost:8000'
-                : '',
-        ],
+        origin: [config.project.frontendUrl],
     })
 );
 
@@ -94,35 +90,50 @@ app.use((req, res, next) => {
     }
     next();
 });
-
+app.get('/', (req, res) => res.send(config.messages.welcomeMessage));
+app.get('/healthcheck', (req, res) => res.sendStatus(200));
 app.use('/api/v1', buildRoutes());
 app.use(
     (
-        err: any,
+        error: Error | undefined,
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
     ) => {
-        if (!err) return next();
+        if (!error) {
+            return next();
+        }
 
-        const error = err as Error;
+        const statusCode =
+            {
+                UnauthorizedError: 401,
+                BadRequestError: 400,
+                NotFoundError: 404,
+                ValidationError: 400,
+            }[error.name] ?? 500;
 
         if (config.project.environment === 'development') {
-            return res.status(500).send({
-                ...error,
+            return res.status(statusCode).send({
                 success: false,
-                message: error.message,
+                ...error,
+                statusCode,
                 stack: error.stack,
             });
         }
 
-        return res.status(500).send({
+        if (!(error instanceof UnhandledError)) {
+            error = new UnhandledError(
+                error.message,
+                statusCode === 500 ? undefined : error.message
+            );
+        }
+
+        return res.status(statusCode).send({
             success: false,
-            message: config.messages.serverUnhandledException,
+            message: (error as UnhandledError).userFriendlyMessage,
         });
     }
 );
-
 app.use((req, res) => {
     const error: any = {
         success: false,

@@ -82,8 +82,12 @@ describe('Supervisor Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
 
     it('should save a new supervisor', async () => {
-        const expectedSupervisorValue = TestingUtils.DEFAULT_SUPERVISOR;
-
+        const expectedSupervisorValue = {
+            ...TestingUtils.DEFAULT_SUPERVISOR,
+            user: await TestingUtils.getUserWithoutPassword(
+                TestingUtils.DEFAULT_SUPERVISOR.user
+            ),
+        };
         const result = await TestingUtils.saveSupervisor(
             TestingUtils.DEFAULT_SUPERVISOR
         );
@@ -102,7 +106,8 @@ describe('Supervisor Database Tests', () => {
     });
 
     it('should find supervisor by email field', async () => {
-        const expectedResultValue = TestingUtils.DEFAULT_SUPERVISOR;
+        const expectedResultValue =
+            TestingUtils.DEFAULT_SUPERVISOR_WITHOUT_PASSWORD;
         await TestingUtils.saveAndTestSupervisor(
             TestingUtils.DEFAULT_SUPERVISOR
         );
@@ -141,6 +146,21 @@ describe('Student Database Tests', () => {
             TestingUtils.DEFAULT_STUDENT
         );
         expect(result.value).toMatchObject(expectedStudentValue);
+    });
+
+    it('should get user by id', async () => {
+        const student = await TestingUtils.saveAndTestStudent(
+            TestingUtils.DEFAULT_STUDENT
+        );
+        const conn = await DatabaseResolver.getConnection();
+
+        expect(
+            await TestingUtils.expectPromiseNotToReject(
+                conn.findUserById(student.id!)
+            )
+        ).not.toBeUndefined();
+
+        expect(conn.getError()).toBeUndefined();
     });
 
     it('should not save a new student with specified email already in use', async () => {

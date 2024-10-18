@@ -6,7 +6,7 @@ import config from '../config';
 import { Student } from '../student/model';
 import { Supervisor } from '../supervisor/model';
 import { UserToken } from '../token/model';
-import { User } from '../user/model';
+import { User, UserRole } from '../user/model';
 import {
     mapSequelizeAdminToModel,
     mapSequelizeStudentToModel,
@@ -23,8 +23,6 @@ import {
 } from './sequelize-tables';
 
 export class SequelizeDatabaseConnection implements DatabaseConnection {
-    private static sequelize: Sequelize;
-    private error?: Error;
     private static models = [
         UserTable,
         UserTokenTable,
@@ -32,6 +30,8 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         SupervisorTable,
         StudentTable,
     ];
+    private static sequelize: Sequelize;
+    private error?: Error;
 
     constructor() {
         this.sequelize = new Sequelize({
@@ -53,6 +53,8 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
 
     async saveNewAdmin(admin: Admin): Promise<Admin | undefined> {
         try {
+            admin.user.role = UserRole.Adm;
+
             const model = await AdminTable.create(admin, {
                 include: [
                     {
@@ -116,6 +118,8 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         supervisor: Supervisor
     ): Promise<Supervisor | undefined> {
         try {
+            supervisor.user.role = UserRole.Supervisor;
+
             const model = await SupervisorTable.create(supervisor, {
                 include: [
                     {
@@ -157,6 +161,8 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     }
     async saveNewStudent(student: Student): Promise<Student | undefined> {
         try {
+            student.user.role = UserRole.Student;
+
             const model = await StudentTable.create(student, {
                 include: [
                     {
@@ -234,7 +240,6 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         try {
             const model = await UserTokenTable.findOne({
                 where: { token },
-                attributes: [],
                 include: [
                     {
                         model: UserTable,
@@ -248,8 +253,22 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             const now = new Date();
 
             // token expirado
-            if (now > model.expiresAt) return;
+            if (model.expiredAt) return;
+            if (now > model.expiresAt) {
+                await model.update({ expiredAt: now });
+                return;
+            }
+
             return mapSequelizeUserToModel(model.user);
+        } catch (err) {
+            this.error = err as Error;
+        }
+    }
+    async findUserById(id: number): Promise<User | undefined> {
+        try {
+            const model = await UserTable.findByPk(id);
+            if (!model) return;
+            return mapSequelizeUserToModel(model);
         } catch (err) {
             this.error = err as Error;
         }

@@ -14,45 +14,39 @@ import {
 export function mapSequelizeAdminToModel(entity: AdminTable) {
     return {
         ...entity.toJSON(),
-        user: !entity.user
-            ? undefined
-            : mapSequelizeUserToModel(entity.user, UserRole.Adm),
+        user: !entity.user ? undefined : mapSequelizeUserToModel(entity.user),
     } as Admin;
 }
 
 export function mapSequelizeSupervisorToModel(entity: SupervisorTable) {
     return {
         ...entity.toJSON(),
-        user: !entity.user
-            ? undefined
-            : mapSequelizeUserToModel(entity.user, UserRole.Supervisor),
+        user: !entity.user ? undefined : mapSequelizeUserToModel(entity.user),
     } as Supervisor;
 }
 
 export function mapSequelizeStudentToModel(entity: StudentTable) {
     return {
         ...entity.toJSON(),
-        user: !entity.user
-            ? undefined
-            : mapSequelizeUserToModel(entity.user, UserRole.Student),
+        user: !entity.user ? undefined : mapSequelizeUserToModel(entity.user),
     } as Student;
 }
 
-export function mapSequelizeUserTokenToModel(
-    entity: UserTokenTable,
-    userRole: UserRole = UserRole.Unknown
-) {
+export function mapSequelizeUserTokenToModel(entity: UserTokenTable) {
     return {
         ...entity.toJSON(),
-        user: !entity.user
-            ? undefined
-            : mapSequelizeUserToModel(entity.user, userRole),
+        user: !entity.user ? undefined : mapSequelizeUserToModel(entity.user),
     } as UserToken;
 }
 
-export function mapSequelizeUserToModel(
-    entity: UserTable,
-    role: UserRole = UserRole.Unknown
-) {
+export function mapSequelizeUserToModel(entity: UserTable) {
+    const rolesMap: Record<string, UserRole> = {
+        admin: UserRole.Adm,
+        student: UserRole.Student,
+        supervisor: UserRole.Supervisor,
+    };
+
+    const role = rolesMap[entity.role];
+
     return { ...entity.toJSON(), role } as User;
 }

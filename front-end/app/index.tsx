@@ -1,15 +1,16 @@
-import { View } from 'react-native';
+import { View, SafeAreaView } from 'react-native';
 import { Link } from 'expo-router';
-import CustomButton from '@/components/button/CustomButton';
+
+import { styles } from './styles';
 
 export default function HomeScreen() {
   return (
-    <View>
-      <Link href={'/signup'}>Registre-se</Link>
-      <Link href={'/signin'}>Entrar</Link>
-      <CustomButton title="PrimaryButton" type="primary" />
-      <CustomButton title="SecondaryButton" type="secondary" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.innerContainer}>
+        <Link style={styles.link} href={'/signup'}>Registre-se</Link>
+        <Link style={styles.link} href={'/signin'}>Entrar</Link>
+      </View>
+    </SafeAreaView>
   );
 }
 
