@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import authService from '../auth/service';
 import config from '../config';
 import { getValidationResult } from '../config/utils';
-import emailService from '../email/service'; // Importe o serviço de email
+import emailService from '../email/service'; 
 import userService from '../user/service';
 import { StudentLoginSchema, StudentRegisterSchema } from './schemas';
 import studentService from './service';
@@ -63,9 +63,9 @@ export default class StudentController {
             res,
             StudentRegisterSchema.validate(req.body)
         );
-
+    
         if (!data) return res.end();
-
+    
         const student = (
             await studentService.saveNewStudent({
                 fullName: data.fullName,
@@ -79,11 +79,9 @@ export default class StudentController {
                 ? 'Os dados foram preenchidos corretamente, mas não foi possível completar o registro'
                 : err.message
         );
-
-        emailService.sendNewUserEmail(student.user.email).catch((error) => {
-            console.error('Erro ao enviar email de boas-vindas:', error);
-        });
-
+    
+        emailService.sendNewUserEmail(student.user.email);
+        
         return res.status(201).send({
             success: true,
             message: config.messages.successfullRegister,

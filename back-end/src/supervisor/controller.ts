@@ -6,6 +6,8 @@ import emailService from '../email/service';
 import { SupervisorLoginSchema, SupervisorRegisterSchema } from './schemas';
 import supervisorService from './service';
 
+
+
 export default class SupervisorController {
     async login(req: Request, res: Response) {
         const data = getValidationResult(
@@ -57,9 +59,9 @@ export default class SupervisorController {
             res,
             SupervisorRegisterSchema.validate(req.body)
         );
-
+    
         if (!data) return res.end();
-
+    
         const supervisor = (
             await supervisorService.saveNewSupervisor({
                 name: data.name,
@@ -73,17 +75,16 @@ export default class SupervisorController {
                 ? 'Os dados foram preenchidos corretamente, mas não foi possível completar o registro'
                 : err.message
         );
-
-        // Enviar email de boas-vindas
-        const emailResult = await emailService.sendNewUserEmail(data.email);
-
-        if (!emailResult.isError) {
+    
+        const emailResult = emailService.sendNewUserEmail(data.email);
+    
+        if (!emailResult.success) {
             return res.status(500).send({
                 success: false,
                 message: 'Falha ao enviar email de boas-vindas.',
             });
         }
-
+    
         return res.status(201).send({
             success: true,
             message: config.messages.successfullRegister,

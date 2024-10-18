@@ -3,8 +3,8 @@ import { User } from '../user/model';
 import config from '../config/index'; 
 import { buildToResult } from '../config/utils';
 import { EmailService } from './EmailService'; 
-import { FakeEmailService } from './FakeEmailService'; 
-import { NodeMailerService } from './service'; 
+import  FakeEmailService  from './FakeEmailService'; 
+import  NodeMailerService  from './service'; 
 
 class EmailServiceResolver {
     async getEmailService(): Promise<EmailService> {

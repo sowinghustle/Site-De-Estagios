@@ -1,9 +1,13 @@
 import nodemailer from 'nodemailer';
-import { User } from '../user/model';
 import config from '../config/index'; 
-import { buildToResult } from '../config/utils';
+import { buildToResult, Result } from '../config/utils';
+import EmailService from './EmailService';
 
-class NodeMailerService {
+
+class NodeMailerService implements EmailService {
+    static sendNewUserEmail(email: string) {
+        throw new Error('Method not implemented.');
+    }
     private transporter;
 
     constructor() {
@@ -17,7 +21,7 @@ class NodeMailerService {
         });
     }
 
-    async sendNewUserEmail(email: string) {
+    async sendNewUserEmail(email: string): Promise<{ success: boolean }> {
         const toResult = buildToResult<void>();
         
         try {
@@ -27,13 +31,13 @@ class NodeMailerService {
                 subject: 'Bem-vindo!',
                 text: 'Sua conta foi criada com sucesso!',
             });
-            return toResult(); // Sucesso
+            return { success: true };
         } catch (error: any) {
-            return toResult(error)
+            return { success: false };
         }
     }
 
-    async sendResetPasswordEmail(email: string) {
+    async sendResetPasswordEmail(email: string): Promise<Result<void>> {
         const toResult = buildToResult<void>();
         
         try {
@@ -43,12 +47,12 @@ class NodeMailerService {
                 subject: 'Redefinição de Senha',
                 text: 'Clique aqui para redefinir sua senha.',
             });
-            return toResult(); // Sucesso
+            return toResult(); 
         } catch (error: any) {
-            return toResult(error)
+            return toResult(error); 
         }
     }
 }
 
-const emailService = new EmailService();
+const nodeMailerService = new NodeMailerService();
 export default NodeMailerService;
