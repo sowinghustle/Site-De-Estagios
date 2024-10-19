@@ -29,6 +29,9 @@ export interface DatabaseConnection {
     // obter um usuário pelo id
     findUserById(id: number): Promise<User | undefined>;
 
+    // verificar se um email está em uso
+    verifyIfEmailIsInUse(email: string): Promise<boolean | undefined>;
+
     // obter um usuário por um user-token válido
     findUserByValidUserToken(token: string): Promise<User | undefined>;
 

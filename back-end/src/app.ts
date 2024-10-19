@@ -8,7 +8,6 @@ import helmet from 'helmet';
 import validator from 'validator';
 import configurePassport from './auth/passport';
 import config from './config';
-import { UnhandledError } from './config/errors';
 import buildRoutes from './routes';
 
 const app = express();
@@ -20,7 +19,7 @@ const sessionOptions: session.SessionOptions = {
     cookie: config.project.cookieOptions,
     store:
         config.project.environment === 'production'
-            ? config.external.redisStore()
+            ? config.external.redisStore
             : new MemoryStore(),
 };
 
@@ -110,6 +109,7 @@ app.use(
                 BadRequestError: 400,
                 NotFoundError: 404,
                 ValidationError: 400,
+                UnhandledError: 500,
             }[error.name] ?? 500;
 
         if (config.project.environment === 'development') {
@@ -121,16 +121,9 @@ app.use(
             });
         }
 
-        if (!(error instanceof UnhandledError)) {
-            error = new UnhandledError(
-                error.message,
-                statusCode === 500 ? undefined : error.message
-            );
-        }
-
         return res.status(statusCode).send({
             success: false,
-            message: (error as UnhandledError).userFriendlyMessage,
+            message: error.message,
         });
     }
 );

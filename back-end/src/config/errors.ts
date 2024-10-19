@@ -40,16 +40,14 @@ export class ValidationError extends Joi.ValidationError implements Error {
 }
 
 export class UnhandledError extends Error {
-    public userFriendlyMessage: string;
+    readonly name = 'UnhandledError';
 
     public constructor(message: string, userFriendlyMessage?: string) {
-        super(message);
-
-        this.userFriendlyMessage =
-            userFriendlyMessage ?? config.messages.serverUnhandledException;
-
-        if (config.project.environment === 'development') {
-            this.userFriendlyMessage = message;
+        if (config.project.environment === 'production') {
+            message =
+                userFriendlyMessage ?? config.messages.serverUnhandledException;
         }
+
+        super(message);
     }
 }

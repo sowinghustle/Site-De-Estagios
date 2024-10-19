@@ -7,6 +7,7 @@ import {
     UnhandledError,
 } from '../config/errors';
 import { getValidationResult } from '../config/utils';
+import emailService from '../email/service';
 import userService from '../user/service';
 import { StudentLoginSchema, StudentRegisterSchema } from './schemas';
 import studentService from './service';
@@ -57,7 +58,7 @@ export default class StudentController {
             req.body
         ).orElseThrow();
 
-        (
+        const student = (
             await studentService.saveNewStudent({
                 fullName: data.fullName,
                 user: {
@@ -72,6 +73,8 @@ export default class StudentController {
                     'Os dados foram preenchidos corretamente, mas não foi possível completar o registro.'
                 )
         );
+
+        await emailService.sendNewUserEmail(student.user);
 
         return res.status(201).send({
             success: true,
