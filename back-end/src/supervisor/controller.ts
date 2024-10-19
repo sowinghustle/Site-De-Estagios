@@ -7,6 +7,7 @@ import {
     UnhandledError,
 } from '../config/errors';
 import { getValidationResult } from '../config/utils';
+import emailService from '../email/service';
 import userService from '../user/service';
 import { SupervisorLoginSchema, SupervisorRegisterSchema } from './schemas';
 import supervisorService from './service';
@@ -61,7 +62,7 @@ export default class SupervisorController {
             req.body
         ).orElseThrow();
 
-        (
+        const supervisor = (
             await supervisorService.saveNewSupervisor({
                 name: data.name,
                 user: {
@@ -76,6 +77,8 @@ export default class SupervisorController {
                     'Os dados foram preenchidos corretamente, mas não foi possível completar o registro.'
                 )
         );
+
+        await emailService.sendNewUserEmail(supervisor.user);
 
         return res.status(201).send({
             success: true,

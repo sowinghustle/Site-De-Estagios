@@ -58,6 +58,15 @@ const config = Object.freeze({
             secret: process.env.secret || randomUUID(),
             frontendUrl: process.env.FRONTEND_URL ?? '',
             redisUrl: process.env.REDIS_URL,
+            emailOptions: {
+                host: process.env.EMAIL_HOST,
+                port: Number(process.env.EMAIL_PORT),
+                sender: process.env.EMAIL_SENDER,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            },
         };
 
         if (process.env.TS_NODE_DEV || process.env.NODE_ENV === 'development') {
@@ -86,13 +95,18 @@ const config = Object.freeze({
         };
     })(),
     external: {
-        redisStore(): Store {
+        get redisStore(): Store {
             const redisClient = new Redis(config.project.redisUrl as string);
 
             return new RedisStore({
                 client: redisClient,
                 prefix: 'session:',
             });
+        },
+        get logger(): (message?: any, ...optionalParams: any[]) => void {
+            return (message, ...optionalParams) => {
+                console.log('=>', message, ...optionalParams);
+            };
         },
     },
 });

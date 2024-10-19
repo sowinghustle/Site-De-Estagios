@@ -1,36 +1,54 @@
 services:
-  redis:
-    container_name: redis-session-store
-    image: redis
-    command: redis-server --save
-    ports:
-      - 6379:6379
-    networks:
-      - net
-  server:
-    container_name: estagios-server
-    build: ./back-end
-    ports:
-      - '8000:8000'
-    networks:
-      - net
-    depends_on:
-      - redis
-    environment:
-      FRONTEND_URL: '*'
-      NODE_ENV: production
-      REDIS_URL: redis://redis:6379
-  redis-commander:
-    container_name: redis-commander
-    image: rediscommander/redis-commander:latest
-    environment:
-      REDIS_HOST: redis
-      REDIS_PORT: redis:6379
-    ports:
-      - 8081:8081
-    networks:
-      - net
+    redis:
+        container_name: redis-session-store
+        image: redis
+        command: redis-server --save
+        ports:
+            - 6379:6379
+        networks:
+            - net
+    server:
+        container_name: estagios-server
+        build: ./back-end
+        ports:
+            - 8000:8000
+        networks:
+            - net
+        depends_on:
+            - redis
+            - mail
+        environment:
+            FRONTEND_URL: '*'
+            NODE_ENV: production
+            REDIS_URL: redis://redis:6379
+            EMAIL_HOST: 'mail'
+            EMAIL_PORT: 1025
+            EMAIL_SENDER: 'estagiohub@email.com'
+            EMAIL_USER: ''
+            EMAIL_PASS: ''
+    redis-commander:
+        container_name: redis-commander
+        image: rediscommander/redis-commander:latest
+        environment:
+            REDIS_HOST: redis
+            REDIS_PORT: redis:6379
+        ports:
+            - 8081:8081
+        networks:
+            - net
+    mail:
+        container_name: smtp-mail-server
+        image: axllent/mailpit
+        ports:
+            - 1025:1025
+            - 8025:8025
+        environment:
+            MP_SMTP_AUTH_ACCEPT_ANY: true
+            MP_SMTP_AUTH_ALLOW_INSECURE: true
+            MP_VERBOSE: true
+        networks:
+            - net
 
 networks:
-  net:
-    driver: bridge
+    net:
+        driver: bridge
