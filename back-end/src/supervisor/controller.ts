@@ -6,7 +6,7 @@ import {
     NotFoundError,
     UnhandledError,
 } from '../config/errors';
-import { getValidationResult } from '../config/utils';
+import { getValidationResult, toPromiseResult } from '../config/utils';
 import emailService from '../email/service';
 import userService from '../user/service';
 import { SupervisorLoginSchema, SupervisorRegisterSchema } from './schemas';
@@ -19,8 +19,8 @@ export default class SupervisorController {
             req.body
         ).orElseThrow();
 
-        const supervisor = (
-            await supervisorService.findSupervisorByEmail(data.email)
+        const supervisor = await toPromiseResult(
+            supervisorService.findSupervisorByEmail(data.email)
         ).orElseThrow();
 
         if (!supervisor) {
@@ -35,8 +35,8 @@ export default class SupervisorController {
             throw new BadRequestError(config.messages.wrongPassword);
         }
 
-        const { token, expiresAt } = (
-            await authService.saveNewUserToken(supervisor.user.id!)
+        const { token, expiresAt } = await toPromiseResult(
+            authService.saveNewUserToken(supervisor.user.id!)
         ).orElseThrow(
             (error) =>
                 new UnhandledError(
@@ -62,8 +62,8 @@ export default class SupervisorController {
             req.body
         ).orElseThrow();
 
-        const supervisor = (
-            await supervisorService.saveNewSupervisor({
+        const supervisor = await toPromiseResult(
+            supervisorService.saveNewSupervisor({
                 name: data.name,
                 user: {
                     email: data.email,

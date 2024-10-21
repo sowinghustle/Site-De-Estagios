@@ -23,13 +23,12 @@ export class SupervisorService {
         supervisor: Supervisor
     ): Promise<Result<Supervisor>> {
         const toResult = buildToResult<Supervisor>();
-
-        const verifyEmailResult = await userService.ensureEmailIsNotInUse(
+        const emailInUseResult = await userService.ensureEmailIsNotInUse(
             supervisor.user.email
         );
 
-        if (verifyEmailResult.isError) {
-            return toResult(verifyEmailResult.value);
+        if (emailInUseResult.isError) {
+            return toResult(emailInUseResult.value);
         }
 
         const conn = await DatabaseResolver.getConnection();
