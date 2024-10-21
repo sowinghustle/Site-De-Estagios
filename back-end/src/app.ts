@@ -116,6 +116,7 @@ app.use(
             return res.status(statusCode).send({
                 success: false,
                 ...error,
+                message: error.message,
                 statusCode,
                 stack: error.stack,
             });

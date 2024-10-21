@@ -44,8 +44,8 @@ export class UnhandledError extends Error {
 
     public constructor(message: string, userFriendlyMessage?: string) {
         if (config.project.environment === 'production') {
-            message =
-                userFriendlyMessage ?? config.messages.serverUnhandledException;
+            const defaultMessage = config.messages.serverUnhandledException;
+            message = userFriendlyMessage || defaultMessage;
         }
 
         super(message);
