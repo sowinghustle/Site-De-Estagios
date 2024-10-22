@@ -6,7 +6,7 @@ import {
     NotFoundError,
     UnhandledError,
 } from '../config/errors';
-import { getValidationResult } from '../config/utils';
+import { getValidationResult, toPromiseResult } from '../config/utils';
 import userService from '../user/service';
 import { AdminLoginSchema } from './schemas';
 import adminService from './service';
@@ -18,8 +18,8 @@ export default class AdminController {
             req.body
         ).orElseThrow();
 
-        const admin = (
-            await adminService.findAdminByNameOrEmail(data.nameOrEmail)
+        const admin = await toPromiseResult(
+            adminService.findAdminByNameOrEmail(data.nameOrEmail)
         ).orElseThrow();
 
         if (!admin) {
@@ -32,8 +32,8 @@ export default class AdminController {
             throw new BadRequestError(config.messages.wrongPassword);
         }
 
-        const { expiresAt, token } = (
-            await authService.saveNewUserToken(admin.user.id!)
+        const { expiresAt, token } = await toPromiseResult(
+            authService.saveNewUserToken(admin.user.id!)
         ).orElseThrow(
             (error) =>
                 new UnhandledError(

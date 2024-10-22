@@ -9,6 +9,19 @@ export type Result<T, E extends Error = Error> = ValueOrError<T, E> & {
     orElseThrow: (cb?: (err: E) => E | string) => T;
 };
 
+class PromiseResult<T, E extends Error = Error> {
+    private promise: Promise<Result<T, E>>;
+
+    constructor(promise: Promise<Result<T, E>>) {
+        this.promise = promise;
+    }
+
+    async orElseThrow(cb?: (err: E) => E | string): Promise<T> {
+        const result = await this.promise;
+        return result.orElseThrow(cb);
+    }
+}
+
 function success<T, E extends Error = Error>(value: T): Result<T, E> {
     return {
         value,
@@ -59,4 +72,10 @@ export function getValidationResult<T>(
     );
 
     return toResult(error);
+}
+
+export function toPromiseResult<T, E extends Error = Error>(
+    promise: Promise<Result<T, E>>
+): PromiseResult<T, E> {
+    return new PromiseResult<T, E>(promise);
 }
