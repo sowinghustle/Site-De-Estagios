@@ -1,10 +1,10 @@
-FROM node:latest AS builder
+FROM node:18 AS builder
 
 COPY . .
-RUN npm install
+RUN npm install --verbose
 RUN npm run build
 
-FROM node:latest
+FROM node:18-alpine
 
 WORKDIR /app
 

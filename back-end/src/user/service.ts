@@ -1,3 +1,5 @@
+import config from '../config';
+import { BadRequestError } from '../config/errors';
 import { buildToResult, Result } from '../config/utils';
 import { DatabaseResolver } from '../database';
 import hashService from '../hash/service';
@@ -19,6 +21,26 @@ class UserService {
         }
 
         return toResult(user);
+    }
+
+    async ensureEmailIsNotInUse(email: string): Promise<Result<void>> {
+        const toResult = buildToResult<void>();
+        const conn = await DatabaseResolver.getConnection();
+        const isEmailInUse = await conn.verifyIfEmailIsInUse(email);
+        const error = conn.getError();
+
+        if (error) {
+            return toResult(error);
+        }
+
+        if (isEmailInUse) {
+            const error = new BadRequestError(
+                config.messages.emailAddressIsInUse
+            );
+            return toResult(error);
+        }
+
+        return toResult();
     }
 }
 
