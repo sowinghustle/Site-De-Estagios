@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/4598b28f-9194-4626-861f-42c54bfb8920" alt="Capa do Repositorio">
+  <img src="https://github.com/gabrielceravoloo/EstagioHUB/blob/main/Banner.png" alt="Capa do Repositorio">
 </div>
 
 
