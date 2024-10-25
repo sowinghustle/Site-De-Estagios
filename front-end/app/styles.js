@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    fontFamily: 'Inter',
   },
   innerContainer: 
   {
@@ -16,18 +17,28 @@ const styles = StyleSheet.create({
   link: 
   {
     color: '#B11116',
-    fontSize: 18,
+    fontSize: 17,
     marginVertical: 10,
     textAlign: 'center',
+    borderColor: '#B11116',
+    borderBottomWidth: 1,
   },
 });
 
 // =============================================================================
 
 const signin = StyleSheet.create({
+  container: 
+  {
+    backgroundColor: '#fff',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   innerContainer: 
   {
-    backgroundColor: '#000',
+    backgroundColor: 'transparent',
+    width: '50%',
   },
   header: 
   {
@@ -46,14 +57,14 @@ const signin = StyleSheet.create({
   {
     
     textAlign: 'left',
-    fontSize: 19,
+    fontSize: 17,
     fontWeight: 400,
     marginVertical: 10,
   },
   linkText: 
   {
     textAlign: 'center',
-    fontSize: 19,
+    fontSize: 17,
     fontWeight: 400,
     marginVertical: 10,
   },
