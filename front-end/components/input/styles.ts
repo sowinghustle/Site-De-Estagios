@@ -1,6 +1,11 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+  input:
+  {
+    borderWidth: 0,
+    borderColor: 'transparent',
+  },
   style:
   {
     color: '#000',
@@ -23,6 +28,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginVertical: 10,
     paddingTop: 5,
+    paddingBottom: 5,
     borderWidth: 0,
   },
   inputStyle: 
@@ -36,14 +42,15 @@ const styles = StyleSheet.create({
   inputContainerStyle:
   {
     borderBottomWidth: 0,
-    margin: 0,
+    borderWidth: 0,
+    backgroundColor: '#fff',
     padding: 0,
-    fontSize: 0,
+    margin: 0,
   },
   labelStyle:
   {
     fontSize: 16,
-    fontWeight: 400,
+    fontWeight: '400',
     marginTop: 5,
     color: '#000',
   },

@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, SafeAreaView } from 'react-native';
-import { Link } from 'expo-router';
 import { useRouter } from 'expo-router';
 
 import CustomButton from '../components/button/CustomButton';
 
-import { signin, styles } from './styles';
+import { styles } from './styles';
 
 export default function HomeScreen() {
 

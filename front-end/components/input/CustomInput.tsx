@@ -29,7 +29,7 @@ onChangeText, secureTextEntry, ...props }) => {
       <Input
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        containerStyle={[ styles.inputContainer ]}
+        containerStyle={[styles.inputContainer, { borderWidth: 0, borderColor: 'transparent' }]}
         placeholder={placeholder}
         rightIcon={
           iconName === 'eye' ? (
@@ -46,13 +46,13 @@ onChangeText, secureTextEntry, ...props }) => {
         }
         errorStyle={styles.errorStyle}
         errorMessage={errorMessage && errorMessage.trim() ? errorMessage : undefined}
-        inputStyle={[ styles.inputStyle ]} 
-        style={{
-          ...styles.style, 
-          ...(isFocused ? {borderWidth: 0, borderColor: 'transparent'} : {borderWidth: 0, borderColor: 'transparent'}) 
-        }}
+        inputStyle={[styles.inputStyle, { borderWidth: 0, borderColor: 'transparent' }]}
+        inputContainerStyle={[styles.inputContainerStyle, { borderBottomWidth: 0, borderColor: 'transparent', borderWidth: 0 }]}
         onChangeText={onChangeText}
-        inputContainerStyle={[styles.inputContainerStyle]}
+        style={{
+          ...styles.style,
+          ...(isFocused ? { borderWidth: 0, borderColor: 'transparent' } : {}),
+        }}        
         secureTextEntry={iconName === 'eye' ? !showPassword : secureTextEntry}
         {...props}
       />
