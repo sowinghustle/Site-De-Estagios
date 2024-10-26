@@ -73,6 +73,68 @@ const signin = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'center',
   },
+  viewCheckBox:
+  {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    paddingLeft: 0,
+  },
 });
 
-export { styles, signin };
+// =============================================================================
+
+const signup = StyleSheet.create({
+  container: 
+  {
+    backgroundColor: '#fff',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerContainer: 
+  {
+    backgroundColor: 'transparent',
+    width: '50%',
+  },
+  header: 
+  {
+    fontSize: 24,
+    fontWeight: 500,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  divider: 
+  {
+    height: 10,
+    backgroundColor: '#E0E0E0',
+    marginVertical: 10,
+  },
+  linkForgotPassword: 
+  {
+    
+    textAlign: 'left',
+    fontSize: 17,
+    fontWeight: 400,
+    marginVertical: 10,
+  },
+  linkText: 
+  {
+    textAlign: 'center',
+    fontSize: 17,
+    fontWeight: 400,
+    marginVertical: 10,
+  },
+  logoImage: 
+  {
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  viewCheckBox:
+  {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    paddingLeft: 0,
+  },
+});
+
+export { styles, signin, signup };

@@ -7,30 +7,24 @@ import CustomInput from '../../components/input/CustomInput';
 
 import { styles, signin } from '../styles';
 
-export default function SignIn() {
+export default function ForgotPassword() 
+{
   const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [senhaError, setSenhaError] = useState('');
 
   const handleSignIn = () => {
     
     setEmailError('');
-    setSenhaError('');
 
-    if (email && senha) {
+    if (email) {
 
-      alert('Acessando o sistema');
+      alert('Recuperando senha');
     } 
     else 
     {
       if (!email) 
       {
         setEmailError("Digite um email");
-      }
-      if (!senha) 
-      {
-        setSenhaError("Digite uma senha");
       }
       alert('Por favor, preencha todos os campos');
     }
@@ -47,7 +41,7 @@ export default function SignIn() {
           resizeMode="contain"
         />
 
-        <Text style={signin.header}>Bem vindo ao nosso sistema!</Text>
+        <Text style={signin.header}>Esqueceu sua senha? Não se preocupe!</Text>
 
         <CustomInput 
           label="Endereço de email"
@@ -56,24 +50,13 @@ export default function SignIn() {
           errorMessage={emailError}
         />
 
-        <CustomInput 
-          label="Senha"
-          placeholder="Digite sua senha"
-          iconName="eye"
-          onChangeText={setSenha}
-          secureTextEntry={true}
-          errorMessage={senhaError}
-        />
-
-        <Text style={signin.linkForgotPassword}>Esqueceu sua senha? <Link style={styles.link} href={'/forgotPassword'}>Redefinir Senha</Link></Text>
-
         <CustomButton 
-          title="Acessar o Sistema" 
+          title="Recuperar Senha" 
           type="primary" 
           onPress={handleSignIn} 
         />
         
-        <Text style={signin.linkText}>Ainda não tem uma conta? <Link style={styles.link} href={'/signup'}>Criar uma Conta</Link></Text>
+        <Text style={signin.linkText}>Quer tentar novamente? <Link style={styles.link} href={'/signin'}>Acessar Agora</Link></Text>
 
       </View>
     </SafeAreaView>
