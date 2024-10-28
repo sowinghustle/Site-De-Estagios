@@ -36,6 +36,7 @@ export class ValidationError extends Joi.ValidationError implements Error {
     ) {
         super(message, details, original);
         this.warning = warning;
+        this.name = 'ValidationError';
     }
 }
 

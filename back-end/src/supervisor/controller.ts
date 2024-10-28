@@ -36,7 +36,7 @@ export default class SupervisorController {
         }
 
         const { token, expiresAt } = await toPromiseResult(
-            authService.saveNewUserToken(supervisor.user.id!)
+            authService.saveNewAccessToken(supervisor.user.id!)
         ).orElseThrow(
             (error) =>
                 new UnhandledError(

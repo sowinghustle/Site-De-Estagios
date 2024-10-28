@@ -2,3 +2,27 @@
 GET {{baseUrl}}/user/me
 Content-Type: application/json
 Access-Control-Allow-Credentials: true
+
+###
+# @name request-password-change
+# @prompt email
+POST {{baseUrl}}/user/forgot-password
+Content-Type: application/json
+Access-Control-Allow-Credentials: true
+
+{
+    "email": "{{email}}"
+}
+
+###
+# @name reset-password
+# @prompt token
+# @prompt password
+POST {{baseUrl}}/user/reset-password
+Content-Type: application/json
+Access-Control-Allow-Credentials: true
+
+{
+    "token": "{{token}}",
+    "newPassword": "{{password}}"
+}

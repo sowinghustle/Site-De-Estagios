@@ -21,6 +21,8 @@ const config = Object.freeze({
             'A senha deve ter pelo menos 8 caracteres.',
         invalidEmail: 'Este não é um email válido',
         emailAddressIsInUse: 'Este email já está em uso',
+        userWithEmailNotFound:
+            'Não foi encontrado nenhum usuário com este email',
         invalidAdminName: 'O nome do admin deve conter apenas letras e números',
         nameOnlyLetters: 'O campo nome só pode ter letras.',
         wrongRepeatPassword: 'A confirmação de senha está incorreta',
@@ -40,7 +42,9 @@ const config = Object.freeze({
         tooManyRequests:
             'Muitas requisições foram enviadas em pouco tempo. Aguarde alguns minutos para continuar.',
         notAuth: 'Você precisa estar autenticado para acessar este recurso!',
-        invalidToken: 'Seu acesso não é válido! Tente fazer o login novamente.',
+        invalidAccessToken:
+            'Seu acesso não é válido! Tente fazer o login novamente.',
+        invalidToken: 'Este token não é válido!',
     },
     validations: {
         minPasswordLength: 8,

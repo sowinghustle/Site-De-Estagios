@@ -32,7 +32,7 @@ export default class StudentController {
         }
 
         const { token, expiresAt } = await toPromiseResult(
-            authService.saveNewUserToken(student.user.id!)
+            authService.saveNewAccessToken(student.user.id!)
         ).orElseThrow(
             (error) =>
                 new UnhandledError(

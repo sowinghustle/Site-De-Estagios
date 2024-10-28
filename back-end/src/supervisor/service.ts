@@ -19,22 +19,35 @@ export class SupervisorService {
 
         return toResult(supervisor);
     }
+
+    async ensureCanSaveStudent(supervisor: Supervisor): Promise<Result<void>> {
+        const toResult = buildToResult<void>();
+        const verifyEmailResult = await userService.ensureEmailIsNotInUse(
+            supervisor.user.email
+        );
+
+        if (verifyEmailResult.isError) {
+            return toResult(verifyEmailResult.value);
+        }
+
+        return toResult();
+    }
+
     async saveNewSupervisor(
         supervisor: Supervisor
     ): Promise<Result<Supervisor>> {
         const toResult = buildToResult<Supervisor>();
-        const emailInUseResult = await userService.ensureEmailIsNotInUse(
-            supervisor.user.email
-        );
+        const canSaveSupervisorResult =
+            await this.ensureCanSaveStudent(supervisor);
 
-        if (emailInUseResult.isError) {
-            return toResult(emailInUseResult.value);
+        if (canSaveSupervisorResult.isError) {
+            return toResult(canSaveSupervisorResult.value);
         }
 
-        const conn = await DatabaseResolver.getConnection();
         const encryptedPassword = await hashService.encryptPassword(
             supervisor.user.password
         );
+        const conn = await DatabaseResolver.getConnection();
         const createdSupervisor = await conn.saveNewSupervisor({
             ...supervisor,
             user: {
@@ -42,13 +55,8 @@ export class SupervisorService {
                 password: encryptedPassword,
             },
         });
-        const error = conn.getError();
 
-        if (error) {
-            return toResult(error);
-        }
-
-        return toResult(createdSupervisor!);
+        return toResult(conn.getError() ?? createdSupervisor!);
     }
 }
 

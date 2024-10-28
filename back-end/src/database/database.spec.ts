@@ -210,7 +210,7 @@ describe('User-Token Database Tests', () => {
         );
         const conn = await DatabaseResolver.getConnection();
         const promise = TestingUtils.expectPromiseNotToReject(
-            conn.saveNewUserToken(token, admin.id!)
+            conn.saveNewAccessToken(token, admin.id!)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });
@@ -227,10 +227,10 @@ describe('User-Token Database Tests', () => {
         );
         const conn = await DatabaseResolver.getConnection();
         await TestingUtils.expectPromiseNotToReject(
-            conn.saveNewUserToken(token, admin.id!)
+            conn.saveNewAccessToken(token, admin.id!)
         );
         const promise = TestingUtils.expectPromiseNotToReject(
-            conn.invalidateUserToken(token)
+            conn.invalidateAccessToken(token)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });
