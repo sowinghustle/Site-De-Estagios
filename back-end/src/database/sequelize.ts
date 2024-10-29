@@ -1,5 +1,5 @@
-import { Op } from 'sequelize';
-import { Sequelize } from 'sequelize-typescript';
+import { Dialect, Op } from 'sequelize';
+import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 import { DatabaseConnection } from '.';
 import { Admin, AdminCollection } from '../admin/model';
 import config from '../config';
@@ -37,7 +37,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     private error?: Error;
 
     constructor() {
-        this.sequelize = new Sequelize({
+        const options: SequelizeOptions = {
             dialect: 'sqlite',
             storage: ':memory:',
             logging: false,
@@ -51,7 +51,18 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                           idle: 1000,
                       }
                     : undefined,
-        });
+        };
+
+        if (config.project.environment === 'production') {
+            options.dialect = config.project.databaseOptions.dialect as Dialect;
+            options.host = config.project.databaseOptions.host;
+            options.port = config.project.databaseOptions.port;
+            options.database = config.project.databaseOptions.name;
+            options.username = config.project.databaseOptions.user;
+            options.password = config.project.databaseOptions.pass;
+        }
+
+        this.sequelize = new Sequelize(options);
     }
 
     async saveNewResetPasswordToken(
