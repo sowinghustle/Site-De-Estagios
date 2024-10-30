@@ -6,7 +6,8 @@ import {
     NotFoundError,
     UnhandledError,
 } from '../config/errors';
-import { getValidationResult } from '../config/utils';
+import { getValidationResult, toPromiseResult } from '../config/utils';
+import emailService from '../email/service';
 import userService from '../user/service';
 import { StudentLoginSchema, StudentRegisterSchema } from './schemas';
 import studentService from './service';
@@ -18,8 +19,8 @@ export default class StudentController {
             req.body
         ).orElseThrow();
 
-        const student = (
-            await studentService.findStudentByEmail(data.email)
+        const student = await toPromiseResult(
+            studentService.findStudentByEmail(data.email)
         ).orElseThrow();
 
         if (!student) {
@@ -30,8 +31,8 @@ export default class StudentController {
             throw new BadRequestError(config.messages.wrongPassword);
         }
 
-        const { token, expiresAt } = (
-            await authService.saveNewUserToken(student.user.id!)
+        const { token, expiresAt } = await toPromiseResult(
+            authService.saveNewUserToken(student.user.id!)
         ).orElseThrow(
             (error) =>
                 new UnhandledError(
@@ -57,8 +58,8 @@ export default class StudentController {
             req.body
         ).orElseThrow();
 
-        (
-            await studentService.saveNewStudent({
+        const student = await toPromiseResult(
+            studentService.saveNewStudent({
                 fullName: data.fullName,
                 user: {
                     email: data.email,
@@ -72,6 +73,8 @@ export default class StudentController {
                     'Os dados foram preenchidos corretamente, mas não foi possível completar o registro.'
                 )
         );
+
+        await emailService.sendNewUserEmail(student.user);
 
         return res.status(201).send({
             success: true,

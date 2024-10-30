@@ -1,6 +1,7 @@
 import { buildToResult, Result } from '../config/utils';
 import { DatabaseResolver } from '../database';
 import hashService from '../hash/service';
+import userService from '../user/service';
 import { Student } from './model';
 
 export class StudentService {
@@ -13,9 +14,29 @@ export class StudentService {
         return toResult(student);
     }
 
+    async ensureCanSaveStudent(student: Student): Promise<Result<void>> {
+        const toResult = buildToResult<void>();
+        const verifyEmailResult = await userService.ensureEmailIsNotInUse(
+            student.user.email
+        );
+
+        if (verifyEmailResult.isError) {
+            return toResult(verifyEmailResult.value);
+        }
+
+        return toResult();
+    }
+
     async saveNewStudent(student: Student): Promise<Result<Student>> {
         const toResult = buildToResult<Student>();
         const conn = await DatabaseResolver.getConnection();
+
+        const canSaveStudentResult = await this.ensureCanSaveStudent(student);
+
+        if (canSaveStudentResult.isError) {
+            return toResult(canSaveStudentResult.value);
+        }
+
         const encryptedPassword = await hashService.encryptPassword(
             student.user.password
         );
