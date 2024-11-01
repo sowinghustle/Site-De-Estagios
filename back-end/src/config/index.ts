@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { CookieOptions } from 'express';
 import { Store } from 'express-session';
 import Redis from 'ioredis';
+import hashService from '../hash/service';
 
 type Environment = 'development' | 'test' | 'production';
 
@@ -54,6 +55,9 @@ const config = Object.freeze({
         adminName: 'admin',
         adminEmail: 'admin@email.com',
         adminPassword: 'adminPassword123*',
+        get encryptedAdminPassword() {
+            return hashService.encryptPassword(this.adminPassword);
+        },
     },
     project: (() => {
         const config = {

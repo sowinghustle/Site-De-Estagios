@@ -1,3 +1,4 @@
+import pg from 'pg';
 import { Dialect, Op } from 'sequelize';
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 import { DatabaseConnection } from '.';
@@ -55,6 +56,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
 
         if (config.project.environment === 'production') {
             options.dialect = config.project.databaseOptions.dialect as Dialect;
+            options.dialectModule = pg;
             options.host = config.project.databaseOptions.host;
             options.port = config.project.databaseOptions.port;
             options.database = config.project.databaseOptions.name;
@@ -410,9 +412,8 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             StudentTable.belongsTo(UserTable, { as: 'user' });
 
             // sync
-            await this.sequelize.sync({
-                force: config.project.environment !== 'production',
-            });
+            if (config.project.environment !== 'production')
+                await this.sequelize.sync();
             await this.sequelize.authenticate();
         } catch (err) {
             const customError = err as Error;

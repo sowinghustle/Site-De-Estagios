@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from 'crypto';
 import config from '../config';
-import { NotFoundError } from '../config/errors';
+import { BadRequestError, NotFoundError } from '../config/errors';
 import { buildToResult, Result } from '../config/utils';
 import { DatabaseResolver } from '../database';
 import { ResetPasswordToken } from './model';
@@ -30,6 +30,8 @@ class TokenService {
         }
 
         if (resetPasswordToken.expiredAt) {
+            const error = new BadRequestError(config.messages.invalidToken);
+            return toResult(error);
         }
 
         return toResult(resetPasswordToken);
