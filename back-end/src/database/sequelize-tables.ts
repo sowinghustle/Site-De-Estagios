@@ -131,10 +131,6 @@ export class AccessTokenTable extends Model<
     tableName: 'users',
 })
 export class UserTable extends Model<SequelizeUser, UserCreate> {
-    public declare tokens: AccessTokenTable[];
-    public declare admin: AdminTable;
-    public declare supervisor: SupervisorTable;
-
     @PrimaryKey
     @AutoIncrement
     @Column

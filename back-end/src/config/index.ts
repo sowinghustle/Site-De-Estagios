@@ -7,7 +7,7 @@ import hashService from '../hash/service';
 
 type Environment = 'development' | 'test' | 'production';
 
-const config = Object.freeze({
+const config = {
     messages: {
         // validation
         adminNotFoundWithNameOrEmail:
@@ -121,10 +121,18 @@ const config = Object.freeze({
         },
         get logger(): (message?: any, ...optionalParams: any[]) => void {
             return (message, ...optionalParams) => {
+                if (config.project.environment === 'test') return message;
                 console.log('=>', message, ...optionalParams);
             };
         },
     },
-});
+};
 
-export default config;
+if (config.project.environment === 'production') {
+    config.instituition.adminName = process.env.DEFAULT_ADMIN_NAME as string;
+    config.instituition.adminEmail = process.env.DEFAULT_ADMIN_EMAIL as string;
+    config.instituition.adminPassword = process.env
+        .DEFAULT_ADMIN_PASSWORD as string;
+}
+
+export default Object.freeze(config);

@@ -1,4 +1,5 @@
 import { Admin, AdminCollection } from '../admin/model';
+import { UnhandledError } from '../config/errors';
 import { Student } from '../student/model';
 import { Supervisor } from '../supervisor/model';
 import { AccessToken, ResetPasswordToken } from '../token/model';
@@ -6,7 +7,7 @@ import { User } from '../user/model';
 import { SequelizeDatabaseConnection } from './sequelize';
 
 export interface DatabaseConnection {
-    getError(): Error | undefined;
+    getError(): UnhandledError | undefined;
 
     // cadastrar novo admin
     saveNewAdmin(admin: Admin): Promise<Admin | undefined>;

@@ -4,6 +4,7 @@ import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 import { DatabaseConnection } from '.';
 import { Admin, AdminCollection } from '../admin/model';
 import config from '../config';
+import { UnhandledError } from '../config/errors';
 import { Student } from '../student/model';
 import { Supervisor } from '../supervisor/model';
 import { AccessToken, ResetPasswordToken } from '../token/model';
@@ -35,7 +36,16 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         ResetPasswordTable,
     ];
     private static sequelize: Sequelize;
-    private error?: Error;
+    private _error?: Error;
+
+    private get error(): Error | undefined {
+        return this._error;
+    }
+
+    private set error(err: Error) {
+        config.external.logger(err.message);
+        this._error = err;
+    }
 
     constructor() {
         const options: SequelizeOptions = {
@@ -396,19 +406,25 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             this.sequelize.addModels(SequelizeDatabaseConnection.models);
 
             // user and user-tokens association
-            UserTable.hasMany(AccessTokenTable, { as: 'tokens' });
+            UserTable.hasMany(AccessTokenTable, {
+                as: 'access_token',
+                foreignKey: 'id',
+            });
             AccessTokenTable.belongsTo(UserTable, { as: 'user' });
 
             // user and admin association
-            UserTable.hasOne(AdminTable, { as: 'admin' });
+            UserTable.hasOne(AdminTable, { as: 'admin', foreignKey: 'id' });
             AdminTable.belongsTo(UserTable, { as: 'user' });
 
             // user and supervisor association
-            UserTable.hasOne(SupervisorTable, { as: 'supervisor' });
+            UserTable.hasOne(SupervisorTable, {
+                as: 'supervisor',
+                foreignKey: 'id',
+            });
             SupervisorTable.belongsTo(UserTable, { as: 'user' });
 
             // user and student association
-            UserTable.hasOne(SupervisorTable, { as: 'student' });
+            UserTable.hasOne(StudentTable, { as: 'student', foreignKey: 'id' });
             StudentTable.belongsTo(UserTable, { as: 'user' });
 
             // sync
@@ -422,8 +438,11 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
         }
     }
 
-    getError(): Error | undefined {
-        return this.error;
+    getError(): UnhandledError | undefined {
+        if (!this.error) return;
+        const error = new UnhandledError(this.error.message);
+        error.stack = this.error.stack;
+        return error;
     }
 
     getConnection() {

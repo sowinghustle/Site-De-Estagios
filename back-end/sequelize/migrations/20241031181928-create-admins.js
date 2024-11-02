@@ -25,6 +25,16 @@ module.exports = {
                 onDelete: 'SET NULL',
                 allowNull: true,
             },
+            createdAt: {
+                type: Sequelize.TIME,
+                allowNull: false,
+                defaultValue: new Date(),
+            },
+            updatedAt: {
+                type: Sequelize.TIME,
+                allowNull: true,
+                defaultValue: null,
+            },
         });
     },
 

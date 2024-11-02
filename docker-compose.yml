@@ -62,7 +62,7 @@ services:
             - mail
         environment:
             NODE_ENV:
-            REDIS_URL:
+            REDIS_URL: ${REDIS_HOST}://${REDIS_PORT}
             EMAIL_HOST:
             EMAIL_PORT:
             EMAIL_SENDER:
@@ -75,6 +75,9 @@ services:
             DB_USER:
             DB_PASS:
             DB_TYPE:
+            DEFAULT_ADMIN_NAME:
+            DEFAULT_ADMIN_EMAIL:
+            DEFAULT_ADMIN_PASSWORD:
         command: sh -c "npm run migrate && npm start"
 
     mail:
