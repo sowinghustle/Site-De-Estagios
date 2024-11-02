@@ -93,7 +93,7 @@ export class ResetPasswordTable extends Model<
 }
 
 @Table({
-    tableName: 'tokens',
+    tableName: 'access-tokens',
 })
 export class AccessTokenTable extends Model<
     SequelizeAccessToken,

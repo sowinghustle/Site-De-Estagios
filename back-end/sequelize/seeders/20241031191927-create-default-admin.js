@@ -33,7 +33,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        const user = await queryInterface.rawSelect(
+        const users = await queryInterface.rawSelect(
             'users',
             {
                 where: { email: config.instituition.adminEmail },
@@ -41,9 +41,7 @@ module.exports = {
             ['id']
         );
 
-        if (user) {
-            await queryInterface.bulkDelete('admins', { userId: user });
-            await queryInterface.bulkDelete('users', { id: user });
-        }
+        await queryInterface.bulkDelete('admins', { userId: users[0] });
+        await queryInterface.bulkDelete('users', { id: users[0] });
     },
 };

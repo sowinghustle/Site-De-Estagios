@@ -14,5 +14,6 @@ module.exports = {
         username: process.env.DB_USER,
         password: process.env.DB_PASS,
         dialect: process.env.DB_TYPE,
+        seederStorage: 'sequelize',
     },
 };
