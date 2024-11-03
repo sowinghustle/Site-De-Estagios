@@ -19,6 +19,6 @@ services:
 databases:
   - name: database
     databaseName: estagiohub
-    user: postgres
+    user: postgres_default_user
     ipAllowList: []
     plan: free
