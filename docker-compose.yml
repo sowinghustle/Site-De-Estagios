@@ -2,7 +2,6 @@ services:
     database:
         container_name: postgres
         image: postgres:latest
-        user: ${DB_USER}
         environment:
             POSTGRES_DB: ${DB_NAME}
             POSTGRES_USER: ${DB_USER}
@@ -33,7 +32,7 @@ services:
         container_name: postgres-admin
         image: adminer
         environment:
-            ADMINER_DEFAULT_SERVER: ${DB_TYPE}
+            ADMINER_DEFAULT_SERVER: postgres
         depends_on:
             - wait-database
         ports:
@@ -43,15 +42,7 @@ services:
 
     server:
         container_name: estagios-server
-        build:
-            context: ./back-end
-            args:
-                DB_HOST:
-                DB_PORT:
-                DB_NAME:
-                DB_USER:
-                DB_PASS:
-                DB_TYPE:
+        build: ./back-end
         ports:
             - 8000:8000
         networks:
@@ -61,23 +52,23 @@ services:
             - redis
             - mail
         environment:
-            NODE_ENV:
-            REDIS_URL: ${REDIS_HOST}://${REDIS_PORT}
-            EMAIL_HOST:
-            EMAIL_PORT:
-            EMAIL_SENDER:
-            EMAIL_USER:
-            EMAIL_PASS:
-            FRONTEND_URL:
+            DATABASE_URL:
             DB_HOST:
             DB_PORT:
             DB_NAME:
             DB_USER:
             DB_PASS:
-            DB_TYPE:
+            REDIS_URL:
+            FRONTEND_URL:
+            EMAIL_HOST:
+            EMAIL_PORT:
+            EMAIL_SENDER:
+            EMAIL_USER:
+            EMAIL_PASS:
             DEFAULT_ADMIN_NAME:
             DEFAULT_ADMIN_EMAIL:
             DEFAULT_ADMIN_PASSWORD:
+            NODE_ENV:
         command: sh -c "npm run migrate && npm start"
 
     mail:
