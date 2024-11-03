@@ -42,7 +42,6 @@ export default class UserController {
 
         return res.send({
             success: true,
-            email: resetPassword.email,
             expiresAt: resetPassword.expiresAt,
         });
     }
@@ -54,7 +53,10 @@ export default class UserController {
         ).orElseThrow();
 
         const resetPasswordToken = (
-            await authService.findValidResetPasswordToken(data.token)
+            await authService.findValidResetPasswordToken(
+                data.email,
+                data.token
+            )
         ).orElseThrow();
 
         if (!resetPasswordToken) {

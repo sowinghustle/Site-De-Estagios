@@ -96,11 +96,15 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
     }
 
     async findValidResetPasswordToken(
+        email: string,
         token: string
     ): Promise<ResetPasswordToken | undefined> {
         try {
             const model = await ResetPasswordTable.findOne({
-                where: { token },
+                where: {
+                    email,
+                    token,
+                },
             });
 
             // token não encontrado

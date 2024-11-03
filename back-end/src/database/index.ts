@@ -56,6 +56,7 @@ export interface DatabaseConnection {
 
     // obter reset-password token não expirado
     findValidResetPasswordToken(
+        email: string,
         token: string
     ): Promise<ResetPasswordToken | undefined>;
 

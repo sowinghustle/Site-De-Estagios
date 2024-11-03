@@ -1,3 +1,5 @@
+import config from '../config';
+import { BadRequestError, NotFoundError } from '../config/errors';
 import { buildToResult, Result } from '../config/utils';
 import { DatabaseResolver } from '../database';
 import { AccessToken, ResetPasswordToken } from '../token/model';
@@ -6,15 +8,28 @@ import { User } from '../user/model';
 
 export class AuthService {
     async findValidResetPasswordToken(
+        email: string,
         token: string
     ): Promise<Result<ResetPasswordToken | undefined>> {
         const toResult = buildToResult<ResetPasswordToken | undefined>();
         const conn = await DatabaseResolver.getConnection();
-        const resetToken = await conn.findValidResetPasswordToken(token);
+        const resetPasswordToken = await conn.findValidResetPasswordToken(
+            email,
+            token
+        );
         const error = conn.getError();
 
+        if (!resetPasswordToken) {
+            const error = new NotFoundError(config.messages.invalidToken);
+            return toResult(error);
+        }
+
+        if (resetPasswordToken.expiredAt) {
+            const error = new BadRequestError(config.messages.invalidToken);
+            return toResult(error);
+        }
         if (error) return toResult(error);
-        return toResult(resetToken);
+        return toResult(resetPasswordToken);
     }
 
     async findUserByValidAccessToken(

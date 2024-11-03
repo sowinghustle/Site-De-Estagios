@@ -18,12 +18,14 @@ Access-Control-Allow-Credentials: true
 ###
 # @name reset-password
 # @prompt token
-# @prompt password
+# @prompt email
+# @prompt newPassword
 POST {{baseUrl}}/user/reset-password
 Content-Type: application/json
 Access-Control-Allow-Credentials: true
 
 {
+    "email": "{{email}}",
     "token": "{{token}}",
-    "newPassword": "{{password}}"
+    "newPassword": "{{newPassword}}"
 }
