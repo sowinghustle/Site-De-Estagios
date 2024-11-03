@@ -17,7 +17,7 @@ export default function () {
 
                 try {
                     const user = (
-                        await authService.findUserByValidUserToken(token)
+                        await authService.findUserByValidAccessToken(token)
                     ).orElseThrow();
                     return done(null, user ?? false);
                 } catch (err) {

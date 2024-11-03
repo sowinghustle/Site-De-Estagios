@@ -1,8 +1,11 @@
-import { randomUUID } from 'crypto';
+import { randomBytes, randomUUID } from 'crypto';
 
 class TokenService {
-    generateUserToken(): string {
+    generateAccessToken(): string {
         return randomUUID();
+    }
+    generateResetPasswordToken(): string {
+        return randomBytes(32).toString('hex');
     }
 }
 

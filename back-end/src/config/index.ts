@@ -3,10 +3,11 @@ import { randomUUID } from 'crypto';
 import { CookieOptions } from 'express';
 import { Store } from 'express-session';
 import Redis from 'ioredis';
+import hashService from '../hash/service';
 
 type Environment = 'development' | 'test' | 'production';
 
-const config = Object.freeze({
+const config = {
     messages: {
         // validation
         adminNotFoundWithNameOrEmail:
@@ -21,6 +22,8 @@ const config = Object.freeze({
             'A senha deve ter pelo menos 8 caracteres.',
         invalidEmail: 'Este não é um email válido',
         emailAddressIsInUse: 'Este email já está em uso',
+        userWithEmailNotFound:
+            'Não foi encontrado nenhum usuário com este email',
         invalidAdminName: 'O nome do admin deve conter apenas letras e números',
         nameOnlyLetters: 'O campo nome só pode ter letras.',
         wrongRepeatPassword: 'A confirmação de senha está incorreta',
@@ -40,7 +43,9 @@ const config = Object.freeze({
         tooManyRequests:
             'Muitas requisições foram enviadas em pouco tempo. Aguarde alguns minutos para continuar.',
         notAuth: 'Você precisa estar autenticado para acessar este recurso!',
-        invalidToken: 'Seu acesso não é válido! Tente fazer o login novamente.',
+        invalidAccessToken:
+            'Seu acesso não é válido! Tente fazer o login novamente.',
+        invalidToken: 'Este token não é válido!',
     },
     validations: {
         minPasswordLength: 8,
@@ -50,6 +55,9 @@ const config = Object.freeze({
         adminName: 'admin',
         adminEmail: 'admin@email.com',
         adminPassword: 'adminPassword123*',
+        get encryptedAdminPassword() {
+            return hashService.encryptPassword(this.adminPassword);
+        },
     },
     project: (() => {
         const config = {
@@ -66,6 +74,14 @@ const config = Object.freeze({
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS,
                 },
+            },
+            databaseOptions: {
+                dialect: process.env.DB_TYPE,
+                host: process.env.DB_HOST,
+                port: Number(process.env.DB_PORT),
+                user: process.env.DB_USER,
+                pass: process.env.DB_PASS,
+                name: process.env.DB_NAME,
             },
         };
 
@@ -105,10 +121,18 @@ const config = Object.freeze({
         },
         get logger(): (message?: any, ...optionalParams: any[]) => void {
             return (message, ...optionalParams) => {
+                if (config.project.environment === 'test') return message;
                 console.log('=>', message, ...optionalParams);
             };
         },
     },
-});
+};
 
-export default config;
+if (config.project.environment === 'production') {
+    config.instituition.adminName = process.env.DEFAULT_ADMIN_NAME as string;
+    config.instituition.adminEmail = process.env.DEFAULT_ADMIN_EMAIL as string;
+    config.instituition.adminPassword = process.env
+        .DEFAULT_ADMIN_PASSWORD as string;
+}
+
+export default Object.freeze(config);

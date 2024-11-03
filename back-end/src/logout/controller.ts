@@ -8,7 +8,9 @@ export default class LogoutController {
             throw new UnauthorizedError();
         }
 
-        const logoutResult = await authService.invalidateToken(req.token!);
+        const logoutResult = await authService.invalidateAccessToken(
+            req.token!
+        );
 
         if (logoutResult.isError) {
             throw logoutResult.value;

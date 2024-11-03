@@ -15,3 +15,10 @@ services:
         - source: 0.0.0.0/0
           description: everywhere
       plan: free
+
+databases:
+  - name: database
+    databaseName: estagiohub
+    user: postgres
+    ipAllowList: []
+    plan: free

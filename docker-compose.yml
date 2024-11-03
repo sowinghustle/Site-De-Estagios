@@ -1,23 +1,85 @@
 services:
+    database:
+        container_name: postgres
+        image: postgres:latest
+        user: ${DB_USER}
+        environment:
+            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASS}
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        ports:
+            - 5432:5432
+        networks:
+            - net
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+    wait-database:
+        container_name: check-db-started
+        image: jwilder/dockerize:0.6.1
+        depends_on:
+            database:
+                condition: service_healthy
+        networks:
+            - net
+        command: 'dockerize -wait=tcp://${DB_HOST}:5432'
+
+    adminer:
+        container_name: postgres-admin
+        image: adminer
+        environment:
+            ADMINER_DEFAULT_SERVER: ${DB_TYPE}
+        depends_on:
+            - wait-database
+        ports:
+            - 8080:8080
+        networks:
+            - net
+
     server:
         container_name: estagios-server
-        build: ./back-end
+        build:
+            context: ./back-end
+            args:
+                DB_HOST:
+                DB_PORT:
+                DB_NAME:
+                DB_USER:
+                DB_PASS:
+                DB_TYPE:
         ports:
             - 8000:8000
         networks:
             - net
         depends_on:
+            - wait-database
             - redis
             - mail
         environment:
-            FRONTEND_URL: '*'
-            NODE_ENV: production
-            REDIS_URL: redis://redis:6379
-            EMAIL_HOST: 'mail'
-            EMAIL_PORT: 1025
-            EMAIL_SENDER: 'estagiohub@email.com'
-            EMAIL_USER: ''
-            EMAIL_PASS: ''
+            NODE_ENV:
+            REDIS_URL: ${REDIS_HOST}://${REDIS_PORT}
+            EMAIL_HOST:
+            EMAIL_PORT:
+            EMAIL_SENDER:
+            EMAIL_USER:
+            EMAIL_PASS:
+            FRONTEND_URL:
+            DB_HOST:
+            DB_PORT:
+            DB_NAME:
+            DB_USER:
+            DB_PASS:
+            DB_TYPE:
+            DEFAULT_ADMIN_NAME:
+            DEFAULT_ADMIN_EMAIL:
+            DEFAULT_ADMIN_PASSWORD:
+        command: sh -c "npm run migrate && npm start"
+
     mail:
         container_name: smtp-mail-server
         image: axllent/mailpit
@@ -30,6 +92,7 @@ services:
             MP_VERBOSE: true
         networks:
             - net
+
     redis:
         container_name: redis-session-store
         image: redis
@@ -38,12 +101,15 @@ services:
             - 6379:6379
         networks:
             - net
+
     redis-commander:
         container_name: redis-commander
         image: rediscommander/redis-commander:latest
         environment:
-            REDIS_HOST: redis
-            REDIS_PORT: redis:6379
+            REDIS_HOST:
+            REDIS_PORT:
+        depends_on:
+            - redis
         ports:
             - 8081:8081
         networks:
@@ -52,3 +118,6 @@ services:
 networks:
     net:
         driver: bridge
+
+volumes:
+    postgres_data:

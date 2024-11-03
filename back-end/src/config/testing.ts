@@ -16,7 +16,8 @@ export const token = randomUUID();
 
 jest.mock('../token/service', () => {
     return {
-        generateUserToken: () => token,
+        generateAccessToken: () => token,
+        generateResetPasswordToken: () => token,
     };
 });
 
