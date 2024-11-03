@@ -14,3 +14,5 @@ COPY --from=builder .sequelizerc ./
 COPY --from=builder package*.json ./
 
 RUN npm run setup:production
+
+CMD ["tail", "-f", "/dev/null"]
