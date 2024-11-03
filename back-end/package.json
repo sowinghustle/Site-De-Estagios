@@ -12,6 +12,7 @@
         "build": "tsc --project tsconfig.prod.json",
         "setup:production": "npm pkg delete scripts.prepare && npm ci --only=production",
         "start": "node dist/main.js",
+        "start:production": "npm run migrate && npm start",
         "migrate": "npm run migration:migrate && npm run migration:seed:all",
         "migration:migrate": "NODE_ENV=production sequelize-cli db:migrate",
         "migration:create": "sequelize-cli migration:create --name",
