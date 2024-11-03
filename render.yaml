@@ -9,7 +9,7 @@ services:
       buildCommand: docker build -p 8000:10000 .
       rootDir: back-end
       healthCheckPath: /healthcheck
-      startCommand: npm run migrate && npm start"
+      dockerCommand: npm run migrate && npm start"
     - type: redis
       name: session-store
       ipAllowList:
