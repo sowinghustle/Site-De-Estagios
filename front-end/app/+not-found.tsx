@@ -4,7 +4,7 @@ import { StyleSheet, View, Image } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-import logo from '@images/logo2.png';
+import logo from '../assets/images/logo2.png';
 
 export default function NotFoundScreen() {
   return (
@@ -26,9 +26,7 @@ export default function NotFoundScreen() {
       <ThemedView style={styles.container}>
         <ThemedText type="title">Parece que essa tela não existe.</ThemedText>
         <Link href="/" style={styles.link}>
-          <ThemedText style={styles.linkText} type="link">
-            Voltar para o EstagioHUB
-          </ThemedText>
+          Voltar
         </Link>
       </ThemedView>
     </>
@@ -45,8 +43,12 @@ const styles = StyleSheet.create({
   },
   link: 
   {
-    marginTop: 15,
-    paddingVertical: 15,
+    color: '#B11116',
+    fontSize: 17,
+    marginVertical: 10,
+    textAlign: 'center',
+    borderColor: '#B11116',
+    borderBottomWidth: 1,
   },
   linkText: 
   {
