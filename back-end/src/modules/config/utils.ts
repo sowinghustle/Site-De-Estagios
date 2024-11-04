@@ -6,11 +6,6 @@ type ValueOrError<T, E extends Error = Error> =
           value: T;
           isError: false;
           orElseThrow: (cb?: (err: E) => E | string) => T;
-          map: <U>(fn: (val: T) => U) => ValueOrError<U, E>;
-          flatMap: <U>(
-              fn: (val: T) => ValueOrError<U, E>
-          ) => ValueOrError<U, E>;
-          unwrap: () => T;
       }
     | {
           value: E;
@@ -62,21 +57,11 @@ export function toResult<T, E extends Error = Error>(
         async resolveAsync() {
             try {
                 const value = await promise;
+
                 return {
                     value,
                     isError: false,
                     orElseThrow: (_) => value,
-                    map: <U>(fn: (val: T) => U) => ({
-                        value: fn(value),
-                        isError: false,
-                        orElseThrow: (_) => fn(value),
-                        map: this.map,
-                        flatMap: this.flatMap,
-                        unwrap: this.unwrap,
-                    }),
-                    flatMap: <U>(fn: (val: T) => ValueOrError<U, E>) =>
-                        fn(value),
-                    unwrap: () => value,
                 };
             } catch (error: any) {
                 return {
