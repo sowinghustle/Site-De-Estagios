@@ -11,22 +11,17 @@ type ValueOrError<T, E extends Error = Error> =
           value: E;
           isError: true;
           orElseThrow: (cb?: (err: E) => E | string) => void;
-          getError: () => E;
           orElse: <U>(alternative: U) => T | U;
       };
 
 type AsyncValueOrError<T, E extends Error = Error> = {
     isErrorAsync: () => Promise<boolean>;
-    getValueAsync: () => Promise<T | E>;
-    orElseThrowAsync: (cb?: (err: E) => E | string) => Promise<T>;
-    resolveAsync: () => Promise<ValueOrError<T, E>>;
     mapAsync: <U>(fn: (val: T) => U | Promise<U>) => AsyncValueOrError<U, E>;
-    flatMapAsync: <U>(
-        fn: (val: T) => AsyncValueOrError<U, E>
-    ) => AsyncValueOrError<U, E>;
-    unwrapAsync: () => Promise<T>;
+    getValueAsync: () => Promise<T | E>;
     getErrorAsync: () => Promise<E | null>;
     orElseAsync: <U>(alternative: U | Promise<U>) => Promise<T | U>;
+    orElseThrowAsync: (cb?: (err: E) => E | string) => Promise<T>;
+    resolveAsync: () => Promise<ValueOrError<T, E>>;
 };
 
 export function toResult<T, E extends Error = Error>(
@@ -86,27 +81,6 @@ export function toResult<T, E extends Error = Error>(
                 return fn(value);
             });
             return toResult(newPromise);
-        },
-
-        flatMapAsync<U>(
-            fn: (val: T) => AsyncValueOrError<U, E>
-        ): AsyncValueOrError<U, E> {
-            const newPromise = this.getValueAsync()
-                .then((value) => {
-                    if (value instanceof Error) throw value;
-                    return fn(value).getValueAsync();
-                })
-                .then((result) => {
-                    if (result instanceof Error) throw result;
-                    return result;
-                });
-            return toResult(newPromise);
-        },
-
-        async unwrapAsync() {
-            const value = await this.getValueAsync();
-            if (value instanceof Error) throw value;
-            return value;
         },
 
         async getErrorAsync() {
