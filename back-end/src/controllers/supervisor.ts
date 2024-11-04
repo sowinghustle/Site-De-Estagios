@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Supervisor } from '../models/supervisor';
 import config from '../modules/config';
 import { NotFoundError, UnhandledError } from '../modules/config/errors';
-import { getValidationResult, toResult } from '../modules/config/utils';
+import { toResult, validateSchema } from '../modules/config/utils';
 import {
     SupervisorLoginSchema,
     SupervisorRegisterSchema,
@@ -14,7 +14,7 @@ import userService from '../services/user';
 
 export default class SupervisorController {
     async login(req: Request, res: Response) {
-        const data = getValidationResult(SupervisorLoginSchema, req.body);
+        const data = validateSchema(SupervisorLoginSchema, req.body);
         const supervisor = await toResult(
             supervisorService.findSupervisorByEmail(data.email)
         )
@@ -51,7 +51,7 @@ export default class SupervisorController {
     }
 
     async register(req: Request, res: Response) {
-        const data = getValidationResult(SupervisorRegisterSchema, req.body);
+        const data = validateSchema(SupervisorRegisterSchema, req.body);
         const supervisor = await toResult(
             supervisorService.saveNewSupervisor({
                 name: data.name,

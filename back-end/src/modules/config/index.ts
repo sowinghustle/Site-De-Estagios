@@ -41,6 +41,10 @@ const messages = {
     notAuth: 'Você precisa estar autenticado para acessar este recurso!',
     invalidAccessToken:
         'Seu acesso não é válido! Tente fazer o login novamente.',
+    invalidEmailOrResetPasswordToken:
+        'O código de uso único ou o e-mail é inválido.',
+    expiredResetPasswordToken: 'O código de uso único expirou.',
+    invalidResetPasswordToken: 'O código de uso único é inválido',
     invalidToken: 'Este token não é válido!',
 };
 

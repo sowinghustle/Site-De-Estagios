@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { mapUserToJson as mapUserToData } from '../models/user';
+import { ResetPasswordToken } from '../models/reset-password-token';
+import { mapUserToJson as mapUserToData, User } from '../models/user';
 import config from '../modules/config';
-import { NotFoundError } from '../modules/config/errors';
-import { getValidationResult, toResult } from '../modules/config/utils';
+import { NotFoundError, UnhandledError } from '../modules/config/errors';
+import { toResult, validateSchema } from '../modules/config/utils';
 import { ForgotPasswordSchema, ResetPasswordSchema } from '../schemas/user';
 import authService from '../services/auth';
 import emailService from '../services/email';
@@ -21,51 +22,67 @@ export default class UserController {
         res: Response,
         next: NextFunction
     ) {
-        const data = getValidationResult(ForgotPasswordSchema, req.body);
-        const user = await userService.findUserByEmail(data.email);
+        const data = validateSchema(ForgotPasswordSchema, req.body);
+        const user = await toResult(userService.findUserByEmail(data.email))
+            .validateAsync<User>(
+                (user) => !!user,
+                new NotFoundError(config.messages.userWithEmailNotFound)
+            )
+            .orElseThrowAsync();
 
-        if (!user) {
-            throw new NotFoundError(config.messages.userWithEmailNotFound);
-        }
-
-        const resetPasswordToken = await authService.saveNewResetPasswordToken(
-            data.email
-        );
+        const { token, expiresAt } =
+            await authService.saveNewResetPasswordToken(data.email);
 
         await toResult(
-            emailService.sendResetPasswordEmail(user, resetPasswordToken.token)
-        ).getValueAsync();
+            emailService.sendResetPasswordEmail(user, token)
+        ).orElseThrowAsync(
+            (err) =>
+                new UnhandledError(
+                    err.message,
+                    `Parece que não foi possível enviar o código de uso único para ${user.email}`
+                )
+        );
 
         return res.send({
             success: true,
-            expiresAt: resetPasswordToken.expiresAt,
+            message: `Um código de uso único foi enviado para ${user.email}.`,
+            expiresAt,
         });
     }
 
     async resetPassword(req: Request, res: Response, next: NextFunction) {
-        const data = getValidationResult(ResetPasswordSchema, req.body);
-
-        const resetPasswordToken =
-            await authService.findValidResetPasswordToken(
-                data.email,
-                data.token
-            );
-
-        if (!resetPasswordToken) {
-            throw new NotFoundError(config.messages.invalidToken);
-        }
-
-        await userService.updatePasswordByEmail(
-            resetPasswordToken.email,
-            data.newPassword
-        );
+        const data = validateSchema(ResetPasswordSchema, req.body);
+        const resetPasswordToken = await toResult(
+            authService.findValidResetPasswordToken(data.email, data.token)
+        )
+            .validateAsync<ResetPasswordToken>(
+                (resetPasswordToken) => !!resetPasswordToken,
+                new NotFoundError(
+                    config.messages.invalidEmailOrResetPasswordToken
+                )
+            )
+            .orElseThrowAsync();
 
         await authService.invalidateResetPasswordToken(
             resetPasswordToken.token
         );
 
+        await toResult(
+            userService.updatePasswordByEmail(
+                resetPasswordToken.email,
+                data.newPassword
+            )
+        ).orElseThrowAsync(
+            (err) =>
+                new UnhandledError(
+                    err.message,
+                    'Não foi possível resetar a senha. Tente novamente com um novo código.'
+                )
+        );
+
         return res.send({
             success: true,
+            message: 'Sua senha foi resetada com sucesso!.',
         });
     }
 }

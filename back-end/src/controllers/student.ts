@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Student } from '../models/student';
 import config from '../modules/config';
 import { NotFoundError, UnhandledError } from '../modules/config/errors';
-import { getValidationResult, toResult } from '../modules/config/utils';
+import { toResult, validateSchema } from '../modules/config/utils';
 import { StudentLoginSchema, StudentRegisterSchema } from '../schemas/student';
 import authService from '../services/auth';
 import emailService from '../services/email';
@@ -11,7 +11,7 @@ import userService from '../services/user';
 
 export default class StudentController {
     async login(req: Request, res: Response) {
-        const data = getValidationResult(StudentLoginSchema, req.body);
+        const data = validateSchema(StudentLoginSchema, req.body);
         const student = await toResult(
             studentService.findStudentByEmail(data.email)
         )
@@ -48,7 +48,7 @@ export default class StudentController {
     }
 
     async register(req: Request, res: Response) {
-        const data = getValidationResult(StudentRegisterSchema, req.body);
+        const data = validateSchema(StudentRegisterSchema, req.body);
         const student = await toResult(
             studentService.saveNewStudent({
                 fullName: data.fullName,

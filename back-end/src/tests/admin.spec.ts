@@ -35,6 +35,7 @@ describe('POST /admin/login', () => {
                 message: config.messages.successfullLogin,
                 token: testingUtils.token,
             };
+
             await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
 
             const res = await requestWithSupertest

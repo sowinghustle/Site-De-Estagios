@@ -62,6 +62,6 @@ export const RepeatPasswordSchema = Joi.any()
     });
 
 export const ResetPasswordTokenSchema = Joi.string().required().messages({
-    'any.required': config.messages.invalidToken,
-    'string.empty': config.messages.invalidToken,
+    'any.required': config.messages.invalidResetPasswordToken,
+    'string.empty': config.messages.invalidResetPasswordToken,
 });

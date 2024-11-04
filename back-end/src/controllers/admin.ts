@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Admin } from '../models/admin';
 import config from '../modules/config';
 import { NotFoundError, UnhandledError } from '../modules/config/errors';
-import { getValidationResult, toResult } from '../modules/config/utils';
+import { toResult, validateSchema } from '../modules/config/utils';
 import { AdminLoginSchema } from '../schemas/admin';
 import adminService from '../services/admin';
 import authService from '../services/auth';
@@ -10,7 +10,7 @@ import userService from '../services/user';
 
 export default class AdminController {
     async login(req: Request, res: Response) {
-        const data = getValidationResult(AdminLoginSchema, req.body);
+        const data = validateSchema(AdminLoginSchema, req.body);
         const admin = await toResult(
             adminService.findAdminByNameOrEmail(data.nameOrEmail)
         )

@@ -8,7 +8,11 @@ type ValueOrError<T, E extends Error = Error> =
           isSuccess: true;
           orElseThrow: (cb?: (err: E) => E | string) => T;
           orElse: <U>(alternative: U) => T;
-          map: <U>(fn: (val: T) => U) => ValueOrError<U, E>;
+          map: <U>(fn: (val: T) => U) => ValueOrError<U, Error>;
+          validate: <U = T>(
+              predicate: (val: T) => boolean,
+              error: Error
+          ) => ValueOrError<U, Error>;
       }
     | {
           value: E;
@@ -16,7 +20,11 @@ type ValueOrError<T, E extends Error = Error> =
           isSuccess: false;
           orElseThrow: (cb?: (err: E) => E | string) => never;
           orElse: <U>(alternative: U) => U;
-          map: <U>(fn: (val: T) => U) => ValueOrError<U, E>;
+          map: <U>(fn: (val: T) => U) => ValueOrError<U, Error>;
+          validate: <U = T>(
+              predicate: (val: T) => boolean,
+              error: Error
+          ) => ValueOrError<U, Error>;
       };
 
 type AsyncValueOrError<T, E extends Error = Error> = {
@@ -31,8 +39,10 @@ type AsyncValueOrError<T, E extends Error = Error> = {
     validateAsync: <U = T>(
         predicate: (val: T) => boolean | Promise<boolean>,
         error: Error
-    ) => AsyncValueOrError<U, E>;
-    mapAsync: <U>(fn: (val: T) => U | Promise<U>) => AsyncValueOrError<U, E>;
+    ) => AsyncValueOrError<U, Error>;
+    mapAsync: <U>(
+        fn: (val: T) => U | Promise<U>
+    ) => AsyncValueOrError<U, Error>;
 };
 
 export function toResult<T, E extends Error = Error>(
@@ -87,6 +97,9 @@ export function toResult<T, E extends Error = Error>(
                         value,
                         isError: true,
                         isSuccess: false,
+                        map: <U>(_: (val: T) => U) =>
+                            transform<U, Error>(value),
+                        orElse: <U>(alternative: U) => alternative,
                         orElseThrow(cb) {
                             if (cb) {
                                 const ex = cb(value);
@@ -94,8 +107,10 @@ export function toResult<T, E extends Error = Error>(
                             }
                             throw value;
                         },
-                        orElse: <U>(alternative: U) => alternative,
-                        map: <U>(_: (val: T) => U) => transform<U, E>(value),
+                        validate: <U = T>(
+                            predicate: (val: T) => boolean,
+                            error: Error
+                        ) => transform<U, Error>(value),
                     };
                 }
 
@@ -103,9 +118,17 @@ export function toResult<T, E extends Error = Error>(
                     value,
                     isError: false,
                     isSuccess: true,
-                    orElseThrow: () => value,
+                    map: <U>(fn: (val: T) => U) =>
+                        transform<U, Error>(fn(value)),
                     orElse: <U>(_: U) => value,
-                    map: <U>(fn: (val: T) => U) => transform<U, E>(fn(value)),
+                    orElseThrow: () => value,
+                    validate: <U = T>(
+                        predicate: (val: T) => boolean,
+                        error: Error
+                    ) =>
+                        predicate(value)
+                            ? transform<U, Error>(value as unknown as U)
+                            : transform<U, Error>(error),
                 };
             };
 
@@ -119,7 +142,7 @@ export function toResult<T, E extends Error = Error>(
             return value instanceof Error ? value : null;
         },
 
-        mapAsync<U>(fn: (val: T) => U | Promise<U>): AsyncValueOrError<U, E> {
+        mapAsync<U>(fn: (val: T) => U | Promise<U>) {
             const newPromise = this.getValueAsync().then((value) => {
                 if (value instanceof Error) throw value;
                 return fn(value);
@@ -141,7 +164,7 @@ export function toResult<T, E extends Error = Error>(
     };
 }
 
-export function getValidationResult<T>(
+export function validateSchema<T>(
     validationSchema: Joi.ObjectSchema<T>,
     value?: any
 ): T {

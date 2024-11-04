@@ -3,6 +3,8 @@ import { ResetPasswordToken } from '../models/reset-password-token';
 import { User } from '../models/user';
 import config from '../modules/config';
 import { BadRequestError, NotFoundError } from '../modules/config/errors';
+import { Replace } from '../modules/config/helpers';
+import { toResult } from '../modules/config/utils';
 import { DatabaseResolver } from '../modules/database';
 import tokenService from './token';
 
@@ -11,23 +13,22 @@ export class AuthService {
         email: string,
         token: string
     ): Promise<ResetPasswordToken | undefined> {
-        const conn = await DatabaseResolver.getConnection();
-        const resetPassToken = await conn.findValidResetPasswordToken(
-            email,
-            token
-        );
+        const resetPasswordTokenResult = await toResult(
+            tokenService.findValidResetPasswordToken(email, token)
+        ).resolveAsync();
 
-        conn.throwIfHasError();
-
-        if (!resetPassToken) {
-            throw new NotFoundError(config.messages.invalidToken);
-        }
-
-        if (resetPassToken.expiredAt) {
-            throw new BadRequestError(config.messages.invalidToken);
-        }
-
-        return resetPassToken;
+        return resetPasswordTokenResult
+            .validate<ResetPasswordToken>(
+                (resetPassworToken) => !!resetPassworToken,
+                new NotFoundError(
+                    config.messages.invalidEmailOrResetPasswordToken
+                )
+            )
+            .validate<Replace<ResetPasswordToken, { expiredAt: Date }>>(
+                (resetPasswordToken) => !resetPasswordToken.expiredAt,
+                new BadRequestError(config.messages.expiredResetPasswordToken)
+            )
+            .orElseThrow();
     }
 
     async findUserByValidAccessToken(
