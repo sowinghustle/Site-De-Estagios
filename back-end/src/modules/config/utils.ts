@@ -5,23 +5,29 @@ type ValueOrError<T, E extends Error = Error> =
     | {
           value: T;
           isError: false;
+          isSuccess: true;
           orElseThrow: (cb?: (err: E) => E | string) => T;
+          orElse: <U>(alternative: U) => T;
+          map: <U>(fn: (val: T) => U) => ValueOrError<U, E>;
       }
     | {
           value: E;
           isError: true;
+          isSuccess: false;
           orElseThrow: (cb?: (err: E) => E | string) => void;
-          orElse: <U>(alternative: U) => T | U;
+          orElse: <U>(alternative: U) => U;
+          map: <U>(fn: (val: T) => U) => ValueOrError<U, E>;
       };
 
 type AsyncValueOrError<T, E extends Error = Error> = {
-    isErrorAsync: () => Promise<boolean>;
-    mapAsync: <U>(fn: (val: T) => U | Promise<U>) => AsyncValueOrError<U, E>;
+    resolveAsync: () => Promise<ValueOrError<T, E>>;
     getValueAsync: () => Promise<T | E>;
     getErrorAsync: () => Promise<E | null>;
-    orElseAsync: <U>(alternative: U | Promise<U>) => Promise<T | U>;
+    isErrorAsync: () => Promise<boolean>;
+    isSuccessAsync: () => Promise<boolean>;
     orElseThrowAsync: (cb?: (err: E) => E | string) => Promise<T>;
-    resolveAsync: () => Promise<ValueOrError<T, E>>;
+    orElseAsync: <U>(alternative: U | Promise<U>) => Promise<T | U>;
+    mapAsync: <U>(fn: (val: T) => U | Promise<U>) => AsyncValueOrError<U, E>;
 };
 
 export function toResult<T, E extends Error = Error>(
@@ -37,7 +43,23 @@ export function toResult<T, E extends Error = Error>(
         },
 
         async isErrorAsync() {
-            return (await this.getValueAsync()) instanceof Error;
+            const value = await this.getValueAsync();
+            if (value instanceof Error) return true;
+            return false;
+        },
+
+        async isSuccessAsync() {
+            const value = await this.getValueAsync();
+            if (value instanceof Error) return false;
+            return true;
+        },
+
+        async orElseAsync<U>(alternative: U | Promise<U>) {
+            try {
+                return await promise;
+            } catch {
+                return await alternative;
+            }
         },
 
         async orElseThrowAsync(cb) {
@@ -49,30 +71,40 @@ export function toResult<T, E extends Error = Error>(
             }
         },
 
-        async resolveAsync() {
-            try {
-                const value = await promise;
+        async resolveAsync(): Promise<ValueOrError<T, E>> {
+            const transform = <T, E extends Error = Error>(
+                value: T | E
+            ): ValueOrError<T, E> => {
+                if (value instanceof Error) {
+                    return {
+                        value,
+                        isError: true,
+                        isSuccess: false,
+                        orElseThrow(cb) {
+                            if (cb) {
+                                const ex = cb(value);
+                                throw ex instanceof Error ? ex : new Error(ex);
+                            }
+                            throw value;
+                        },
+                        orElse: <U>(alternative: U) => alternative,
+                        map: <U>(_: (val: T) => U) => transform<U, E>(value),
+                    };
+                }
 
                 return {
                     value,
                     isError: false,
-                    orElseThrow: (_) => value,
+                    isSuccess: true,
+                    orElseThrow: () => value,
+                    orElse: <U>(_: U) => value,
+                    map: <U>(fn: (val: T) => U) => transform<U, E>(fn(value)),
                 };
-            } catch (error: any) {
-                return {
-                    value: error,
-                    isError: true,
-                    orElseThrow(cb) {
-                        if (cb) {
-                            const ex = cb(error);
-                            throw ex instanceof Error ? ex : new Error(ex);
-                        }
-                        throw error;
-                    },
-                    getError: () => error,
-                    orElse: <U>(alternative: U) => alternative,
-                };
-            }
+            };
+
+            return await promise
+                .then((value) => transform<T, E>(value))
+                .catch((err) => transform<T, E>(err));
         },
 
         mapAsync<U>(fn: (val: T) => U | Promise<U>): AsyncValueOrError<U, E> {
@@ -85,15 +117,8 @@ export function toResult<T, E extends Error = Error>(
 
         async getErrorAsync() {
             const value = await this.getValueAsync();
-            return value instanceof Error ? value : null;
-        },
-
-        async orElseAsync<U>(alternative: U | Promise<U>) {
-            try {
-                return await promise;
-            } catch {
-                return await alternative;
-            }
+            if (value instanceof Error) return value;
+            return null;
         },
     };
 }
