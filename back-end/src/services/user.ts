@@ -72,6 +72,18 @@ class UserService {
             user.password
         );
     }
+
+    async ensurePasswordsMatchAsync(
+        user: User,
+        plainPassword: string
+    ): Promise<void> {
+        const passwordsMatch = await userService.comparePasswordsAsync(
+            user,
+            plainPassword
+        );
+        if (passwordsMatch) return;
+        throw new BadRequestError(config.messages.wrongPassword);
+    }
 }
 
 const userService = new UserService();

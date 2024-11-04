@@ -1,26 +1,18 @@
 import { Request, Response } from 'express';
-import config from '../config';
-import {
-    BadRequestError,
-    NotFoundError,
-    UnhandledError,
-} from '../config/errors';
-import { getValidationResult, toPromiseResult } from '../config/utils';
+import config from '../modules/config';
+import { NotFoundError, UnhandledError } from '../modules/config/errors';
+import { getValidationResult, toResult } from '../modules/config/utils';
 import { AdminLoginSchema } from '../schemas/admin';
+import adminService from '../services/admin';
 import authService from '../services/auth';
 import userService from '../services/user';
-import adminService from './service';
 
 export default class AdminController {
     async login(req: Request, res: Response) {
-        const data = getValidationResult(
-            AdminLoginSchema,
-            req.body
-        ).orElseThrow();
-
-        const admin = await toPromiseResult(
-            adminService.findAdminByNameOrEmail(data.nameOrEmail)
-        ).orElseThrow();
+        const data = getValidationResult(AdminLoginSchema, req.body);
+        const admin = await adminService.findAdminByNameOrEmail(
+            data.nameOrEmail
+        );
 
         if (!admin) {
             throw new NotFoundError(
@@ -28,32 +20,25 @@ export default class AdminController {
             );
         }
 
-        if (
-            !(await userService.comparePasswordsAsync(
-                admin.user,
-                data.password
-            ))
-        ) {
-            throw new BadRequestError(config.messages.wrongPassword);
-        }
+        await userService.ensurePasswordsMatchAsync(admin.user, data.password);
 
-        const { expiresAt, token } = await toPromiseResult(
+        const accessToken = await toResult(
             authService.saveNewAccessToken(admin.user.id!)
         ).orElseThrow(
-            (error) =>
+            (err) =>
                 new UnhandledError(
-                    error.message,
+                    err.message,
                     'Não foi possível realizar o login, tente novamente mais tarde.'
                 )
         );
 
         return res
             .status(200)
-            .cookie('token', token, config.project.cookieOptions)
+            .cookie('token', accessToken.token, config.project.cookieOptions)
             .send({
                 success: true,
-                token,
-                expiresAt,
+                token: accessToken.token,
+                expiresAt: accessToken.expiresAt,
                 message: config.messages.successfullLogin,
             });
     }

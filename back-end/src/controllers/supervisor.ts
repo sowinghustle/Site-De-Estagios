@@ -1,11 +1,7 @@
 import { Request, Response } from 'express';
-import config from '../config';
-import {
-    BadRequestError,
-    NotFoundError,
-    UnhandledError,
-} from '../config/errors';
-import { getValidationResult, toPromiseResult } from '../config/utils';
+import config from '../modules/config';
+import { NotFoundError, UnhandledError } from '../modules/config/errors';
+import { getValidationResult, toResult } from '../modules/config/utils';
 import {
     SupervisorLoginSchema,
     SupervisorRegisterSchema,
@@ -17,14 +13,10 @@ import userService from '../services/user';
 
 export default class SupervisorController {
     async login(req: Request, res: Response) {
-        const data = getValidationResult(
-            SupervisorLoginSchema,
-            req.body
-        ).orElseThrow();
-
-        const supervisor = await toPromiseResult(
-            supervisorService.findSupervisorByEmail(data.email)
-        ).orElseThrow();
+        const data = getValidationResult(SupervisorLoginSchema, req.body);
+        const supervisor = await supervisorService.findSupervisorByEmail(
+            data.email
+        );
 
         if (!supervisor) {
             throw new NotFoundError(
@@ -32,16 +24,12 @@ export default class SupervisorController {
             );
         }
 
-        if (
-            !(await userService.comparePasswordsAsync(
-                supervisor.user,
-                data.password
-            ))
-        ) {
-            throw new BadRequestError(config.messages.wrongPassword);
-        }
+        await userService.ensurePasswordsMatchAsync(
+            supervisor.user,
+            data.password
+        );
 
-        const { token, expiresAt } = await toPromiseResult(
+        const accessToken = await toResult(
             authService.saveNewAccessToken(supervisor.user.id!)
         ).orElseThrow(
             (error) =>
@@ -53,22 +41,18 @@ export default class SupervisorController {
 
         return res
             .status(200)
-            .cookie('token', token, config.project.cookieOptions)
+            .cookie('token', accessToken.token, config.project.cookieOptions)
             .send({
                 success: true,
-                token,
-                expiresAt,
+                token: accessToken.token,
+                expiresAt: accessToken.expiresAt,
                 message: config.messages.successfullLogin,
             });
     }
 
     async register(req: Request, res: Response) {
-        const data = getValidationResult(
-            SupervisorRegisterSchema,
-            req.body
-        ).orElseThrow();
-
-        const supervisor = await toPromiseResult(
+        const data = getValidationResult(SupervisorRegisterSchema, req.body);
+        const supervisor = await toResult(
             supervisorService.saveNewSupervisor({
                 name: data.name,
                 user: {
@@ -84,7 +68,9 @@ export default class SupervisorController {
                 )
         );
 
-        await emailService.sendNewUserEmail(supervisor.user);
+        await toResult(
+            emailService.sendNewUserEmail(supervisor.user)
+        ).getValue();
 
         return res.status(201).send({
             success: true,

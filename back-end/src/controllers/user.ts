@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import config from '../config';
-import { NotFoundError } from '../config/errors';
-import { getValidationResult, toPromiseResult } from '../config/utils';
 import { mapUserToJson as mapUserToData } from '../models/user';
+import config from '../modules/config';
+import { NotFoundError } from '../modules/config/errors';
+import { getValidationResult, toResult } from '../modules/config/utils';
 import { ForgotPasswordSchema, ResetPasswordSchema } from '../schemas/user';
 import authService from '../services/auth';
 import emailService from '../services/email';
@@ -21,54 +21,44 @@ export default class UserController {
         res: Response,
         next: NextFunction
     ) {
-        const data = getValidationResult(
-            ForgotPasswordSchema,
-            req.body
-        ).orElseThrow();
-
-        const user = await toPromiseResult(
-            userService.findUserByEmail(data.email)
-        ).orElseThrow();
+        const data = getValidationResult(ForgotPasswordSchema, req.body);
+        const user = await userService.findUserByEmail(data.email);
 
         if (!user) {
             throw new NotFoundError(config.messages.userWithEmailNotFound);
         }
 
-        const resetPassword = await toPromiseResult(
-            authService.saveNewResetPasswordToken(data.email)
-        ).orElseThrow();
+        const resetPasswordToken = await authService.saveNewResetPasswordToken(
+            data.email
+        );
 
-        await emailService.sendResetPasswordEmail(user, resetPassword.token);
+        await toResult(
+            emailService.sendResetPasswordEmail(user, resetPasswordToken.token)
+        ).getValue();
 
         return res.send({
             success: true,
-            expiresAt: resetPassword.expiresAt,
+            expiresAt: resetPasswordToken.expiresAt,
         });
     }
 
     async resetPassword(req: Request, res: Response, next: NextFunction) {
-        const data = getValidationResult(
-            ResetPasswordSchema,
-            req.body
-        ).orElseThrow();
+        const data = getValidationResult(ResetPasswordSchema, req.body);
 
-        const resetPasswordToken = (
+        const resetPasswordToken =
             await authService.findValidResetPasswordToken(
                 data.email,
                 data.token
-            )
-        ).orElseThrow();
+            );
 
         if (!resetPasswordToken) {
             throw new NotFoundError(config.messages.invalidToken);
         }
 
-        await toPromiseResult(
-            userService.updatePasswordByEmail(
-                resetPasswordToken.email,
-                data.newPassword
-            )
-        ).orElseThrow();
+        await userService.updatePasswordByEmail(
+            resetPasswordToken.email,
+            data.newPassword
+        );
 
         await authService.invalidateResetPasswordToken(
             resetPasswordToken.token

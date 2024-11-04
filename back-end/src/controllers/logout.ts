@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { UnauthorizedError } from '../config/errors';
+import { UnauthorizedError } from '../modules/config/errors';
 import authService from '../services/auth';
 
 export default class LogoutController {
@@ -8,19 +8,13 @@ export default class LogoutController {
             throw new UnauthorizedError();
         }
 
-        const logoutResult = await authService.invalidateAccessToken(
-            req.token!
-        );
-
-        if (logoutResult.isError) {
-            throw logoutResult.value;
-        }
+        await authService.invalidateAccessToken(req.token!);
 
         req.logout((err) => {
             if (err) return next(err);
             res.clearCookie('connect.sid');
             res.clearCookie('token');
-            req.session.destroy(() => res.sendStatus(204));
+            req.session.destroy(() => res.status(204).send({ success: true }));
         });
     }
 }

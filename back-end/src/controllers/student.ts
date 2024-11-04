@@ -1,11 +1,7 @@
 import { Request, Response } from 'express';
-import config from '../config';
-import {
-    BadRequestError,
-    NotFoundError,
-    UnhandledError,
-} from '../config/errors';
-import { getValidationResult, toPromiseResult } from '../config/utils';
+import config from '../modules/config';
+import { NotFoundError, UnhandledError } from '../modules/config/errors';
+import { getValidationResult, toResult } from '../modules/config/utils';
 import { StudentLoginSchema, StudentRegisterSchema } from '../schemas/student';
 import authService from '../services/auth';
 import emailService from '../services/email';
@@ -14,56 +10,42 @@ import userService from '../services/user';
 
 export default class StudentController {
     async login(req: Request, res: Response) {
-        const data = getValidationResult(
-            StudentLoginSchema,
-            req.body
-        ).orElseThrow();
-
-        const student = await toPromiseResult(
-            studentService.findStudentByEmail(data.email)
-        ).orElseThrow();
+        const data = getValidationResult(StudentLoginSchema, req.body);
+        const student = await studentService.findStudentByEmail(data.email);
 
         if (!student) {
             throw new NotFoundError(config.messages.studentNotFoundWithEmail);
         }
 
-        if (
-            !(await userService.comparePasswordsAsync(
-                student.user,
-                data.password
-            ))
-        ) {
-            throw new BadRequestError(config.messages.wrongPassword);
-        }
+        await userService.ensurePasswordsMatchAsync(
+            student.user,
+            data.password
+        );
 
-        const { token, expiresAt } = await toPromiseResult(
+        const accessToken = await toResult(
             authService.saveNewAccessToken(student.user.id!)
         ).orElseThrow(
-            (error) =>
+            (err) =>
                 new UnhandledError(
-                    error.message,
+                    err.message,
                     'Não foi possível realizar o login, tente novamente mais tarde.'
                 )
         );
 
         return res
             .status(200)
-            .cookie('token', token, config.project.cookieOptions)
+            .cookie('token', accessToken.token, config.project.cookieOptions)
             .send({
                 success: true,
-                token,
-                expiresAt,
+                token: accessToken.token,
+                expiresAt: accessToken.expiresAt,
                 message: config.messages.successfullLogin,
             });
     }
 
     async register(req: Request, res: Response) {
-        const data = getValidationResult(
-            StudentRegisterSchema,
-            req.body
-        ).orElseThrow();
-
-        const student = await toPromiseResult(
+        const data = getValidationResult(StudentRegisterSchema, req.body);
+        const student = await toResult(
             studentService.saveNewStudent({
                 fullName: data.fullName,
                 user: {
@@ -79,7 +61,7 @@ export default class StudentController {
                 )
         );
 
-        await emailService.sendNewUserEmail(student.user);
+        await toResult(emailService.sendNewUserEmail(student.user)).getValue();
 
         return res.status(201).send({
             success: true,
