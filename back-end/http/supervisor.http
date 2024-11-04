@@ -1,0 +1,27 @@
+# @name login
+# @prompt email
+# @prompt password
+POST {{baseUrl}}/supervisor/login
+Content-Type: application/json
+Access-Control-Allow-Credentials: true
+
+{
+    "email": "{{email}}",
+    "password": "{{password}}"
+}
+
+###
+# @name register
+# @prompt name
+# @prompt email
+# @prompt password
+POST {{baseUrl}}/supervisor/register
+Content-Type: application/json
+Access-Control-Allow-Credentials: true
+
+{
+    "name": "{{name}}",
+    "email": "{{email}}",
+    "password": "{{password}}",
+    "repeatPassword": "{{password}}"
+}
