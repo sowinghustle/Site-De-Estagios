@@ -14,7 +14,7 @@ type ValueOrError<T, E extends Error = Error> =
           value: E;
           isError: true;
           isSuccess: false;
-          orElseThrow: (cb?: (err: E) => E | string) => void;
+          orElseThrow: (cb?: (err: E) => E | string) => never;
           orElse: <U>(alternative: U) => U;
           map: <U>(fn: (val: T) => U) => ValueOrError<U, E>;
       };
@@ -35,7 +35,7 @@ type AsyncValueOrError<T, E extends Error = Error> = {
     mapAsync: <U>(fn: (val: T) => U | Promise<U>) => AsyncValueOrError<U, E>;
 };
 
-export function result<T, E extends Error = Error>(
+export function toResult<T, E extends Error = Error>(
     promise: Promise<T>
 ): AsyncValueOrError<T, E> {
     return {
@@ -124,7 +124,7 @@ export function result<T, E extends Error = Error>(
                 if (value instanceof Error) throw value;
                 return fn(value);
             });
-            return result(newPromise);
+            return toResult(newPromise);
         },
 
         validateAsync<U = T>(
@@ -136,7 +136,7 @@ export function result<T, E extends Error = Error>(
                 if (!(await predicate(value))) throw error;
                 return value as unknown as U;
             });
-            return result(newPromise);
+            return toResult(newPromise);
         },
     };
 }

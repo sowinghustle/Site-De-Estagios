@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Student } from '../models/student';
 import config from '../modules/config';
 import { NotFoundError, UnhandledError } from '../modules/config/errors';
 import { getValidationResult, toResult } from '../modules/config/utils';
@@ -11,11 +12,14 @@ import userService from '../services/user';
 export default class StudentController {
     async login(req: Request, res: Response) {
         const data = getValidationResult(StudentLoginSchema, req.body);
-        const student = await studentService.findStudentByEmail(data.email);
-
-        if (!student) {
-            throw new NotFoundError(config.messages.studentNotFoundWithEmail);
-        }
+        const student = await toResult(
+            studentService.findStudentByEmail(data.email)
+        )
+            .validateAsync<Student>(
+                (student) => !!student,
+                new NotFoundError(config.messages.studentNotFoundWithEmail)
+            )
+            .orElseThrowAsync();
 
         await userService.ensurePasswordsMatchAsync(
             student.user,
@@ -24,7 +28,7 @@ export default class StudentController {
 
         const accessToken = await toResult(
             authService.saveNewAccessToken(student.user.id!)
-        ).orElseThrow(
+        ).orElseThrowAsync(
             (err) =>
                 new UnhandledError(
                     err.message,
@@ -53,7 +57,7 @@ export default class StudentController {
                     password: data.password,
                 },
             })
-        ).orElseThrow(
+        ).orElseThrowAsync(
             (error) =>
                 new UnhandledError(
                     error.message,
@@ -61,7 +65,7 @@ export default class StudentController {
                 )
         );
 
-        await toResult(emailService.sendNewUserEmail(student.user)).getValue();
+        await toResult(emailService.sendNewUserEmail(student.user)).waitAsync();
 
         return res.status(201).send({
             success: true,

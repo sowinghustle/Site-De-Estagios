@@ -1,15 +1,20 @@
-import { requestWithSupertest, TestingUtils } from '../modules/config/testing';
+import testingUtils, {
+    DEFAULT_ADMIN,
+    DEFAULT_STUDENT,
+    DEFAULT_SUPERVISOR,
+    requestWithSupertest,
+} from '../modules/config/testing';
 import { DatabaseResolver } from '../modules/database';
 
 describe('POST /admin/logout', () => {
     beforeEach(() => DatabaseResolver.reset());
 
     it('should successfully log out the admin', async () => {
-        await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
+        await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
 
-        const loginRes = await TestingUtils.authenticateAdmin(
-            TestingUtils.DEFAULT_ADMIN.name,
-            TestingUtils.DEFAULT_ADMIN.user.password
+        const loginRes = await testingUtils.authenticateAdmin(
+            DEFAULT_ADMIN.name,
+            DEFAULT_ADMIN.user.password
         );
         const res = await requestWithSupertest
             .delete(`/api/v1/logout?access_token=${loginRes.body.token}`)
@@ -32,9 +37,9 @@ describe('POST /admin/logout', () => {
         });
 
         it('when admin token was invalidated', async () => {
-            const admin = TestingUtils.DEFAULT_ADMIN;
-            await TestingUtils.saveAndTestAdmin(admin);
-            const loginRes = await TestingUtils.authenticateAdmin(
+            const admin = DEFAULT_ADMIN;
+            await testingUtils.saveAndTestAdmin(admin);
+            const loginRes = await testingUtils.authenticateAdmin(
                 admin.name,
                 admin.user.password
             );
@@ -53,9 +58,9 @@ describe('POST /admin/logout', () => {
         });
 
         it('when supervisor token was invalidated', async () => {
-            const supervisor = TestingUtils.DEFAULT_SUPERVISOR;
-            await TestingUtils.saveAndTestSupervisor(supervisor);
-            const loginRes = await TestingUtils.authenticateSupervisor(
+            const supervisor = DEFAULT_SUPERVISOR;
+            await testingUtils.saveAndTestSupervisor(supervisor);
+            const loginRes = await testingUtils.authenticateSupervisor(
                 supervisor.user.email,
                 supervisor.user.password
             );
@@ -73,9 +78,9 @@ describe('POST /admin/logout', () => {
         });
 
         it('when student token was invalidated', async () => {
-            const student = TestingUtils.DEFAULT_STUDENT;
-            await TestingUtils.saveAndTestStudent(student);
-            const loginRes = await TestingUtils.authenticateStudent(
+            const student = DEFAULT_STUDENT;
+            await testingUtils.saveAndTestStudent(student);
+            const loginRes = await testingUtils.authenticateStudent(
                 student.user.email,
                 student.user.password
             );

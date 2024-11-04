@@ -1,8 +1,8 @@
 import config from '../modules/config';
-import {
+import testingUtils, {
+    ALTERNATIVE_ADMIN,
+    DEFAULT_ADMIN,
     requestWithSupertest,
-    TestingUtils,
-    token,
 } from '../modules/config/testing';
 import { DatabaseResolver } from '../modules/database';
 
@@ -14,18 +14,18 @@ describe('POST /admin/login', () => {
             const expectedResultValue = {
                 success: true,
                 message: config.messages.successfullLogin,
-                token,
+                token: testingUtils.token,
             };
-            await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
+            await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
 
             const res = await requestWithSupertest
                 .post('/api/v1/admin/login')
                 .send({
-                    nameOrEmail: TestingUtils.DEFAULT_ADMIN.name,
-                    password: TestingUtils.DEFAULT_ADMIN.user.password,
+                    nameOrEmail: DEFAULT_ADMIN.name,
+                    password: DEFAULT_ADMIN.user.password,
                 });
             expect(res.body).toMatchObject(expectedResultValue);
-            TestingUtils.testAuthResponseCookies(res);
+            testingUtils.testAuthResponseCookies(res);
             expect(res.status).toEqual(200);
         });
 
@@ -33,18 +33,18 @@ describe('POST /admin/login', () => {
             const expectedResultValue = {
                 success: true,
                 message: config.messages.successfullLogin,
-                token,
+                token: testingUtils.token,
             };
-            await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
+            await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
 
             const res = await requestWithSupertest
                 .post('/api/v1/admin/login')
                 .send({
-                    nameOrEmail: TestingUtils.DEFAULT_ADMIN.user.email,
-                    password: TestingUtils.DEFAULT_ADMIN.user.password,
+                    nameOrEmail: DEFAULT_ADMIN.user.email,
+                    password: DEFAULT_ADMIN.user.password,
                 });
             expect(res.body).toMatchObject(expectedResultValue);
-            TestingUtils.testAuthResponseCookies(res);
+            testingUtils.testAuthResponseCookies(res);
             expect(res.status).toEqual(200);
         });
     });
@@ -68,7 +68,7 @@ describe('POST /admin/login', () => {
             const res = await requestWithSupertest
                 .post('/api/v1/admin/login')
                 .send({
-                    nameOrEmail: TestingUtils.DEFAULT_ADMIN.name,
+                    nameOrEmail: DEFAULT_ADMIN.name,
                 });
             expect(res.body).toMatchObject(expectedResultValue);
             expect(res.status).toEqual(400);
@@ -82,8 +82,8 @@ describe('POST /admin/login', () => {
             const res = await requestWithSupertest
                 .post('/api/v1/admin/login')
                 .send({
-                    nameOrEmail: TestingUtils.DEFAULT_ADMIN.name,
-                    password: TestingUtils.DEFAULT_ADMIN.user.password,
+                    nameOrEmail: DEFAULT_ADMIN.name,
+                    password: DEFAULT_ADMIN.user.password,
                 });
             expect(res.body).toMatchObject(expectedResultValue);
             expect(res.status).toEqual(404);
@@ -94,13 +94,13 @@ describe('POST /admin/login', () => {
                 success: false,
                 message: config.messages.wrongPassword,
             };
-            await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
+            await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
 
             const res = await requestWithSupertest
                 .post('/api/v1/admin/login')
                 .send({
-                    nameOrEmail: TestingUtils.DEFAULT_ADMIN.name,
-                    password: TestingUtils.ALTERNATIVE_ADMIN.user.password,
+                    nameOrEmail: DEFAULT_ADMIN.name,
+                    password: ALTERNATIVE_ADMIN.user.password,
                 });
             expect(res.body).toMatchObject(expectedResultValue);
             expect(res.status).toEqual(400);
@@ -114,7 +114,7 @@ describe('POST /admin/login', () => {
             const res = await requestWithSupertest
                 .post('/api/v1/admin/login')
                 .send({
-                    nameOrEmail: TestingUtils.DEFAULT_ADMIN.user.email,
+                    nameOrEmail: DEFAULT_ADMIN.user.email,
                     password: 'r',
                 });
             expect(res.body).toMatchObject(expectedResultValue);

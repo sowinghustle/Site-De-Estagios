@@ -34,7 +34,7 @@ export default class UserController {
 
         await toResult(
             emailService.sendResetPasswordEmail(user, resetPasswordToken.token)
-        ).getValue();
+        ).getValueAsync();
 
         return res.send({
             success: true,

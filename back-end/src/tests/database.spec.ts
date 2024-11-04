@@ -1,4 +1,14 @@
-import { TestingUtils } from '../modules/config/testing';
+import testingUtils, {
+    ALTERNATIVE_ADMIN,
+    ALTERNATIVE_STUDENT,
+    ALTERNATIVE_SUPERVISOR,
+    DEFAULT_ADMIN,
+    DEFAULT_ADMIN_WITHOUT_PASSWORD,
+    DEFAULT_STUDENT,
+    DEFAULT_SUPERVISOR,
+    DEFAULT_SUPERVISOR_WITHOUT_PASSWORD,
+} from '../modules/config/testing';
+import { toResult } from '../modules/config/utils';
 import { DatabaseResolver } from '../modules/database';
 import adminService from '../services/admin';
 
@@ -6,30 +16,30 @@ describe('Admin Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
 
     it('should save a new admin', async () => {
-        const expectAdminValue = TestingUtils.DEFAULT_ADMIN_WITHOUT_PASSWORD;
-        const result = await TestingUtils.saveAdmin(TestingUtils.DEFAULT_ADMIN);
+        const expectAdminValue = DEFAULT_ADMIN_WITHOUT_PASSWORD;
+        const result = await testingUtils.saveAdmin(DEFAULT_ADMIN);
         expect(result.isError).toBe(false);
         expect(result.value).toMatchObject(expectAdminValue);
     });
 
     describe('should not save a new admin', () => {
         it('admin name already in use', async () => {
-            await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
-            const result = await TestingUtils.saveAdmin({
-                ...TestingUtils.DEFAULT_ADMIN,
+            await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
+            const result = await testingUtils.saveAdmin({
+                ...DEFAULT_ADMIN,
                 user: {
-                    ...TestingUtils.DEFAULT_ADMIN.user,
-                    email: TestingUtils.ALTERNATIVE_ADMIN.user.email,
+                    ...DEFAULT_ADMIN.user,
+                    email: ALTERNATIVE_ADMIN.user.email,
                 },
             });
             expect(result.value).toBeInstanceOf(Error);
         });
 
         it('specified email already in use', async () => {
-            await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
-            const result = await TestingUtils.saveAdmin({
-                ...TestingUtils.DEFAULT_ADMIN,
-                name: TestingUtils.ALTERNATIVE_ADMIN.name,
+            await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
+            const result = await testingUtils.saveAdmin({
+                ...DEFAULT_ADMIN,
+                name: ALTERNATIVE_ADMIN.name,
             });
             expect(result.value).toBeInstanceOf(Error);
         });
@@ -37,41 +47,41 @@ describe('Admin Database Tests', () => {
 
     describe('should find admin', () => {
         it('by name field', async () => {
-            const expectedResultValue =
-                TestingUtils.DEFAULT_ADMIN_WITHOUT_PASSWORD;
-            await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
-            const result = await adminService.findAdminByNameOrEmail(
-                TestingUtils.DEFAULT_ADMIN.name
-            );
+            const expectedResultValue = DEFAULT_ADMIN_WITHOUT_PASSWORD;
+            await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
+            const result = await toResult(
+                adminService.findAdminByNameOrEmail(DEFAULT_ADMIN.name)
+            ).resolveAsync();
             expect(result.value).toMatchObject(expectedResultValue);
         });
 
         it('by email field', async () => {
-            const expectedResultValue =
-                TestingUtils.DEFAULT_ADMIN_WITHOUT_PASSWORD;
-            await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
-            const result = await adminService.findAdminByNameOrEmail(
-                TestingUtils.DEFAULT_ADMIN.user.email
-            );
+            const expectedResultValue = DEFAULT_ADMIN_WITHOUT_PASSWORD;
+            await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
+            const result = await toResult(
+                adminService.findAdminByNameOrEmail(DEFAULT_ADMIN.user.email)
+            ).resolveAsync();
             expect(result.value).toMatchObject(expectedResultValue);
         });
     });
 
     describe('should not find admin', () => {
         it('when provided name is wrong', async () => {
-            await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
-            const result = await adminService.findAdminByNameOrEmail(
-                TestingUtils.ALTERNATIVE_ADMIN.name
-            );
+            await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
+            const result = await toResult(
+                adminService.findAdminByNameOrEmail(ALTERNATIVE_ADMIN.name)
+            ).resolveAsync();
             expect(result.value).toBeUndefined();
             expect(result.isError).toBe(false);
         });
 
         it('when provided email is wrong', async () => {
-            await TestingUtils.saveAndTestAdmin(TestingUtils.DEFAULT_ADMIN);
-            const result = await adminService.findAdminByNameOrEmail(
-                TestingUtils.ALTERNATIVE_ADMIN.user.email
-            );
+            await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
+            const result = await toResult(
+                adminService.findAdminByNameOrEmail(
+                    ALTERNATIVE_ADMIN.user.email
+                )
+            ).resolveAsync();
             expect(result.value).toBeUndefined();
             expect(result.isError).toBe(false);
         });
@@ -83,52 +93,41 @@ describe('Supervisor Database Tests', () => {
 
     it('should save a new supervisor', async () => {
         const expectedSupervisorValue = {
-            ...TestingUtils.DEFAULT_SUPERVISOR,
-            user: await TestingUtils.getUserWithoutPassword(
-                TestingUtils.DEFAULT_SUPERVISOR.user
-            ),
+            ...DEFAULT_SUPERVISOR,
+            user: testingUtils.getUserWithoutPassword(DEFAULT_SUPERVISOR.user),
         };
-        const result = await TestingUtils.saveSupervisor(
-            TestingUtils.DEFAULT_SUPERVISOR
-        );
+        const result = await testingUtils.saveSupervisor(DEFAULT_SUPERVISOR);
         expect(result.value).toMatchObject(expectedSupervisorValue);
     });
 
     it('should not save a new supervisor with specified email already in use', async () => {
-        await TestingUtils.saveAndTestSupervisor(
-            TestingUtils.DEFAULT_SUPERVISOR
-        );
-        const result = await TestingUtils.saveSupervisor({
-            ...TestingUtils.DEFAULT_SUPERVISOR,
-            name: TestingUtils.ALTERNATIVE_SUPERVISOR.name,
+        await testingUtils.saveAndTestSupervisor(DEFAULT_SUPERVISOR);
+        const result = await testingUtils.saveSupervisor({
+            ...DEFAULT_SUPERVISOR,
+            name: ALTERNATIVE_SUPERVISOR.name,
         });
         expect(result.value).toBeInstanceOf(Error);
     });
 
     it('should find supervisor by email field', async () => {
-        const expectedResultValue =
-            TestingUtils.DEFAULT_SUPERVISOR_WITHOUT_PASSWORD;
-        await TestingUtils.saveAndTestSupervisor(
-            TestingUtils.DEFAULT_SUPERVISOR
-        );
+        const expectedResultValue = DEFAULT_SUPERVISOR_WITHOUT_PASSWORD;
+        await testingUtils.saveAndTestSupervisor(DEFAULT_SUPERVISOR);
         const conn = await DatabaseResolver.getConnection();
         const promise = conn.findSupervisorByEmail(
-            TestingUtils.DEFAULT_SUPERVISOR.user.email
+            DEFAULT_SUPERVISOR.user.email
         );
-        await TestingUtils.expectPromiseNotToReject(promise);
+        await testingUtils.expectPromiseNotToReject(promise);
         await expect(promise).resolves.toMatchObject(expectedResultValue);
     });
 
     it('should not find supervisor when provided email is wrong', async () => {
-        await TestingUtils.saveAndTestSupervisor(
-            TestingUtils.DEFAULT_SUPERVISOR
-        );
+        await testingUtils.saveAndTestSupervisor(DEFAULT_SUPERVISOR);
         const conn = await DatabaseResolver.getConnection();
         const promise = conn.findAdminByNameOrEmail(
-            TestingUtils.ALTERNATIVE_SUPERVISOR.user.email
+            ALTERNATIVE_SUPERVISOR.user.email
         );
         await expect(promise).resolves.toBeUndefined();
-        await TestingUtils.expectPromiseNotToReject(promise);
+        await testingUtils.expectPromiseNotToReject(promise);
     });
 });
 
@@ -137,25 +136,21 @@ describe('Student Database Tests', () => {
 
     it('should save a new student', async () => {
         const expectedStudentValue = {
-            ...TestingUtils.DEFAULT_STUDENT,
-            user: await TestingUtils.getUserWithoutPassword(
-                TestingUtils.DEFAULT_STUDENT.user
+            ...DEFAULT_STUDENT,
+            user: await testingUtils.getUserWithoutPassword(
+                DEFAULT_STUDENT.user
             ),
         };
-        const result = await TestingUtils.saveStudent(
-            TestingUtils.DEFAULT_STUDENT
-        );
+        const result = await testingUtils.saveStudent(DEFAULT_STUDENT);
         expect(result.value).toMatchObject(expectedStudentValue);
     });
 
     it('should get user by id', async () => {
-        const student = await TestingUtils.saveAndTestStudent(
-            TestingUtils.DEFAULT_STUDENT
-        );
+        const student = await testingUtils.saveAndTestStudent(DEFAULT_STUDENT);
         const conn = await DatabaseResolver.getConnection();
 
         expect(
-            await TestingUtils.expectPromiseNotToReject(
+            await testingUtils.expectPromiseNotToReject(
                 conn.findUserById(student.id!)
             )
         ).not.toBeUndefined();
@@ -164,39 +159,33 @@ describe('Student Database Tests', () => {
     });
 
     it('should not save a new student with specified email already in use', async () => {
-        await TestingUtils.saveAndTestStudent(TestingUtils.DEFAULT_STUDENT);
-        const result = await TestingUtils.saveStudent({
-            ...TestingUtils.DEFAULT_STUDENT,
-            fullName: TestingUtils.ALTERNATIVE_STUDENT.fullName,
+        await testingUtils.saveAndTestStudent(DEFAULT_STUDENT);
+        const result = await testingUtils.saveStudent({
+            ...DEFAULT_STUDENT,
+            fullName: ALTERNATIVE_STUDENT.fullName,
         });
         expect(result.value).toBeInstanceOf(Error);
     });
 
     it('should find student by email field', async () => {
         const expectedResultValue = {
-            ...TestingUtils.DEFAULT_STUDENT,
-            user: await TestingUtils.getUserWithoutPassword(
-                TestingUtils.DEFAULT_STUDENT.user
-            ),
+            ...DEFAULT_STUDENT,
+            user: testingUtils.getUserWithoutPassword(DEFAULT_STUDENT.user),
         };
 
-        await TestingUtils.saveAndTestStudent(TestingUtils.DEFAULT_STUDENT);
+        await testingUtils.saveAndTestStudent(DEFAULT_STUDENT);
         const conn = await DatabaseResolver.getConnection();
-        const promise = conn.findStudentByEmail(
-            TestingUtils.DEFAULT_STUDENT.user.email
-        );
-        await TestingUtils.expectPromiseNotToReject(promise);
+        const promise = conn.findStudentByEmail(DEFAULT_STUDENT.user.email);
+        await testingUtils.expectPromiseNotToReject(promise);
         await expect(promise).resolves.toMatchObject(expectedResultValue);
     });
 
     it('should not find student when provided email is wrong', async () => {
-        await TestingUtils.saveAndTestStudent(TestingUtils.DEFAULT_STUDENT);
+        await testingUtils.saveAndTestStudent(DEFAULT_STUDENT);
         const conn = await DatabaseResolver.getConnection();
-        const promise = conn.findStudentByEmail(
-            TestingUtils.ALTERNATIVE_STUDENT.user.email
-        );
+        const promise = conn.findStudentByEmail(ALTERNATIVE_STUDENT.user.email);
         await expect(promise).resolves.toBeUndefined();
-        await TestingUtils.expectPromiseNotToReject(promise);
+        await testingUtils.expectPromiseNotToReject(promise);
     });
 });
 
@@ -204,41 +193,35 @@ describe('Access-Token Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
 
     it('should save a new access-token successfully', async () => {
-        const expectedResult = { token };
-        const admin = await TestingUtils.saveAndTestAdmin(
-            TestingUtils.DEFAULT_ADMIN
-        );
+        const expectedResult = { token: testingUtils.token };
+        const admin = await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
         const conn = await DatabaseResolver.getConnection();
-        const promise = TestingUtils.expectPromiseNotToReject(
-            conn.saveNewAccessToken(token, admin.id!)
+        const promise = testingUtils.expectPromiseNotToReject(
+            conn.saveNewAccessToken(testingUtils.token, admin.id!)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });
 
     it('should find a user by a valid access-token', async () => {
-        const expectedResult = TestingUtils.DEFAULT_ADMIN_WITHOUT_PASSWORD.user;
-        const admin = await TestingUtils.saveAndTestAdmin(
-            TestingUtils.DEFAULT_ADMIN
-        );
+        const expectedResult = DEFAULT_ADMIN_WITHOUT_PASSWORD.user;
+        const admin = await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
         const conn = await DatabaseResolver.getConnection();
-        await TestingUtils.expectPromiseNotToReject(
-            conn.saveNewAccessToken(token, admin.id!)
+        await testingUtils.expectPromiseNotToReject(
+            conn.saveNewAccessToken(testingUtils.token, admin.id!)
         );
-        const promise = TestingUtils.expectPromiseNotToReject(
-            conn.findUserByValidAccessToken(token)
+        const promise = testingUtils.expectPromiseNotToReject(
+            conn.findUserByValidAccessToken(testingUtils.token)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });
 
     it('should not find a user with an invalid access-token', async () => {
-        const admin = await TestingUtils.saveAndTestAdmin(
-            TestingUtils.DEFAULT_ADMIN
-        );
+        const admin = await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
         const conn = await DatabaseResolver.getConnection();
-        await TestingUtils.expectPromiseNotToReject(
-            conn.saveNewAccessToken(token, admin.id!)
+        await testingUtils.expectPromiseNotToReject(
+            conn.saveNewAccessToken(testingUtils.token, admin.id!)
         );
-        const promise = TestingUtils.expectPromiseNotToReject(
+        const promise = testingUtils.expectPromiseNotToReject(
             conn.findUserByValidAccessToken('invalid_access_token')
         );
         await expect(promise).resolves.toBeUndefined();
@@ -246,20 +229,16 @@ describe('Access-Token Database Tests', () => {
 
     it('should invalidate a access-token successfully', async () => {
         const expectedResult = {
-            token,
-            user: await TestingUtils.getUserWithoutPassword(
-                TestingUtils.DEFAULT_ADMIN.user
-            ),
+            token: testingUtils.token,
+            user: await testingUtils.getUserWithoutPassword(DEFAULT_ADMIN.user),
         };
-        const admin = await TestingUtils.saveAndTestAdmin(
-            TestingUtils.DEFAULT_ADMIN
-        );
+        const admin = await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
         const conn = await DatabaseResolver.getConnection();
-        await TestingUtils.expectPromiseNotToReject(
-            conn.saveNewAccessToken(token, admin.id!)
+        await testingUtils.expectPromiseNotToReject(
+            conn.saveNewAccessToken(testingUtils.token, admin.id!)
         );
-        const promise = TestingUtils.expectPromiseNotToReject(
-            conn.invalidateAccessToken(token)
+        const promise = testingUtils.expectPromiseNotToReject(
+            conn.invalidateAccessToken(testingUtils.token)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });
@@ -269,61 +248,56 @@ describe('Reset-Password Token Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
 
     it('should save a new reset-password token successfully', async () => {
-        const expectedResult = { token };
-        const admin = await TestingUtils.saveAndTestAdmin(
-            TestingUtils.DEFAULT_ADMIN
-        );
+        const expectedResult = { token: testingUtils.token };
+        const admin = await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
         const conn = await DatabaseResolver.getConnection();
-        const promise = TestingUtils.expectPromiseNotToReject(
-            conn.saveNewResetPasswordToken(admin.user.email, token)
+        const promise = testingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, testingUtils.token)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });
 
     it('should find a reset-password token by valid token and email', async () => {
         const expectedResult = {
-            email: TestingUtils.DEFAULT_ADMIN.user.email,
-            token,
+            email: DEFAULT_ADMIN.user.email,
+            token: testingUtils.token,
         };
-        const admin = await TestingUtils.saveAndTestAdmin(
-            TestingUtils.DEFAULT_ADMIN
-        );
+        const admin = await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
         const conn = await DatabaseResolver.getConnection();
-        await TestingUtils.expectPromiseNotToReject(
-            conn.saveNewResetPasswordToken(admin.user.email, token)
+        await testingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, testingUtils.token)
         );
-        const promise = TestingUtils.expectPromiseNotToReject(
-            conn.findValidResetPasswordToken(admin.user.email, token)
+        const promise = testingUtils.expectPromiseNotToReject(
+            conn.findValidResetPasswordToken(
+                admin.user.email,
+                testingUtils.token
+            )
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });
 
     it('should not find a reset-password token with invalid email', async () => {
-        const admin = await TestingUtils.saveAndTestAdmin(
-            TestingUtils.DEFAULT_ADMIN
-        );
+        const admin = await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
         const conn = await DatabaseResolver.getConnection();
-        await TestingUtils.expectPromiseNotToReject(
-            conn.saveNewResetPasswordToken(admin.user.email, token)
+        await testingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, testingUtils.token)
         );
-        const promise = TestingUtils.expectPromiseNotToReject(
+        const promise = testingUtils.expectPromiseNotToReject(
             conn.findValidResetPasswordToken(
-                TestingUtils.ALTERNATIVE_ADMIN.user.email,
-                token
+                ALTERNATIVE_ADMIN.user.email,
+                testingUtils.token
             )
         );
         await expect(promise).resolves.toBeUndefined();
     });
 
     it('should not find a reset-password token with invalid token', async () => {
-        const admin = await TestingUtils.saveAndTestAdmin(
-            TestingUtils.DEFAULT_ADMIN
-        );
+        const admin = await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
         const conn = await DatabaseResolver.getConnection();
-        await TestingUtils.expectPromiseNotToReject(
-            conn.saveNewResetPasswordToken(admin.user.email, token)
+        await testingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, testingUtils.token)
         );
-        const promise = TestingUtils.expectPromiseNotToReject(
+        const promise = testingUtils.expectPromiseNotToReject(
             conn.findValidResetPasswordToken(
                 admin.user.email,
                 'invalid_reset_password_token'
@@ -334,18 +308,16 @@ describe('Reset-Password Token Database Tests', () => {
 
     it('should invalidate a reset-password token successfully', async () => {
         const expectedResult = {
-            token,
-            email: TestingUtils.DEFAULT_ADMIN.user.email,
+            token: testingUtils.token,
+            email: DEFAULT_ADMIN.user.email,
         };
-        const admin = await TestingUtils.saveAndTestAdmin(
-            TestingUtils.DEFAULT_ADMIN
-        );
+        const admin = await testingUtils.saveAndTestAdmin(DEFAULT_ADMIN);
         const conn = await DatabaseResolver.getConnection();
-        await TestingUtils.expectPromiseNotToReject(
-            conn.saveNewResetPasswordToken(admin.user.email, token)
+        await testingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, testingUtils.token)
         );
-        const promise = TestingUtils.expectPromiseNotToReject(
-            conn.invalidateResetPasswordToken(token)
+        const promise = testingUtils.expectPromiseNotToReject(
+            conn.invalidateResetPasswordToken(testingUtils.token)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });

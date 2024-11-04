@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Supervisor } from '../models/supervisor';
 import config from '../modules/config';
 import { NotFoundError, UnhandledError } from '../modules/config/errors';
 import { getValidationResult, toResult } from '../modules/config/utils';
@@ -14,15 +15,14 @@ import userService from '../services/user';
 export default class SupervisorController {
     async login(req: Request, res: Response) {
         const data = getValidationResult(SupervisorLoginSchema, req.body);
-        const supervisor = await supervisorService.findSupervisorByEmail(
-            data.email
-        );
-
-        if (!supervisor) {
-            throw new NotFoundError(
-                config.messages.supervisorNotFoundWithEmail
-            );
-        }
+        const supervisor = await toResult(
+            supervisorService.findSupervisorByEmail(data.email)
+        )
+            .validateAsync<Supervisor>(
+                (student) => !!student,
+                new NotFoundError(config.messages.supervisorNotFoundWithEmail)
+            )
+            .orElseThrowAsync();
 
         await userService.ensurePasswordsMatchAsync(
             supervisor.user,
@@ -31,7 +31,7 @@ export default class SupervisorController {
 
         const accessToken = await toResult(
             authService.saveNewAccessToken(supervisor.user.id!)
-        ).orElseThrow(
+        ).orElseThrowAsync(
             (error) =>
                 new UnhandledError(
                     error.message,
@@ -60,7 +60,7 @@ export default class SupervisorController {
                     password: data.password,
                 },
             })
-        ).orElseThrow(
+        ).orElseThrowAsync(
             (error) =>
                 new UnhandledError(
                     error.message,
@@ -70,7 +70,7 @@ export default class SupervisorController {
 
         await toResult(
             emailService.sendNewUserEmail(supervisor.user)
-        ).getValue();
+        ).getValueAsync();
 
         return res.status(201).send({
             success: true,

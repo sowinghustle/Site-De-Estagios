@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Admin } from '../models/admin';
 import config from '../modules/config';
 import { NotFoundError, UnhandledError } from '../modules/config/errors';
 import { getValidationResult, toResult } from '../modules/config/utils';
@@ -10,21 +11,20 @@ import userService from '../services/user';
 export default class AdminController {
     async login(req: Request, res: Response) {
         const data = getValidationResult(AdminLoginSchema, req.body);
-        const admin = await adminService.findAdminByNameOrEmail(
-            data.nameOrEmail
-        );
-
-        if (!admin) {
-            throw new NotFoundError(
-                config.messages.adminNotFoundWithNameOrEmail
-            );
-        }
+        const admin = await toResult(
+            adminService.findAdminByNameOrEmail(data.nameOrEmail)
+        )
+            .validateAsync<Admin>(
+                (admin) => !!admin,
+                new NotFoundError(config.messages.adminNotFoundWithNameOrEmail)
+            )
+            .orElseThrowAsync();
 
         await userService.ensurePasswordsMatchAsync(admin.user, data.password);
 
         const accessToken = await toResult(
             authService.saveNewAccessToken(admin.user.id!)
-        ).orElseThrow(
+        ).orElseThrowAsync(
             (err) =>
                 new UnhandledError(
                     err.message,
