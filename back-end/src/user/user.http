@@ -1,4 +1,31 @@
 # @name me
-GET {{baseUrl}}/user/me
+# @prompt token
+GET {{baseUrl}}/user/me?access_token={{token}}
 Content-Type: application/json
 Access-Control-Allow-Credentials: true
+
+###
+# @name request-password-change
+# @prompt email
+POST {{baseUrl}}/user/forgot-password
+Content-Type: application/json
+Access-Control-Allow-Credentials: true
+
+{
+    "email": "{{email}}"
+}
+
+###
+# @name reset-password
+# @prompt token
+# @prompt email
+# @prompt newPassword
+POST {{baseUrl}}/user/reset-password
+Content-Type: application/json
+Access-Control-Allow-Credentials: true
+
+{
+    "email": "{{email}}",
+    "token": "{{token}}",
+    "newPassword": "{{newPassword}}"
+}

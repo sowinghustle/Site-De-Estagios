@@ -60,3 +60,8 @@ export const RepeatPasswordSchema = Joi.any()
     .options({
         messages: { 'any.only': config.messages.wrongRepeatPassword },
     });
+
+export const ResetPasswordTokenSchema = Joi.string().required().messages({
+    'any.required': config.messages.invalidToken,
+    'string.empty': config.messages.invalidToken,
+});

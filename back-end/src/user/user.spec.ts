@@ -1,4 +1,4 @@
-import { requestWithSupertest, TestingUtils } from '../config/testing';
+import { requestWithSupertest, TestingUtils, token } from '../config/testing';
 import { DatabaseResolver } from '../database';
 import { UserRole } from './model';
 
@@ -71,5 +71,92 @@ describe('GET /user/me', () => {
     it('should get unauthorized if user not logged in', async () => {
         const res = await requestWithSupertest.get('/api/v1/user/me').send();
         expect(res.status).toEqual(401);
+    });
+
+    it('should reset student password', async () => {
+        const student = TestingUtils.DEFAULT_STUDENT;
+        const expectedResultValue = { success: true };
+
+        await TestingUtils.saveAndTestStudent(student);
+
+        const forgotPasswordRes = await requestWithSupertest
+            .post('/api/v1/user/forgot-password')
+            .send({ email: student.user.email });
+        expect(forgotPasswordRes.status).toEqual(200);
+        expect(forgotPasswordRes.body).toMatchObject(expectedResultValue);
+
+        const res = await requestWithSupertest
+            .post('/api/v1/user/reset-password')
+            .send({
+                email: student.user.email,
+                token,
+                newPassword: TestingUtils.ALTERNATIVE_STUDENT.user.password,
+            });
+        expect(res.status).toEqual(200);
+        expect(res.body).toMatchObject(expectedResultValue);
+
+        const loginRes = await TestingUtils.authenticateStudent(
+            student.user.email,
+            TestingUtils.ALTERNATIVE_STUDENT.user.password
+        );
+        expect(loginRes.status).toEqual(200);
+    });
+
+    it('should not reset student password with invalid token', async () => {
+        const student = TestingUtils.DEFAULT_STUDENT;
+        const expectedResultValue = { success: false };
+
+        await TestingUtils.saveAndTestStudent(student);
+
+        const forgotPasswordRes = await requestWithSupertest
+            .post('/api/v1/user/forgot-password')
+            .send({ email: student.user.email });
+        expect(forgotPasswordRes.status).toEqual(200);
+        expect(forgotPasswordRes.body).toMatchObject({ success: true });
+
+        const res = await requestWithSupertest
+            .post('/api/v1/user/reset-password')
+            .send({
+                email: student.user.email,
+                token: 'invalid_reset_password_token',
+                newPassword: TestingUtils.ALTERNATIVE_STUDENT.user.password,
+            });
+        expect(res.status).toEqual(404);
+        expect(res.body).toMatchObject(expectedResultValue);
+
+        const loginRes = await TestingUtils.authenticateStudent(
+            student.user.email,
+            TestingUtils.ALTERNATIVE_STUDENT.user.password
+        );
+        expect(loginRes.status).toEqual(400);
+    });
+
+    it('should not reset student password with invalid email', async () => {
+        const student = TestingUtils.DEFAULT_STUDENT;
+        const expectedResultValue = { success: false };
+
+        await TestingUtils.saveAndTestStudent(student);
+
+        const forgotPasswordRes = await requestWithSupertest
+            .post('/api/v1/user/forgot-password')
+            .send({ email: student.user.email });
+        expect(forgotPasswordRes.status).toEqual(200);
+        expect(forgotPasswordRes.body).toMatchObject({ success: true });
+
+        const res = await requestWithSupertest
+            .post('/api/v1/user/reset-password')
+            .send({
+                email: TestingUtils.ALTERNATIVE_STUDENT.user.email,
+                token,
+                newPassword: TestingUtils.ALTERNATIVE_STUDENT.user.password,
+            });
+        expect(res.status).toEqual(404);
+        expect(res.body).toMatchObject(expectedResultValue);
+
+        const loginRes = await TestingUtils.authenticateStudent(
+            student.user.email,
+            TestingUtils.ALTERNATIVE_STUDENT.user.password
+        );
+        expect(loginRes.status).toEqual(400);
     });
 });

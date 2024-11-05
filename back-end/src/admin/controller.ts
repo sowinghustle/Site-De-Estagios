@@ -33,7 +33,7 @@ export default class AdminController {
         }
 
         const { expiresAt, token } = await toPromiseResult(
-            authService.saveNewUserToken(admin.user.id!)
+            authService.saveNewAccessToken(admin.user.id!)
         ).orElseThrow(
             (error) =>
                 new UnhandledError(

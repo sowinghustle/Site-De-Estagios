@@ -1,6 +1,6 @@
 import { User } from '../user/model';
 
-export type UserToken = {
+export type AccessToken = {
     id?: number;
     token: string;
     user: User;
@@ -8,4 +8,10 @@ export type UserToken = {
     expiredAt?: Date;
 };
 
-export type UserTokenCollection = UserToken[];
+export type ResetPasswordToken = {
+    id?: number;
+    email: string;
+    token: string;
+    expiresAt: Date;
+    expiredAt?: Date;
+};

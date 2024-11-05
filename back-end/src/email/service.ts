@@ -71,8 +71,10 @@ class NodeMailerService implements EmailService {
                 text: `Olá ${user.email},\n\nRecebemos uma solicitação para redefinir sua senha. Clique no link abaixo para criar uma nova senha:\n\n[Link para redefinir a senha]\n\nSe você não fez essa solicitação, pode ignorar este e-mail.\n\nAtenciosamente,\nEquipe EstagioHub`,
                 html: `
                 <p>Olá <strong>${user.email}</strong>,</p>
+                <p>Este é o seu token de redefinição de senha:</p>
+                <sub>${token}</sub>
                 <p>Recebemos uma solicitação para redefinir sua senha. Clique no link abaixo para criar uma nova senha:</p>
-                <p><a href="[Link para redefinir a senha]?token=${token}">Redefinir Senha</a></p>
+                <p><a href="${config.project.frontendUrl}/forgot-password">Redefinir Senha</a></p>
                 <p>Se você não fez essa solicitação, pode ignorar este e-mail.</p>
                 <p>Atenciosamente,<br/>Equipe EstagioHub</p>
             `,

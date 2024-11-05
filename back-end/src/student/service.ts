@@ -29,8 +29,6 @@ export class StudentService {
 
     async saveNewStudent(student: Student): Promise<Result<Student>> {
         const toResult = buildToResult<Student>();
-        const conn = await DatabaseResolver.getConnection();
-
         const canSaveStudentResult = await this.ensureCanSaveStudent(student);
 
         if (canSaveStudentResult.isError) {
@@ -40,6 +38,7 @@ export class StudentService {
         const encryptedPassword = await hashService.encryptPassword(
             student.user.password
         );
+        const conn = await DatabaseResolver.getConnection();
         const createdStudent = await conn.saveNewStudent({
             ...student,
             user: {
@@ -47,13 +46,8 @@ export class StudentService {
                 password: encryptedPassword,
             },
         });
-        const error = conn.getError();
 
-        if (error) {
-            return toResult(error);
-        }
-
-        return toResult(createdStudent!);
+        return toResult(conn.getError() ?? createdStudent!);
     }
 }
 

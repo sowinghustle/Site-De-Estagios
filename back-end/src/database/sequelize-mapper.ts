@@ -1,14 +1,15 @@
 import { Admin } from '../admin/model';
 import { Student } from '../student/model';
 import { Supervisor } from '../supervisor/model';
-import { UserToken } from '../token/model';
+import { AccessToken, ResetPasswordToken } from '../token/model';
 import { User, UserRole } from '../user/model';
 import {
+    AccessTokenTable,
     AdminTable,
+    ResetPasswordTable,
     StudentTable,
     SupervisorTable,
     UserTable,
-    UserTokenTable,
 } from './sequelize-tables';
 
 export function mapSequelizeAdminToModel(entity: AdminTable) {
@@ -32,11 +33,17 @@ export function mapSequelizeStudentToModel(entity: StudentTable) {
     } as Student;
 }
 
-export function mapSequelizeUserTokenToModel(entity: UserTokenTable) {
+export function mapSequelizeAccessTokenToModel(entity: AccessTokenTable) {
     return {
         ...entity.toJSON(),
         user: !entity.user ? undefined : mapSequelizeUserToModel(entity.user),
-    } as UserToken;
+    } as AccessToken;
+}
+
+export function mapSequelizeResetPasswordTokenToModel(
+    entity: ResetPasswordTable
+) {
+    return entity.toJSON() as ResetPasswordToken;
 }
 
 export function mapSequelizeUserToModel(entity: UserTable) {

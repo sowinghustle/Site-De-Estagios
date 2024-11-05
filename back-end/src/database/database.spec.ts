@@ -200,22 +200,51 @@ describe('Student Database Tests', () => {
     });
 });
 
-describe('User-Token Database Tests', () => {
+describe('Access-Token Database Tests', () => {
     beforeEach(() => DatabaseResolver.reset());
 
-    it('should save a new user-token successfully', async () => {
+    it('should save a new access-token successfully', async () => {
         const expectedResult = { token };
         const admin = await TestingUtils.saveAndTestAdmin(
             TestingUtils.DEFAULT_ADMIN
         );
         const conn = await DatabaseResolver.getConnection();
         const promise = TestingUtils.expectPromiseNotToReject(
-            conn.saveNewUserToken(token, admin.id!)
+            conn.saveNewAccessToken(token, admin.id!)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });
 
-    it('should invalidate a user-token successfully', async () => {
+    it('should find a user by a valid access-token', async () => {
+        const expectedResult = TestingUtils.DEFAULT_ADMIN_WITHOUT_PASSWORD.user;
+        const admin = await TestingUtils.saveAndTestAdmin(
+            TestingUtils.DEFAULT_ADMIN
+        );
+        const conn = await DatabaseResolver.getConnection();
+        await TestingUtils.expectPromiseNotToReject(
+            conn.saveNewAccessToken(token, admin.id!)
+        );
+        const promise = TestingUtils.expectPromiseNotToReject(
+            conn.findUserByValidAccessToken(token)
+        );
+        await expect(promise).resolves.toMatchObject(expectedResult);
+    });
+
+    it('should not find a user with an invalid access-token', async () => {
+        const admin = await TestingUtils.saveAndTestAdmin(
+            TestingUtils.DEFAULT_ADMIN
+        );
+        const conn = await DatabaseResolver.getConnection();
+        await TestingUtils.expectPromiseNotToReject(
+            conn.saveNewAccessToken(token, admin.id!)
+        );
+        const promise = TestingUtils.expectPromiseNotToReject(
+            conn.findUserByValidAccessToken('invalid_access_token')
+        );
+        await expect(promise).resolves.toBeUndefined();
+    });
+
+    it('should invalidate a access-token successfully', async () => {
         const expectedResult = {
             token,
             user: await TestingUtils.getUserWithoutPassword(
@@ -227,10 +256,96 @@ describe('User-Token Database Tests', () => {
         );
         const conn = await DatabaseResolver.getConnection();
         await TestingUtils.expectPromiseNotToReject(
-            conn.saveNewUserToken(token, admin.id!)
+            conn.saveNewAccessToken(token, admin.id!)
         );
         const promise = TestingUtils.expectPromiseNotToReject(
-            conn.invalidateUserToken(token)
+            conn.invalidateAccessToken(token)
+        );
+        await expect(promise).resolves.toMatchObject(expectedResult);
+    });
+});
+
+describe('Reset-Password Token Database Tests', () => {
+    beforeEach(() => DatabaseResolver.reset());
+
+    it('should save a new reset-password token successfully', async () => {
+        const expectedResult = { token };
+        const admin = await TestingUtils.saveAndTestAdmin(
+            TestingUtils.DEFAULT_ADMIN
+        );
+        const conn = await DatabaseResolver.getConnection();
+        const promise = TestingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, token)
+        );
+        await expect(promise).resolves.toMatchObject(expectedResult);
+    });
+
+    it('should find a reset-password token by valid token and email', async () => {
+        const expectedResult = {
+            email: TestingUtils.DEFAULT_ADMIN.user.email,
+            token,
+        };
+        const admin = await TestingUtils.saveAndTestAdmin(
+            TestingUtils.DEFAULT_ADMIN
+        );
+        const conn = await DatabaseResolver.getConnection();
+        await TestingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, token)
+        );
+        const promise = TestingUtils.expectPromiseNotToReject(
+            conn.findValidResetPasswordToken(admin.user.email, token)
+        );
+        await expect(promise).resolves.toMatchObject(expectedResult);
+    });
+
+    it('should not find a reset-password token with invalid email', async () => {
+        const admin = await TestingUtils.saveAndTestAdmin(
+            TestingUtils.DEFAULT_ADMIN
+        );
+        const conn = await DatabaseResolver.getConnection();
+        await TestingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, token)
+        );
+        const promise = TestingUtils.expectPromiseNotToReject(
+            conn.findValidResetPasswordToken(
+                TestingUtils.ALTERNATIVE_ADMIN.user.email,
+                token
+            )
+        );
+        await expect(promise).resolves.toBeUndefined();
+    });
+
+    it('should not find a reset-password token with invalid token', async () => {
+        const admin = await TestingUtils.saveAndTestAdmin(
+            TestingUtils.DEFAULT_ADMIN
+        );
+        const conn = await DatabaseResolver.getConnection();
+        await TestingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, token)
+        );
+        const promise = TestingUtils.expectPromiseNotToReject(
+            conn.findValidResetPasswordToken(
+                admin.user.email,
+                'invalid_reset_password_token'
+            )
+        );
+        await expect(promise).resolves.toBeUndefined();
+    });
+
+    it('should invalidate a reset-password token successfully', async () => {
+        const expectedResult = {
+            token,
+            email: TestingUtils.DEFAULT_ADMIN.user.email,
+        };
+        const admin = await TestingUtils.saveAndTestAdmin(
+            TestingUtils.DEFAULT_ADMIN
+        );
+        const conn = await DatabaseResolver.getConnection();
+        await TestingUtils.expectPromiseNotToReject(
+            conn.saveNewResetPasswordToken(admin.user.email, token)
+        );
+        const promise = TestingUtils.expectPromiseNotToReject(
+            conn.invalidateResetPasswordToken(token)
         );
         await expect(promise).resolves.toMatchObject(expectedResult);
     });

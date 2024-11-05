@@ -6,12 +6,20 @@ services:
       plan: free
       branch: main
       autoDeploy: true
-      buildCommand: docker build -p 8000:10000 .
       rootDir: back-end
       healthCheckPath: /healthcheck
+      buildCommand: docker build -p 8000:10000 .
+      dockerCommand: npm run start:production
     - type: redis
       name: session-store
       ipAllowList:
         - source: 0.0.0.0/0
           description: everywhere
       plan: free
+
+databases:
+  - name: estagiohub-database
+    databaseName: estagiohub
+    user: postgres_default_user
+    ipAllowList: []
+    plan: free
