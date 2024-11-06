@@ -61,6 +61,27 @@ const requests = {
             });
         },
     },
+    supervisor: {
+        login(email: string, password: string) {
+            return requestWithSupertest.post('/api/v1/supervisor/login').send({
+                email,
+                password,
+            });
+        },
+    },
+    student: {
+        login(email: string, password: string) {
+            return requestWithSupertest.post('/api/v1/student/login').send({
+                email,
+                password,
+            });
+        },
+    },
+    logout(token: string) {
+        return requestWithSupertest
+            .delete(`/api/v1/logout?access_token=${token}`)
+            .send();
+    },
 };
 
 const services = {

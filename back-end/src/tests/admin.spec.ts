@@ -1,9 +1,7 @@
 import timekeeper from 'timekeeper';
 import testing from '.';
 import config from '../modules/config';
-import { DatabaseConnection, DatabaseResolver } from '../modules/database';
-
-let dbConn: DatabaseConnection;
+import { DatabaseResolver } from '../modules/database';
 
 describe('admin', () => {
     beforeEach(async () => {
