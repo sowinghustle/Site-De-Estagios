@@ -5,57 +5,84 @@ import { Student } from '../../models/student';
 import { Supervisor } from '../../models/supervisor';
 import { User } from '../../models/user';
 import { UserRole } from '../../models/user-role';
+import { MapperDictionary } from '../config/helpers';
+import { mapObject } from '../config/utils';
 import {
     AccessTokenTable,
     AdminTable,
-    ResetPasswordTable,
+    ResetPasswordTable as ResetPasswordTokenTable,
     StudentTable,
     SupervisorTable,
     UserTable,
 } from './sequelize-tables';
 
-export function mapSequelizeAdminToModel(entity: AdminTable) {
-    return {
-        ...entity.toJSON(),
-        user: !entity.user ? undefined : mapSequelizeUserToModel(entity.user),
-    } as Admin;
-}
+const adminMapper: MapperDictionary<AdminTable, Admin> = {
+    id: 'id',
+    name: 'name',
+    user: (src) => mapSequelizeUserToModel(src.user),
+};
 
-export function mapSequelizeSupervisorToModel(entity: SupervisorTable) {
-    return {
-        ...entity.toJSON(),
-        user: !entity.user ? undefined : mapSequelizeUserToModel(entity.user),
-    } as Supervisor;
-}
+const supervisorMapper: MapperDictionary<SupervisorTable, Supervisor> = {
+    id: 'id',
+    name: 'name',
+    user: (src) => mapSequelizeUserToModel(src.user),
+};
 
-export function mapSequelizeStudentToModel(entity: StudentTable) {
-    return {
-        ...entity.toJSON(),
-        user: !entity.user ? undefined : mapSequelizeUserToModel(entity.user),
-    } as Student;
-}
+const studentMapper: MapperDictionary<StudentTable, Student> = {
+    id: 'id',
+    fullName: 'fullName',
+    user: (src) => mapSequelizeUserToModel(src.user),
+};
 
-export function mapSequelizeAccessTokenToModel(entity: AccessTokenTable) {
-    return {
-        ...entity.toJSON(),
-        user: !entity.user ? undefined : mapSequelizeUserToModel(entity.user),
-    } as AccessToken;
-}
+const userMapper: MapperDictionary<UserTable, User> = {
+    id: 'id',
+    email: 'email',
+    password: 'password',
+    role: (src) => {
+        const rolesMap: Record<string, UserRole> = {
+            admin: UserRole.Adm,
+            student: UserRole.Student,
+            supervisor: UserRole.Supervisor,
+        };
 
-export function mapSequelizeResetPasswordTokenToModel(
-    entity: ResetPasswordTable
-) {
-    return entity.toJSON() as ResetPasswordToken;
-}
+        return rolesMap[src.role];
+    },
+};
 
-export function mapSequelizeUserToModel(entity: UserTable) {
-    const rolesMap: Record<string, UserRole> = {
-        admin: UserRole.Adm,
-        student: UserRole.Student,
-        supervisor: UserRole.Supervisor,
-    };
+const accessTokenMapper: MapperDictionary<AccessTokenTable, AccessToken> = {
+    id: 'id',
+    token: 'token',
+    expiredAt: 'expiredAt',
+    expiresAt: 'expiresAt',
+    user: (src) => mapSequelizeUserToModel(src.user),
+};
 
-    const role = rolesMap[entity.role];
+const resetPasswordTokenMapper: MapperDictionary<
+    ResetPasswordTokenTable,
+    ResetPasswordToken
+> = {
+    id: 'id',
+    email: 'email',
+    expiredAt: 'expiredAt',
+    expiresAt: 'expiresAt',
+    token: 'token',
+};
 
-    return { ...entity.toJSON(), role } as User;
-}
+export const mapSequelizeAdminToModel = (entity: AdminTable) =>
+    mapObject(entity, adminMapper);
+
+export const mapSequelizeSupervisorToModel = (entity: SupervisorTable) =>
+    mapObject(entity, supervisorMapper);
+
+export const mapSequelizeStudentToModel = (entity: StudentTable) =>
+    mapObject(entity, studentMapper);
+
+export const mapSequelizeAccessTokenToModel = (entity: AccessTokenTable) =>
+    mapObject(entity, accessTokenMapper);
+
+export const mapSequelizeResetPasswordTokenToModel = (
+    entity: ResetPasswordTokenTable
+) => mapObject(entity, resetPasswordTokenMapper);
+
+export const mapSequelizeUserToModel = (entity: UserTable) =>
+    mapObject(entity, userMapper);
