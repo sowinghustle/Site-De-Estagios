@@ -77,8 +77,10 @@ export const mapSequelizeSupervisorToModel = (entity: SupervisorTable) =>
 export const mapSequelizeStudentToModel = (entity: StudentTable) =>
     mapObject(entity, studentMapper);
 
-export const mapSequelizeAccessTokenToModel = (entity: AccessTokenTable) =>
-    mapObject(entity, accessTokenMapper);
+export const mapSequelizeAccessTokenToModel = (
+    entity: AccessTokenTable,
+    ignoreError: boolean = false
+) => mapObject(entity, accessTokenMapper, ignoreError);
 
 export const mapSequelizeResetPasswordTokenToModel = (
     entity: ResetPasswordTokenTable

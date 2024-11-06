@@ -205,18 +205,23 @@ export function deepMerge<T>(target: T, source: DeepPartial<T>): T {
 
 export function mapObject<From extends object, To extends object>(
     sourceObject: From,
-    mapper: MapperDictionary<From, To>
+    mapper: MapperDictionary<From, To>,
+    ignoreError: boolean = false
 ): To {
     const result: Partial<To> = {};
 
     for (const toKey in mapper) {
-        const mapping = mapper[toKey];
+        const fromKey = mapper[toKey];
 
-        if (typeof mapping === 'function') {
-            result[toKey] = mapping(sourceObject);
-        } else if (typeof mapping === 'string' && mapping in sourceObject) {
+        if (typeof fromKey === 'function') {
+            try {
+                result[toKey] = fromKey(sourceObject);
+            } catch (err) {
+                if (!ignoreError) throw err;
+            }
+        } else if (typeof fromKey === 'string' && fromKey in sourceObject) {
             result[toKey] = sourceObject[
-                mapping as keyof From
+                fromKey as keyof From
             ] as unknown as To[typeof toKey];
         }
     }

@@ -311,7 +311,7 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
                 userId,
             });
 
-            return mapSequelizeAccessTokenToModel(model);
+            return mapSequelizeAccessTokenToModel(model, true);
         } catch (err) {
             this.error = err as Error;
         }

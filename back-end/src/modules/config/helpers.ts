@@ -8,6 +8,13 @@ export type Immutable<T> = {
     readonly [K in keyof T]: Immutable<T[K]>;
 };
 
+export function is<T>(
+    value: unknown,
+    constructor: new (...args: any[]) => T
+): value is T {
+    return value instanceof constructor;
+}
+
 export function deepFreeze<T extends object>(obj: T): Immutable<T> {
     Object.keys(obj).forEach((key) => {
         const prop = obj[key as keyof T];
