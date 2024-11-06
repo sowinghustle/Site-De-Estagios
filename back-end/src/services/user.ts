@@ -52,15 +52,13 @@ class UserService {
     }
 
     async ensureEmailIsInUse(email: string): Promise<void> {
-        const isEmailInUse = await this.verifyIfEmailIsInUse(email);
-        if (isEmailInUse) return;
-        throw new BadRequestError(config.messages.userWithEmailNotFound);
+        if (!(await this.verifyIfEmailIsInUse(email)))
+            throw new BadRequestError(config.messages.userWithEmailNotFound);
     }
 
     async ensureEmailIsNotInUse(email: string): Promise<void> {
-        const isEmailInUse = await this.verifyIfEmailIsInUse(email);
-        if (!isEmailInUse) return;
-        throw new BadRequestError(config.messages.emailAddressIsInUse);
+        if (await this.verifyIfEmailIsInUse(email))
+            throw new BadRequestError(config.messages.emailAddressIsInUse);
     }
 
     async comparePasswordsAsync(
@@ -81,8 +79,8 @@ class UserService {
             user,
             plainPassword
         );
-        if (passwordsMatch) return;
-        throw new BadRequestError(config.messages.wrongPassword);
+        if (!passwordsMatch)
+            throw new BadRequestError(config.messages.wrongPassword);
     }
 }
 

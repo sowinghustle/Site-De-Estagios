@@ -1,14 +1,14 @@
+import { requestWithSupertest } from '.';
 import config from '../modules/config';
-import { requestWithSupertest } from '../modules/config/testing';
 
 it('GET /healthcheck should return 200 status code', async () => {
-    const res = await requestWithSupertest.get('/healthcheck');
-    expect(res.status).toEqual(200);
+    await requestWithSupertest.get('/healthcheck').expect(200);
 });
 
 it('GET / should return correct message', async () => {
-    const res = await requestWithSupertest.get('/');
-    expect(res.text).toEqual(config.messages.welcomeMessage);
+    await requestWithSupertest
+        .get('/')
+        .expect(200, config.messages.welcomeMessage);
 });
 
 it('GET /not-existent-route should return 404', async () => {
@@ -16,7 +16,8 @@ it('GET /not-existent-route should return 404', async () => {
         success: false,
         message: config.messages.routeNotFound,
     };
-    const res = await requestWithSupertest.get('/non-existent-route');
-    expect(res.status).toEqual(404);
-    expect(res.body).toMatchObject(expectedResultValue);
+
+    await requestWithSupertest
+        .get('/non-existent-route')
+        .expect(404, expectedResultValue);
 });
