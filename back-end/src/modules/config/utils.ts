@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { ValidationError } from './errors';
+import { DeepPartial, MapperDictionary } from './helpers';
 
 type ValueOrError<T, E extends Error = Error> =
     | {
@@ -179,4 +180,46 @@ export function validateSchema<T>(
     }
 
     return validationResult.value;
+}
+
+export function deepMerge<T>(target: T, source: DeepPartial<T>): T {
+    for (const key in source) {
+        const targetValue = target[key];
+        const sourceValue = source[key];
+
+        if (
+            sourceValue &&
+            typeof sourceValue === 'object' &&
+            !Array.isArray(sourceValue)
+        ) {
+            target[key] = deepMerge(
+                { ...targetValue } as T[Extract<keyof T, string>],
+                sourceValue
+            ) as T[Extract<keyof T, string>];
+        } else {
+            target[key] = sourceValue as T[Extract<keyof T, string>];
+        }
+    }
+    return target;
+}
+
+export function mapObject<From extends object, To extends object>(
+    sourceObject: From,
+    mapper: MapperDictionary<From, To>
+): To {
+    const result: Partial<To> = {};
+
+    for (const toKey in mapper) {
+        const mapping = mapper[toKey];
+
+        if (typeof mapping === 'function') {
+            result[toKey] = mapping(sourceObject);
+        } else if (typeof mapping === 'string' && mapping in sourceObject) {
+            result[toKey] = sourceObject[
+                mapping as keyof From
+            ] as unknown as To[typeof toKey];
+        }
+    }
+
+    return result as To;
 }
