@@ -1,22 +1,12 @@
 import React from 'react';
 import { View, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
-
 import CustomButton from '../components/button/CustomButton';
-
 import { styles } from './styles';
 
 export default function HomeScreen() {
 
   const router = useRouter();
-
-  const PaginaLogin = () => {
-    router.push('/signin');
-  };
-
-  const PaginaRegister = () => {
-    router.push('/signup');
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -25,13 +15,19 @@ export default function HomeScreen() {
         <CustomButton 
           title="Login" 
           type="primary" 
-          onPress={PaginaLogin} 
+          onPress={() => router.push('/signin')}
         />
 
         <CustomButton 
           title="Cadastro" 
           type="secondary" 
-          onPress={PaginaRegister} 
+          onPress={() => router.push('/signup')}
+        />
+
+        <CustomButton 
+          title="Tela Admin" 
+          type="primary" 
+          onPress={() => router.push('/admin')}
         />
         
       </View>
