@@ -8,6 +8,7 @@ import { UserRole } from '../models/user-role';
 import app from '../modules/app';
 import { DeepPartial } from '../modules/config/helpers';
 import { deepMerge, toResult } from '../modules/config/utils';
+import adminService from '../services/admin';
 import hashService from '../services/hash';
 
 const accessToken = randomUUID();
@@ -52,11 +53,21 @@ const expectPromiseNotToBeUndefined = async <T>(promise: Promise<T>) => {
 };
 
 const requests = {
-    async loginAdmin(nameOrEmail: string, password: string) {
-        return await requestWithSupertest.post('/api/v1/admin/login').send({
-            nameOrEmail,
-            password,
-        });
+    admin: {
+        login(nameOrEmail: string, password: string) {
+            return requestWithSupertest.post('/api/v1/admin/login').send({
+                nameOrEmail,
+                password,
+            });
+        },
+    },
+};
+
+const services = {
+    admin: {
+        async saveNewAdmin(admin: Admin) {
+            return await adminService.saveNewAdmin({ ...admin });
+        },
     },
 };
 
@@ -195,6 +206,7 @@ export default Object.freeze({
     resetPasswordToken,
     accessToken,
     models,
+    services,
     requests,
     expectAuthResponseCookies,
     expectPromiseNotToReject,

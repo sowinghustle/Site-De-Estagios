@@ -196,8 +196,14 @@ export class SequelizeDatabaseConnection implements DatabaseConnection {
             const model = await AdminTable.findOne({
                 where: {
                     [Op.or]: [
-                        { name: nameOrEmail },
-                        { '$user.email$': nameOrEmail },
+                        Sequelize.where(
+                            Sequelize.fn('LOWER', Sequelize.col('name')),
+                            nameOrEmail.toLowerCase()
+                        ),
+                        Sequelize.where(
+                            Sequelize.fn('LOWER', Sequelize.col('user.email')),
+                            nameOrEmail.toLowerCase()
+                        ),
                     ],
                 },
                 include: [
