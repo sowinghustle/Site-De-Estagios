@@ -70,7 +70,7 @@ export default class SupervisorController {
 
         await toResult(
             emailService.sendNewUserEmail(supervisor.user)
-        ).getValueAsync();
+        ).waitAsync();
 
         return res.status(201).send({
             success: true,
