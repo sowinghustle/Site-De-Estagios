@@ -12,16 +12,15 @@ import adminService from '../services/admin';
 import hashService from '../services/hash';
 import studentService from '../services/student';
 import supervisorService from '../services/supervisor';
+import tokenService from '../services/token';
 
 const accessToken = randomUUID();
 const resetPasswordToken = randomUUID();
 
-jest.mock('../services/token', () => {
-    return {
-        generateAccessToken: () => accessToken,
-        generateResetPasswordToken: () => resetPasswordToken,
-    };
-});
+jest.spyOn(tokenService, 'generateAccessToken').mockReturnValue(accessToken);
+jest.spyOn(tokenService, 'generateResetPasswordToken').mockReturnValue(
+    resetPasswordToken
+);
 
 export const requestWithSupertest = supertest(app);
 
@@ -55,6 +54,31 @@ const expectPromiseNotToBeUndefined = async <T>(promise: Promise<T>) => {
 };
 
 const requests = {
+    user: {
+        me(token?: string) {
+            return requestWithSupertest
+                .get(`/api/v1/user/me?access_token=${token}`)
+                .send();
+        },
+        forgotPassword(email: string) {
+            return requestWithSupertest
+                .post('/api/v1/user/forgot-password')
+                .send({ email });
+        },
+        resetPasswordToken(data: {
+            email: string;
+            token: string;
+            newPassword: string;
+        }) {
+            return requestWithSupertest
+                .post('/api/v1/user/reset-password')
+                .send({
+                    email: data.email,
+                    token: data.token,
+                    newPassword: data.newPassword,
+                });
+        },
+    },
     admin: {
         login(nameOrEmail: string, password: string) {
             return requestWithSupertest.post('/api/v1/admin/login').send({
@@ -69,6 +93,21 @@ const requests = {
                 email,
                 password,
             });
+        },
+        register(data: {
+            name: string;
+            email: string;
+            password: string;
+            repeatPassword: string;
+        }) {
+            return requestWithSupertest
+                .post('/api/v1/supervisor/register')
+                .send({
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
+                    repeatPassword: data.repeatPassword,
+                });
         },
     },
     student: {

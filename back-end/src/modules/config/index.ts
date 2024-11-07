@@ -26,9 +26,12 @@ const messages = {
     wrongPassword: 'A senha está incorreta!',
 
     // good
-    successfullLogin: 'Login realizado com sucesso!',
-    successfullRegister: 'Cadastro realizado com sucesso!',
     welcomeMessage: 'Servidor ativo. API está disponível.',
+    successfullLogin: 'Login realizado com sucesso!',
+    successfullRegister: 'Cadastro realizado com sucesso.',
+    successfullPasswordReset: 'Senha alterada com sucesso.',
+    getSuccessfullRequestResetPassword: (email: string) =>
+        `Um código de uso único foi enviado para ${email}.`,
 
     // bad
     databaseImplNotDefined:

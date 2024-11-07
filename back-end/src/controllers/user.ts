@@ -45,7 +45,9 @@ export default class UserController {
 
         return res.send({
             success: true,
-            message: `Um código de uso único foi enviado para ${user.email}.`,
+            message: config.messages.getSuccessfullRequestResetPassword(
+                user.email
+            ),
             expiresAt,
         });
     }
@@ -82,7 +84,7 @@ export default class UserController {
 
         return res.send({
             success: true,
-            message: 'Sua senha foi resetada com sucesso!.',
+            message: config.messages.successfullPasswordReset,
         });
     }
 }
