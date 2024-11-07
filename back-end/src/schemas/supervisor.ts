@@ -4,7 +4,7 @@ import {
     NameSchema,
     PasswordSchema,
     RepeatPasswordSchema,
-} from '../modules/config/joi';
+} from '.';
 
 export const SupervisorLoginSchema = Joi.object<{
     email: string;

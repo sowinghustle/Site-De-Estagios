@@ -1,9 +1,5 @@
 import Joi from 'joi';
-import {
-    EmailSchema,
-    PasswordSchema,
-    ResetPasswordTokenSchema,
-} from '../modules/config/joi';
+import { EmailSchema, PasswordSchema, ResetPasswordTokenSchema } from '.';
 
 export const ForgotPasswordSchema = Joi.object<{ email: string }>({
     email: EmailSchema,

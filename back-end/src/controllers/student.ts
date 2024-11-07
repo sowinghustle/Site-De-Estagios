@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Student } from '../models/student';
 import config from '../modules/config';
-import { NotFoundError, UnhandledError } from '../modules/config/errors';
 import { toResult, validateSchema } from '../modules/config/utils';
+import { NotFoundError, UnhandledError } from '../modules/errors';
 import { StudentLoginSchema, StudentRegisterSchema } from '../schemas/student';
 import authService from '../services/auth';
 import emailService from '../services/email';

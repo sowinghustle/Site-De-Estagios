@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Admin } from '../models/admin';
 import config from '../modules/config';
-import { NotFoundError, UnhandledError } from '../modules/config/errors';
 import { toResult, validateSchema } from '../modules/config/utils';
+import { NotFoundError, UnhandledError } from '../modules/errors';
 import { AdminLoginSchema } from '../schemas/admin';
 import adminService from '../services/admin';
 import authService from '../services/auth';

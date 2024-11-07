@@ -4,7 +4,7 @@ import { ResetPasswordToken } from '../../models/reset-password-token';
 import { Student } from '../../models/student';
 import { Supervisor } from '../../models/supervisor';
 import { User } from '../../models/user';
-import { UnhandledError } from '../config/errors';
+import { UnhandledError } from '../errors';
 import { SequelizeDatabaseConnection } from './sequelize';
 
 export interface DatabaseConnection {

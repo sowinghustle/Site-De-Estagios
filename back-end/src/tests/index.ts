@@ -10,6 +10,8 @@ import { DeepPartial } from '../modules/config/helpers';
 import { deepMerge, toResult } from '../modules/config/utils';
 import adminService from '../services/admin';
 import hashService from '../services/hash';
+import studentService from '../services/student';
+import supervisorService from '../services/supervisor';
 
 const accessToken = randomUUID();
 const resetPasswordToken = randomUUID();
@@ -76,6 +78,19 @@ const requests = {
                 password,
             });
         },
+        register(data: {
+            fullName: string;
+            email: string;
+            password: string;
+            repeatPassword: string;
+        }) {
+            return requestWithSupertest.post('/api/v1/student/register').send({
+                fullName: data.fullName,
+                email: data.email,
+                password: data.password,
+                repeatPassword: data.repeatPassword,
+            });
+        },
     },
     logout(token: string) {
         return requestWithSupertest
@@ -88,6 +103,16 @@ const services = {
     admin: {
         async saveNewAdmin(admin: Admin) {
             return await adminService.saveNewAdmin({ ...admin });
+        },
+    },
+    student: {
+        async saveNewStudent(student: Student) {
+            return await studentService.saveNewStudent({ ...student });
+        },
+    },
+    supervisor: {
+        async saveNewSupervisor(supervisor: Supervisor) {
+            return await supervisorService.saveNewSupervisor({ ...supervisor });
         },
     },
 };
@@ -223,7 +248,7 @@ const models = {
     },
 };
 
-export default Object.freeze({
+const testing = Object.freeze({
     resetPasswordToken,
     accessToken,
     models,
@@ -233,3 +258,5 @@ export default Object.freeze({
     expectPromiseNotToReject,
     expectPromiseNotToBeUndefined,
 });
+
+export default testing;

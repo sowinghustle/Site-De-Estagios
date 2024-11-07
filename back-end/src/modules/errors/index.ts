@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import config from '.';
+import config from '../config';
 
 export class UnauthorizedError extends Error {
     readonly name = 'UnauthorizedError';

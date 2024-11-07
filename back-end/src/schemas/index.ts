@@ -1,17 +1,20 @@
 import Joi from 'joi';
-import config from '.';
+import config from '../modules/config';
 
 const NameSchemaNoMessages = Joi.string()
     .pattern(/^[a-zA-Z ]+$/)
+    .lowercase()
     .required();
 
 const AdminNameSchemaNoMessages = Joi.string()
     .pattern(/^[a-zA-Z0-9 ]+$/)
+    .lowercase()
     .required();
 
 const EmailSchemaNoMessages = Joi.string()
     .email()
     .max(config.validations.maxEmailLength)
+    .lowercase()
     .required();
 
 export const AdminNameSchema = AdminNameSchemaNoMessages.messages({

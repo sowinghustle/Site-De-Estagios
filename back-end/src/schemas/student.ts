@@ -4,7 +4,7 @@ import {
     NameSchema,
     PasswordSchema,
     RepeatPasswordSchema,
-} from '../modules/config/joi';
+} from '.';
 
 export const StudentLoginSchema = Joi.object<{
     email: string;

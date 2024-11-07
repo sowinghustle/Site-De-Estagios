@@ -9,7 +9,7 @@ import { Supervisor } from '../../models/supervisor';
 import { User } from '../../models/user';
 import { UserRole } from '../../models/user-role';
 import config from '../config';
-import { UnhandledError } from '../config/errors';
+import { UnhandledError } from '../errors';
 import {
     mapSequelizeAccessTokenToModel,
     mapSequelizeAdminToModel,

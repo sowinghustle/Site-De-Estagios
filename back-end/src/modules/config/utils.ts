@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { ValidationError } from './errors';
+import { ValidationError } from '../errors';
 import { DeepPartial, MapperDictionary } from './helpers';
 
 type ValueOrError<T, E extends Error = Error> =

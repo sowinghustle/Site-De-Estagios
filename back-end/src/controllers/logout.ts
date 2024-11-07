@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { UnauthorizedError } from '../modules/config/errors';
+import { UnauthorizedError } from '../modules/errors';
 import authService from '../services/auth';
 
 export default class LogoutController {

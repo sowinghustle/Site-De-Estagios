@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Supervisor } from '../models/supervisor';
 import config from '../modules/config';
-import { NotFoundError, UnhandledError } from '../modules/config/errors';
 import { toResult, validateSchema } from '../modules/config/utils';
+import { NotFoundError, UnhandledError } from '../modules/errors';
 import {
     SupervisorLoginSchema,
     SupervisorRegisterSchema,
