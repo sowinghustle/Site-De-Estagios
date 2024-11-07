@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, SafeAreaView, Text, Image } from 'react-native';
 import { Link } from 'expo-router';
 
+import logo from '../../assets/images/LogoEstagioRed.png'
 import CustomButton from '../../components/button/CustomButton';
 import CustomInput from '../../components/input/CustomInput';
 
@@ -42,7 +43,7 @@ export default function SignIn() {
       <View style={signin.innerContainer}>
         
         <Image 
-          source={require('../../assets/images/Logo1.png')}
+          source={logo}
           style={signin.logoImage}
           resizeMode="contain"
         />
