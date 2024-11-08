@@ -23,6 +23,14 @@ const styles = StyleSheet.create({
     borderColor: '#B11116',
     borderBottomWidth: 1,
   },
+  
+  header: {
+    fontSize: 24,        // Tamanho maior do texto, como um título
+    fontWeight: '500',   // Peso da fonte para um visual mais forte
+    textAlign: 'center', // Alinhando o texto ao centro
+    marginVertical: 20,  // Espaçamento acima e abaixo
+    color: 'black',      // Cor do título
+  },
 });
 
 // =============================================================================

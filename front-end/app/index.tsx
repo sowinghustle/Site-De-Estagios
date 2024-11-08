@@ -25,9 +25,9 @@ export default function HomeScreen() {
         />
 
         <CustomButton 
-          title="Tela Admin" 
+          title="Aluno" 
           type="primary" 
-          onPress={() => router.push('/admin')}
+          onPress={() => router.push('/aluno')}
         />
         
       </View>
