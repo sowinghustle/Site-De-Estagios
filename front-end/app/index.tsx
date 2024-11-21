@@ -25,9 +25,15 @@ export default function HomeScreen() {
         />
 
         <CustomButton 
-          title="Aluno" 
+          title="Tela do Aluno" 
           type="primary" 
           onPress={() => router.push('/aluno')}
+        />
+
+        <CustomButton 
+          title="Tela do Orientador" 
+          type="secondary" 
+          onPress={() => router.push('/orientador')}
         />
         
       </View>

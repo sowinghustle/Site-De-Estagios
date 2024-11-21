@@ -25,16 +25,17 @@ const styles = StyleSheet.create({
   },
   
   header: {
-    fontSize: 24,        // Tamanho maior do texto, como um título
-    fontWeight: '500',   // Peso da fonte para um visual mais forte
-    textAlign: 'center', // Alinhando o texto ao centro
-    marginVertical: 20,  // Espaçamento acima e abaixo
-    color: 'black',      // Cor do título
+    fontSize: 24,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginVertical: 20,
+    color: 'black',
   },
 });
 
 // =============================================================================
 
+// Tela de login
 const signin = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
@@ -82,6 +83,7 @@ const signin = StyleSheet.create({
 
 // =============================================================================
 
+// Tela de Cadastro
 const signup = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
@@ -127,4 +129,14 @@ const signup = StyleSheet.create({
   },
 });
 
-export { styles, signin, signup };
+// =============================================================================
+
+// Tela de estagio
+const estagio = StyleSheet.create({
+  containerButton:
+  {
+    marginTop: 20,
+  }
+});
+
+export { styles, signin, signup, estagio };
