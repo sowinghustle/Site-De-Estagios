@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
 // =============================================================================
 
 // Tela de login
-const signin = StyleSheet.create({
+const login = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     flex: 1,
@@ -58,7 +58,7 @@ const signin = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     marginVertical: 10,
   },
-  linkForgotPassword: {
+  linkRecuperarSenha: {
     textAlign: 'left',
     fontSize: 17,
     fontWeight: 400,
@@ -84,7 +84,7 @@ const signin = StyleSheet.create({
 // =============================================================================
 
 // Tela de Cadastro
-const signup = StyleSheet.create({
+const cadastro = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     flex: 1,
@@ -106,7 +106,7 @@ const signup = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     marginVertical: 10,
   },
-  linkForgotPassword: {
+  linkRecuperarSenha: {
     textAlign: 'left',
     fontSize: 17,
     fontWeight: 400,
@@ -136,7 +136,58 @@ const estagio = StyleSheet.create({
   containerButton:
   {
     marginTop: 20,
-  }
+  },
 });
 
-export { styles, signin, signup, estagio };
+// =============================================================================
+
+// Informações do Usuario - Configurações
+
+const configuracoes = StyleSheet.create({
+  informacaoPerfil: 
+  {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingBottom: 10,
+  },
+  informacaoItem: 
+  {
+    backgroundColor: '#666666',
+    borderRadius: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    width: '230%',
+  },
+  informacaoNome: 
+  {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 24,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    maxWidth: '90%',
+  },
+  informacaoEmail: 
+  {
+    color: 'white',
+    fontSize: 18,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    maxWidth: '100%',  
+  },
+  botoesPerfil: 
+  {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginBottom: 10,
+    marginRight: 25,
+    marginLeft: 10,
+    width: '25%',
+  },
+});
+
+export { styles, login, cadastro, estagio, configuracoes };

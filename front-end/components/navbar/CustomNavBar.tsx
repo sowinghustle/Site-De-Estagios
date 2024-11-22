@@ -10,6 +10,7 @@ interface NavMenuProps {
 }
 
 const NavMenu: React.FC<NavMenuProps> = ({ userType }) => {
+
   const router = useRouter();
   
   const [usuarioFoto, SetUsuarioFoto] = useState({ uri: 'https://randomuser.me/api/portraits/men/36.jpg' });
@@ -28,19 +29,21 @@ const NavMenu: React.FC<NavMenuProps> = ({ userType }) => {
   const alunoRoutes = [
     { name: 'Meu Estágio', icon: 'briefcase-clock', route: '/estagio' },
     { name: 'Meus Documentos', icon: 'file', route: '/documentos' },
-    { name: 'Minhas Notificações', icon: 'bell', route: '/NotificacoesAluno' },
+    { name: 'Minhas Notificações', icon: 'bell', route: '/notificacoesAluno' },
     { name: 'Configurações', icon: 'cog', route: '/configuracoesAluno' }
   ];
 
   const orientadorRoutes = [
-    { name: 'Empresas Registradas', icon: 'office-building', route: '/empresas' },
-    { name: 'Alunos Registrados', icon: 'account-group', route: '/alunos' },
-    { name: 'Cursos Registrados', icon: 'book-open-variant', route: '/cursos' },
-    { name: 'Minhas Notificações', icon: 'bell', route: '/NotificacoesOrientador' },
+    { name: 'Empresas Registradas', icon: 'office-building', route: '/empresasRegistradas' },
+    { name: 'Alunos Registrados', icon: 'account-group', route: '/alunosRegistrados' },
+    { name: 'Cursos Registrados', icon: 'book-open-variant', route: '/cursosRegistrados' },
+    { name: 'Minhas Notificações', icon: 'bell', route: '/notificacoesOrientador' },
     { name: 'Configurações', icon: 'cog', route: '/configuracoesOrientador' }
   ];
 
   const routes = userType === 'aluno' ? alunoRoutes : orientadorRoutes;
+
+  const configuracoesRoute = userType === 'aluno' ? '/configuracoesAluno' : '/configuracoesOrientador';
 
   return (
     <View style={styles.navContainer}>
@@ -78,7 +81,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ userType }) => {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <ListItem containerStyle={styles.footerItem} bottomDivider>
+        <ListItem containerStyle={styles.footerItem} bottomDivider onPress={() => router.push(configuracoesRoute)}>
           <Avatar rounded source={usuarioFoto} />
           <ListItem.Content>
             <ListItem.Title style={styles.footerName}>{usuario}</ListItem.Title>

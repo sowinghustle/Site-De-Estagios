@@ -11,17 +11,13 @@ interface CustomContainerProps
 const CustomContainer: React.FC<CustomContainerProps> = ({ children, title }) => {
   return (
     <View style={styles.container}>
-      
-      {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.title}>{title}</Text>
       </View>
 
-      {/* Conteudos */}
       <View style={styles.childrenContainer}>
         {children}
       </View>
-      
     </View>
   );
 };

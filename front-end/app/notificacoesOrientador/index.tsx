@@ -9,14 +9,6 @@ import CustomContainer from '../../components/container/CustomContainer';
 
 export default function NotificacoesOrientador() 
 {
-  
-  const paths = ['Home', 'Minhas Notificações'];
-  const router = useRouter();
-
-  const handleNavigate = (index: number) => {
-    const route = paths.slice(0, index + 1).join('/');
-    console.log(route);
-  };
 
   return (
     <SafeAreaView style={styles.container}>

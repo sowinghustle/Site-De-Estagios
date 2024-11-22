@@ -15,13 +15,13 @@ export default function HomeScreen() {
         <CustomButton 
           title="Login" 
           type="primary" 
-          onPress={() => router.push('/signin')}
+          onPress={() => router.push('/login')}
         />
 
         <CustomButton 
           title="Cadastro" 
           type="secondary" 
-          onPress={() => router.push('/signup')}
+          onPress={() => router.push('/cadastro')}
         />
 
         <CustomButton 

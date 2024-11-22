@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 12,
@@ -13,13 +13,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     marginTop: 20,
-    flex: 1,
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     backgroundColor: '#fff',
-    borderRadius: 20,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#B11116",
     padding: 12,
     elevation: 2,
     shadowColor: '#000',
@@ -27,18 +28,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     marginBottom: 30,
-    marginLeft: 5,
-    width: '99%',
+    width: '100%',
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'semibold',
-    color: '#000', 
+    fontSize: 18,
+    fontWeight: '600',
+    color: "#000",
   },
-  childrenContainer: 
-  {
+  childrenContainer: {
     flex: 1,
-    marginLeft: 8,
+    marginLeft: 15,
+    marginRight: 15,
   },
 });
 

@@ -10,14 +10,6 @@ import CustomContainer from '../../components/container/CustomContainer';
 
 export default function Estagio() 
 {
-  
-  const paths = ['Home', 'Meus Documentos'];
-  const router = useRouter();
-
-  const handleNavigate = (index: number) => {
-    const route = paths.slice(0, index + 1).join('/');
-    console.log(route);
-  };
 
   return (
     <SafeAreaView style={styles.container}>
