@@ -22,11 +22,7 @@ export default function ConfiguracoesAluno() {
   const [telefone1, setTelefone1] = useState("");
   const [telefone2, setTelefone2] = useState("");
   const [website, setWebsite] = useState("");
-  const [departamento, setDepartamento] = useState(""); 
-  const [nomeSupervisor, setNomeSupervisor] = useState(""); 
-  const [cargoSupervisor, setCargoSupervisor] = useState("");
-  const [emailSupervisor, setEmailSupervisor] = useState("");
-
+  
   const handleSalvarDados = () => {
     console.log('Dados salvos!');
   };
@@ -34,7 +30,7 @@ export default function ConfiguracoesAluno() {
   return (
     <SafeAreaView style={styles.container}>
       
-      <CustomNavBar userType="aluno" />
+      <CustomNavBar userType="orientador" />
 
       <ScrollView contentContainerStyle={styles.content}>
         <CustomSearch />
@@ -47,28 +43,7 @@ export default function ConfiguracoesAluno() {
           <CustomInput label="Endereço" placeholder="Endereço da empresa, n° - Bairro, Cidade, Estado" onChangeText={setEndereco} />
           <CustomInput label="Telefone 1" placeholder="+99 (99) 99999-9999" onChangeText={setTelefone1} />
           <CustomInput label="Telefone 2" placeholder="+99 (99) 99999-9999" onChangeText={setTelefone2} />
-          <CustomInput label="Website da empresa" placeholder="Cole o link do site da empresa" onChangeText={setWebsite} />
-          <hr/>
-        </CustomContainer>
-
-        <CustomContainer title="Informações do Estágio">
-          <CustomInput label="Departamento de aplicação do estágio" placeholder="Digite o departamento" onChangeText={setDepartamento} />
-          <CustomInput label="Nome do supervisor de estágio" placeholder="Digite o nome do supervisor" onChangeText={setNomeSupervisor} />
-          <CustomInput label="Cargo do supervisor de estágio" placeholder="Digite o cargo do supervisor" onChangeText={setCargoSupervisor} />
-          <CustomInput label="Email do supervisor de estágio" placeholder="Digite o email do supervisor" onChangeText={setEmailSupervisor} />
-          <hr/>
-          <hr/>
-          <hr/>
-          <hr/>
-          <CustomInput label="Estagio obrigatorio?" placeholder="Sim / Não " onChangeText={setEmailSupervisor} />
-          <CustomInput label="Data de inicio do estagio" placeholder="00/00/0000" onChangeText={setEmailSupervisor} />
-          <CustomInput label="Data de termino do estagio" placeholder="00/00/0000" onChangeText={setEmailSupervisor} />
-          <CustomInput label="Dias de estagio" placeholder="Ex. Segunda, Terça e Quarta" onChangeText={setEmailSupervisor} />
-          <CustomInput label="Horario de estagio" placeholder="Ex. 06:30 ás 12:30" onChangeText={setEmailSupervisor} />
-          <CustomInput label="Valor da bolsa do estagio" placeholder="R$ 0,00" onChangeText={setEmailSupervisor} />
-          <CustomInput label="Auxilio Transporte" placeholder="R$ 0,00" onChangeText={setEmailSupervisor} />
-          <CustomInput label="Situação de Trabalho" placeholder="Presencial / Hibrido / Remoto" onChangeText={setEmailSupervisor} />
-          <CustomInput label="Resumo das Atividades do estagio" placeholder="Faça um breve resumo aqui" onChangeText={setEmailSupervisor} />
+          <CustomInput label="Website da empresa" placeholder="Cole o link do site da empresa" onChangeText={setWebsite} />     
           <hr/>
           <CustomButton title="Enviar" type="primary" onPress={handleSalvarDados} />
           <hr/>
