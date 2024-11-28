@@ -1,19 +1,16 @@
-import adminService from './admin/service';
-import app from './app';
-import config from './config';
-import { toPromiseResult } from './config/utils';
+import app from './modules/app';
+import config from './modules/config';
+import adminService from './services/admin';
 
 app.listen(config.project.port, async () => {
     if (config.project.environment === 'development') {
-        await toPromiseResult(
-            adminService.saveNewAdmin({
-                name: config.instituition.adminName,
-                user: {
-                    email: config.instituition.adminEmail,
-                    password: config.instituition.adminPassword,
-                },
-            })
-        ).orElseThrow();
+        await adminService.saveNewAdmin({
+            name: config.instituition.adminName,
+            user: {
+                email: config.instituition.adminEmail,
+                password: config.instituition.adminPassword,
+            },
+        });
     }
 
     console.log('Server running at port ' + config.project.port);

@@ -12,7 +12,8 @@ module.exports = {
                     {
                         email: config.instituition.adminEmail,
                         password:
-                            await config.instituition.encryptedAdminPassword,
+                            await config.instituition
+                                .encryptedAdminPasswordAsync,
                         role: 'admin',
                     },
                 ],
