@@ -15,19 +15,25 @@ export default function HomeScreen() {
         <CustomButton 
           title="Login" 
           type="primary" 
-          onPress={() => router.push('/signin')}
+          onPress={() => router.push('/login')}
         />
 
         <CustomButton 
           title="Cadastro" 
           type="secondary" 
-          onPress={() => router.push('/signup')}
+          onPress={() => router.push('/cadastro')}
         />
 
         <CustomButton 
-          title="Tela Admin" 
+          title="Tela do Aluno" 
           type="primary" 
-          onPress={() => router.push('/admin')}
+          onPress={() => router.push('/aluno')}
+        />
+
+        <CustomButton 
+          title="Tela do Orientador" 
+          type="secondary" 
+          onPress={() => router.push('/orientador')}
         />
         
       </View>

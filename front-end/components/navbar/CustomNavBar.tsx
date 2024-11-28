@@ -5,15 +5,17 @@ import { useRouter } from 'expo-router';
 import styles from './styles';
 import logo from '../../assets/images/LogoEstagioWhite.png';
 
-const NavMenu = () => {
+interface NavMenuProps {
+  userType: 'aluno' | 'orientador';
+}
+
+const NavMenu: React.FC<NavMenuProps> = ({ userType }) => {
 
   const router = useRouter();
   
-  const [usuarioFoto, SetUsuarioFoto] = useState({uri: 'https://randomuser.me/api/portraits/men/36.jpg'})
-  
+  const [usuarioFoto, SetUsuarioFoto] = useState({ uri: 'https://randomuser.me/api/portraits/men/36.jpg' });
   const [usuario, setUsuario] = useState('Usuariano da Silva');
   const [email, setEmail] = useState('user.silva@fatec.sp.gov.br');
-
   const [activeButton, setActiveButton] = useState<string | null>(null);
 
   const handlePressIn = (buttonName: string) => {
@@ -24,22 +26,33 @@ const NavMenu = () => {
     setActiveButton(null);
   };
 
-  const routes = [
-    { name: 'Meus Estágios', icon: 'briefcase-clock', route: '/meus-estagios' },
-    { name: 'Meus Documentos', icon: 'file', route: '/meus-documentos' },
-    { name: 'Empresas Registradas', icon: 'office-building', route: '/empresas-registradas' },
-    { name: 'Alunos Registrados', icon: 'account-group', route: '/alunos-registrados' },
-    { name: 'Cursos Registrados', icon: 'book-open-variant', route: '/cursos-registrados' },
-    { name: 'Minhas Notificações', icon: 'bell', route: '/minhas-notificacoes' },
-    { name: 'Configurações', icon: 'cog', route: '/configuracoes' }
+  const alunoRoutes = [
+    { name: 'Meu Estágio', icon: 'briefcase-clock', route: '/estagio' },
+    { name: 'Meus Documentos', icon: 'file', route: '/documentos' },
+    { name: 'Minhas Notificações', icon: 'bell', route: '/notificacoesAluno' },
+    { name: 'Configurações', icon: 'cog', route: '/configuracoesAluno' }
   ];
+
+  const orientadorRoutes = [
+    { name: 'Empresas Registradas', icon: 'office-building', route: '/empresasRegistradas' },
+    { name: 'Alunos Registrados', icon: 'account-group', route: '/alunosRegistrados' },
+    { name: 'Cursos Registrados', icon: 'book-open-variant', route: '/cursosRegistrados' },
+    { name: 'Minhas Notificações', icon: 'bell', route: '/notificacoesOrientador' },
+    { name: 'Configurações', icon: 'cog', route: '/configuracoesOrientador' }
+  ];
+
+  const routes = userType === 'aluno' ? alunoRoutes : orientadorRoutes;
+
+  const configuracoesRoute = userType === 'aluno' ? '/configuracoesAluno' : '/configuracoesOrientador';
 
   return (
     <View style={styles.navContainer}>
       
       {/* Header */}
       <View style={styles.header}>
-        <Image source={logo} style={styles.logo} />
+        <TouchableOpacity onPress={() => router.push({ pathname: '/' })}>
+          <Image source={logo} style={styles.logo} />
+        </TouchableOpacity>
       </View>
 
       {/* Menu */}
@@ -47,7 +60,7 @@ const NavMenu = () => {
         {routes.map((item, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => router.push({pathname: item.route as any })}
+            onPress={() => router.push({ pathname: item.route, params: {} })}
             onPressIn={() => handlePressIn(item.name)}
             onPressOut={handlePressOut}
             style={[
@@ -68,11 +81,8 @@ const NavMenu = () => {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <ListItem containerStyle={styles.footerItem} bottomDivider>
-          <Avatar
-            rounded
-            source={usuarioFoto} // Substitua pela foto da API
-          />
+        <ListItem containerStyle={styles.footerItem} bottomDivider onPress={() => router.push(configuracoesRoute)}>
+          <Avatar rounded source={usuarioFoto} />
           <ListItem.Content>
             <ListItem.Title style={styles.footerName}>{usuario}</ListItem.Title>
             <ListItem.Subtitle style={styles.footerEmail}>{email}</ListItem.Subtitle>

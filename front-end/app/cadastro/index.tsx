@@ -5,16 +5,17 @@ import { Link } from 'expo-router';
 import logo from '../../assets/images/LogoEstagioRed.png'
 import CustomButton from '../../components/button/CustomButton';
 import CustomInput from '../../components/input/CustomInput';
+import CustomCheckBox from '../../components/checkbox/CustomCheckBox';
 
-import { styles, signin } from '../styles';
+import { styles, cadastro } from '../styles';
 
-export default function SignIn() {
+export default function Cadastro() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [emailError, setEmailError] = useState('');
   const [senhaError, setSenhaError] = useState('');
 
-  const handleSignIn = () => {
+  const handleCadastro = () => {
     
     setEmailError('');
     setSenhaError('');
@@ -39,16 +40,23 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView style={signin.container}>
-      <View style={signin.innerContainer}>
+    <SafeAreaView style={cadastro.container}>
+      <View style={cadastro.innerContainer}>
         
         <Image 
           source={logo}
-          style={signin.logoImage}
+          style={cadastro.logoImage}
           resizeMode="contain"
         />
 
-        <Text style={signin.header}>Bem vindo ao nosso sistema!</Text>
+        <Text style={cadastro.header}>Bem vindo ao nosso sistema!</Text>
+
+        <CustomInput 
+          label="Nome Completo"
+          placeholder="Digite seu nome"
+          onChangeText={setEmail}
+          errorMessage={emailError}
+        />
 
         <CustomInput 
           label="Endereço de email"
@@ -66,15 +74,28 @@ export default function SignIn() {
           errorMessage={senhaError}
         />
 
-        <Text style={signin.linkForgotPassword}>Esqueceu sua senha? <Link style={styles.link} href={'/forgotPassword'}>Redefinir Senha</Link></Text>
+        <CustomInput 
+          label="Confirmação de Senha"
+          placeholder="Digite sua senha"
+          iconName="eye"
+          onChangeText={setSenha}
+          secureTextEntry={true}
+          errorMessage={senhaError}
+        />
+
+        <View style={cadastro.viewCheckBox}>
+          <CustomCheckBox />
+          <Text style={cadastro.linkRecuperarSenha}>Estou de acordo com as </Text>
+          <Link style={styles.link} href={'/politicas'}>politicas e diretrizes</Link>
+        </View>
 
         <CustomButton 
           title="Acessar o Sistema" 
           type="primary" 
-          onPress={handleSignIn} 
+          onPress={handleCadastro} 
         />
         
-        <Text style={signin.linkText}>Ainda não tem uma conta? <Link style={styles.link} href={'/signup'}>Criar uma Conta</Link></Text>
+        <Text style={cadastro.linkText}> Já tem uma conta? <Link style={styles.link} href={'/login'}>Acessar Agora</Link></Text>
 
       </View>
     </SafeAreaView>

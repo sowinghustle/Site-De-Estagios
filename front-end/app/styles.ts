@@ -23,11 +23,20 @@ const styles = StyleSheet.create({
     borderColor: '#B11116',
     borderBottomWidth: 1,
   },
+  
+  header: {
+    fontSize: 24,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginVertical: 20,
+    color: 'black',
+  },
 });
 
 // =============================================================================
 
-const signin = StyleSheet.create({
+// Tela de login
+const login = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     flex: 1,
@@ -49,7 +58,7 @@ const signin = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     marginVertical: 10,
   },
-  linkForgotPassword: {
+  linkRecuperarSenha: {
     textAlign: 'left',
     fontSize: 17,
     fontWeight: 400,
@@ -74,7 +83,8 @@ const signin = StyleSheet.create({
 
 // =============================================================================
 
-const signup = StyleSheet.create({
+// Tela de Cadastro
+const cadastro = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     flex: 1,
@@ -96,7 +106,7 @@ const signup = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     marginVertical: 10,
   },
-  linkForgotPassword: {
+  linkRecuperarSenha: {
     textAlign: 'left',
     fontSize: 17,
     fontWeight: 400,
@@ -119,4 +129,65 @@ const signup = StyleSheet.create({
   },
 });
 
-export { styles, signin, signup };
+// =============================================================================
+
+// Tela de estagio
+const estagio = StyleSheet.create({
+  containerButton:
+  {
+    marginTop: 20,
+  },
+});
+
+// =============================================================================
+
+// Informações do Usuario - Configurações
+
+const configuracoes = StyleSheet.create({
+  informacaoPerfil: 
+  {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingBottom: 10,
+  },
+  informacaoItem: 
+  {
+    backgroundColor: '#666666',
+    borderRadius: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    width: '230%',
+  },
+  informacaoNome: 
+  {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 24,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    maxWidth: '90%',
+  },
+  informacaoEmail: 
+  {
+    color: 'white',
+    fontSize: 18,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    maxWidth: '100%',  
+  },
+  botoesPerfil: 
+  {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginBottom: 10,
+    marginRight: 25,
+    marginLeft: 10,
+    width: '25%',
+  },
+});
+
+export { styles, login, cadastro, estagio, configuracoes };

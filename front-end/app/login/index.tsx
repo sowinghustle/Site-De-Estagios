@@ -5,17 +5,17 @@ import { Link } from 'expo-router';
 import logo from '../../assets/images/LogoEstagioRed.png'
 import CustomButton from '../../components/button/CustomButton';
 import CustomInput from '../../components/input/CustomInput';
-import CustomCheckBox from '../../components/checkbox/CustomCheckBox';
 
-import { styles, signup } from '../styles';
+import { styles, login } from '../styles';
 
-export default function SignUp() {
+export default function Login() {
+  
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [emailError, setEmailError] = useState('');
   const [senhaError, setSenhaError] = useState('');
 
-  const handleSignUp = () => {
+  const handleLogin = () => {
     
     setEmailError('');
     setSenhaError('');
@@ -40,23 +40,16 @@ export default function SignUp() {
   };
 
   return (
-    <SafeAreaView style={signup.container}>
-      <View style={signup.innerContainer}>
+    <SafeAreaView style={login.container}>
+      <View style={login.innerContainer}>
         
         <Image 
           source={logo}
-          style={signup.logoImage}
+          style={login.logoImage}
           resizeMode="contain"
         />
 
-        <Text style={signup.header}>Bem vindo ao nosso sistema!</Text>
-
-        <CustomInput 
-          label="Nome Completo"
-          placeholder="Digite seu nome"
-          onChangeText={setEmail}
-          errorMessage={emailError}
-        />
+        <Text style={login.header}>Bem vindo ao nosso sistema!</Text>
 
         <CustomInput 
           label="Endereço de email"
@@ -74,28 +67,15 @@ export default function SignUp() {
           errorMessage={senhaError}
         />
 
-        <CustomInput 
-          label="Confirmação de Senha"
-          placeholder="Digite sua senha"
-          iconName="eye"
-          onChangeText={setSenha}
-          secureTextEntry={true}
-          errorMessage={senhaError}
-        />
-
-        <View style={signup.viewCheckBox}>
-          <CustomCheckBox />
-          <Text style={signup.linkForgotPassword}>Estou de acordo com as </Text>
-          <Link style={styles.link} href={'/policies'}>politicas e diretrizes</Link>
-        </View>
+        <Text style={login.linkRecuperarSenha}>Esqueceu sua senha? <Link style={styles.link} href={'/recuperarSenha'}>Redefinir Senha</Link></Text>
 
         <CustomButton 
           title="Acessar o Sistema" 
           type="primary" 
-          onPress={handleSignUp} 
+          onPress={handleLogin} 
         />
         
-        <Text style={signup.linkText}> Já tem uma conta? <Link style={styles.link} href={'/signin'}>Acessar Agora</Link></Text>
+        <Text style={login.linkText}>Ainda não tem uma conta? <Link style={styles.link} href={'/cadastro'}>Criar uma Conta</Link></Text>
 
       </View>
     </SafeAreaView>
