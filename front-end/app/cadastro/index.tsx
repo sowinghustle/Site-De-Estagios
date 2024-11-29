@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, SafeAreaView, Text, Image } from 'react-native';
 import { Link } from 'expo-router';
 
+import { useRouter } from 'expo-router';
+
 import logo from '../../assets/images/LogoEstagioRed.png'
 import CustomButton from '../../components/button/CustomButton';
 import CustomInput from '../../components/input/CustomInput';
@@ -9,20 +11,36 @@ import CustomCheckBox from '../../components/checkbox/CustomCheckBox';
 
 import { styles, cadastro } from '../styles';
 
+import axios from 'axios';
+
 export default function Cadastro() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [nome, setNome] = useState('');
   const [emailError, setEmailError] = useState('');
   const [senhaError, setSenhaError] = useState('');
+  const [nomeError, setNomeError] = useState('');
 
-  const handleCadastro = () => {
+  const router = useRouter();
+
+  const handleCadastro = async () => {
     
     setEmailError('');
     setSenhaError('');
+    setNomeError('');
 
     if (email && senha) {
 
-      alert('Acessando o sistema');
+      try {
+        await axios.post('http://localhost:8000/api/v1/student/register', {
+          nome: nome, 
+          email: email,
+          senha: senha,
+        });
+        router.push('/login');
+      } catch (error) {
+        console.error(error);
+      }
     } 
     else 
     {
@@ -34,7 +52,12 @@ export default function Cadastro() {
       {
         setSenhaError("Digite uma senha");
       }
+      if (!nome) 
+      {
+        setSenhaError("Digite um nome");
+      }
       alert('Por favor, preencha todos os campos');
+
     }
     
   };
@@ -54,8 +77,8 @@ export default function Cadastro() {
         <CustomInput 
           label="Nome Completo"
           placeholder="Digite seu nome"
-          onChangeText={setEmail}
-          errorMessage={emailError}
+          onChangeText={setNome}
+          errorMessage={nomeError}
         />
 
         <CustomInput 
@@ -90,7 +113,7 @@ export default function Cadastro() {
         </View>
 
         <CustomButton 
-          title="Acessar o Sistema" 
+          title="Cadastrar-se" 
           type="primary" 
           onPress={handleCadastro} 
         />

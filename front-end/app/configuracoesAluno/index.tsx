@@ -84,7 +84,7 @@ export default function ConfiguracoesAluno() {
           <CustomInput label="Cidade" placeholder="Digite sua cidade" onChangeText={setCidade} />
           <CustomInput label="Estado" placeholder="Digite seu estado" onChangeText={setEstado} />
           <br />
-          <CustomButton title="Salvar" type="primary" onPress={handleSalvarDados} />
+          <CustomButton title="Enviar" type="primary" onPress={handleSalvarDados} />
           <br />
 
         </CustomContainer>
